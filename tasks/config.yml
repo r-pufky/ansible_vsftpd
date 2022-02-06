@@ -1,0 +1,119 @@
+---
+###############################################################################
+# vsftpd Configuration
+###############################################################################
+# vsftpd configuration requires YES/NO strings. Convert boolean values to these
+# strings.
+#
+# If service fails to start with 'status=2/INVALIDARGUMENT' in syslog, manually
+# execute the configuration file to determine the exact cause:
+#
+#   vsftpd /etc/vsftpd.conf
+#
+# Reference:
+# * https://security.appspot.com/vsftpd/vsftpd_conf.html
+# * https://unix.stackexchange.com/questions/181436/vsftpd-wont-start-systemd1-vsftpd-service-main-process-exited-code-exite
+
+- name: 'config | set vsftpd configuration'
+  ansible.builtin.template:
+    src:   'vsftpd.conf.j2'
+    dest:  '/etc/vsftpd.conf'
+    owner: 'root'
+    group: 'root'
+    mode:  0644
+  notify: 'restart vsftpd'
+
+- name: 'config | set local root directory permissions'
+  ansible.builtin.file:
+    path:    '{{ vsftpd_local_root }}'
+    owner:   '{{ vsftpd_local_root_perms.user }}'
+    group:   '{{ vsftpd_local_root_perms.group }}'
+    mode:    '{{ vsftpd_local_root_perms.mode }}'
+    recurse: true
+    state:   directory
+  when: vsftpd_local_root|length > 0 and vsftpd_local_root_perms|length > 0
+
+- name: 'config | set banned emails'
+  block:
+    - name: 'config | set banned emails directory'
+      ansible.builtin.file:
+        path:    '{{ vsftpd_banned_email_file|dirname }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0755
+        recurse: true
+        state:   directory
+
+    - name: 'config | set banned emails'
+      ansible.builtin.copy:
+        dest:    '{{ vsftpd_banned_email_file }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0644
+        content: '{{ vsftpd_banned_email_contents }}'
+      notify: 'restart vsftpd'
+  when: vsftpd_deny_email_enable
+
+- name: 'config | set chroot list'
+  block:
+    - name: 'config | set chroot list directory'
+      ansible.builtin.file:
+        path:    '{{ vsftpd_chroot_list_file|dirname }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0755
+        recurse: true
+        state:   directory
+
+    - name: 'config | set chroot list'
+      ansible.builtin.copy:
+        dest:    '{{ vsftpd_chroot_list_file }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0644
+        content: '{{ vsftpd_chroot_list_contents }}'
+      notify: 'restart vsftpd'
+  when: vsftpd_chroot_list_enable
+
+- name: 'config | set email password file'
+  block:
+    - name: 'config | set email password directory'
+      ansible.builtin.file:
+        path:    '{{ vsftp_email_password_file|dirname }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0755
+        recurse: true
+        state:   directory
+
+    - name: 'config | set email password file'
+      ansible.builtin.copy:
+        dest:    '{{ vsftp_email_password_file }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0640
+        content: '{{ vsftpd_secure_email_list_contents }}'
+      notify: 'restart vsftpd'
+      no_log: true # passwords
+  when: vsftpd_secure_email_list_enable
+
+- name: 'config | set userlist'
+  block:
+    - name: 'config | set userlist directory'
+      ansible.builtin.file:
+        path:    '{{ vsftpd_userlist_file|dirname }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0755
+        recurse: true
+        state:   directory
+
+    - name: 'config | set userlist'
+      ansible.builtin.copy:
+        dest:    '{{ vsftpd_userlist_file }}'
+        owner:   'root'
+        group:   'root'
+        mode:    0644
+        content: '{{ vsftpd_userlist_contents }}'
+      notify: 'restart vsftpd'
+  when: vsftpd_userlist_enable or vsftpd_userlist_deny
