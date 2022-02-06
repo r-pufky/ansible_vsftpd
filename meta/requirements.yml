@@ -1,0 +1,9 @@
+---
+# Ansible galaxy packages
+
+collections:
+  # https://docs.ansible.com/ansible/latest/collections/community/general/
+  # htpasswd
+  - community.general
+
+roles: []

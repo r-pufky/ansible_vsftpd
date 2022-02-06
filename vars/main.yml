@@ -1,0 +1,60 @@
+---
+###############################################################################
+# Default vsftpd Package Dependencies
+###############################################################################
+# Default required packages for vsftpd install.
+
+vsftpd_default_packages:
+  - 'vsftpd'
+
+vsftpd_default_virtual_user_packages:
+  - 'python3-passlib'
+  - 'libpam-pwdfile'
+
+###############################################################################
+# Default vsftpd Virtual Users File
+###############################################################################
+# Manage virtual users on vsftpd.
+
+# Virtual users htpasswd file location.
+vsftpd_default_virtual_users_file: '/etc/vsftpd/virtual_users'
+
+# Virtual users PAM authentication module location.
+vsftpd_default_virtual_users_pam_file: '/etc/pam.d/vsftpd_virtual'
+
+###############################################################################
+# Default vsftpd FTP User Group
+###############################################################################
+# Default group settings if an vsftpd user is force created.
+
+vsftpd_default_group:
+  name: 'ftp'
+  gid:  666
+
+###############################################################################
+# Default vsftpd FTP User Account
+###############################################################################
+# Default user settings if an vsftpd user is force created.
+#
+# Logins are disabled.
+
+vsftpd_default_user:
+  name:            'ftp'
+  group:           'ftp'
+  uid:             666
+  shell:           '/usr/sbin/nologin'
+  home:            '/srv/ftp'
+  comment:         'ftp daemon,,,'
+  create_home:     true
+  password:        '!'
+  password_lock:   true
+  update_password: 'always'
+  expires:         -1
+  system:          true
+
+###############################################################################
+# vsftpd Configuration Version
+###############################################################################
+# Base version used for initial role creation.
+
+vsftpd_base_version: '3.0.3-12'

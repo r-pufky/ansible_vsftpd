@@ -1,0 +1,34 @@
+---
+###############################################################################
+# vsftpd Packages
+###############################################################################
+# vsftpd is a GPL licensed FTP server for UNIX systems, including Linux. It is
+# secure and extremely fast. It is stable. If your main requirement from an FTP
+# server is one of the following things then yes, vsftpd is probably the FTP
+#  server you are looking for: Security, Performance, Stability. The only
+# reason you might prefer a different FTP server to vsftpd is if you really
+# need the configurability of one of the more bloated FTP servers. vsftpd
+# caters for the vast majority of use cases. Even if vsftpd appears to be
+# missing a feature, it is often satisfied by an external component such as PAM
+# or xinetd / tcp_wrappers.
+#
+# Reference:
+# * https://security.appspot.com/vsftpd.html
+
+- name: 'packages | add packages (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      Packages are being installed. This will take a few minutes.
+
+- name: 'packages | install core dependencies'
+  ansible.builtin.apt:
+    name:  '{{ vsftpd_default_packages }}'
+    state: 'latest'
+    update_cache: true
+
+- name: 'packages | install virtual user support'
+  ansible.builtin.apt:
+    name: '{{ vsftpd_default_virtual_user_packages }}'
+    state: 'latest'
+    update_cache: true
+  when: vsftpd_virtual_users|length > 0
