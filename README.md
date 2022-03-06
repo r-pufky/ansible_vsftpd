@@ -7,7 +7,7 @@ No additional requirements.
 ## Role Variables
 Settings have been throughly documented for usage.
 
-[defaults/main.yml](https://github.com/r-pufky/ansible_vsftpd/blob/main/defaults/main.yml).
+[defaults/main/main.yml](https://github.com/r-pufky/ansible_vsftpd/blob/main/defaults/main/main.yml).
 
 ## Dependencies
 N/A
