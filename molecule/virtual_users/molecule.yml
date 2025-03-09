@@ -1,0 +1,64 @@
+---
+# Confirm:
+# * virtual users are created and can successfully login to ftp server.
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        vsftpd_user_home_mode: '0550'
+        vsftpd_service_virtual_users:
+          - user: 'test'
+            pass: 'test'
+          - user: 'test2'
+            pass: 'test2'
+        vsftpd_config_listen_ipv6: true
+        vsftpd_config_listen_port: 21
+        vsftpd_config_connect_from_port_20: true
+        vsftpd_config_dirmessage_enable: true
+        vsftpd_config_xferlog_enable: true
+        vsftpd_config_anonymous_enable: false
+        vsftpd_config_local_enable: true
+        vsftpd_config_write_enable: true
+        vsftpd_config_chroot_local_user: true
+        vsftpd_config_guest_enable: true
+        vsftpd_config_guest_username: 'ftp'
+        vsftpd_config_virtual_use_local_privs: true
+platforms:
+  - name: 'vsftpd-debian-12-virtual_users'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    # - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # service drop-ins always enforce.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

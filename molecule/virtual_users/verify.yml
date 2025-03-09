@@ -1,0 +1,71 @@
+---
+# yamllint disable rule:line-length
+- name: 'Default | verify'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Default | verify | gather service status'
+      ansible.builtin.service_facts:
+
+    - name: 'Default | verify | assert vsftpd.service active'
+      ansible.builtin.assert:
+        that:
+          - '"vsftpd.service" in ansible_facts.services'
+          - 'ansible_facts["services"]["vsftpd.service"]["state"] == "running"'
+        fail_msg: 'vsftpd.service should be enabled and running.'
+
+    - name: "Virtual users | verify | query guest_enable"
+      ansible.builtin.lineinfile:
+        name: '/etc/vsftpd.conf'
+        line: 'guest_enable=YES'
+        state: 'present'
+      check_mode: true
+      register: _test_vsftpd_guest
+
+    - name: 'Default | verify | assert guest_enable'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_guest.changed
+        fail_msg: 'guest_enable should be YES ({ _test_vsftpd_guest.diff }}).'
+
+    - name: "Virtual users | verify | query pam_service_name"
+      ansible.builtin.lineinfile:
+        name: '/etc/vsftpd.conf'
+        line: 'pam_service_name=vsftpd_virtual'
+        state: 'present'
+      check_mode: true
+      register: _test_vsftpd_pam
+
+    - name: 'Default | verify | assert pam_service_name'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_pam.changed
+        fail_msg: >
+          _test_vsftpd_pam should be vsftpd_virtual
+          ({ _test_vsftpd_pam.diff }}).
+
+    - name: 'Default | verify | query virtual user test login success'
+      ansible.builtin.command: 'wget --spider --tries=1 --user=test --password=test ftp://127.0.0.1'
+      changed_when: false
+      register: _test_vsftpd_test_login
+
+    - name: 'Default | verify | assert virtual user test login success'
+      ansible.builtin.assert:
+        that:
+          - _test_vsftpd_test_login.rc == 0
+        fail_msg: >
+          test@127.0.0.1 should successfully login.
+          ({{ _test_vsftpd_test_login.stderr }}).
+
+    - name: 'Default | verify | query virtual user test2 login success'
+      ansible.builtin.command: 'wget --spider --tries=1 --user=test2 --password=test2 ftp://127.0.0.1'
+      changed_when: false
+      register: _test_vsftpd_test_login
+
+    - name: 'Default | verify | assert virtual user test2 login success'
+      ansible.builtin.assert:
+        that:
+          - _test_vsftpd_test_login.rc == 0
+        fail_msg: >
+          test@127.0.0.1 should successfully login.
+          ({{ _test_vsftpd_test_login.stderr }}).

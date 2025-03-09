@@ -1,0 +1,8 @@
+---
+- name: 'VSFTPd.d | converge'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'VSFTPd.d | converge | apply r_pufky.srv.vsftpd'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.vsftpd'

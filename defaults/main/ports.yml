@@ -1,12 +1,13 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
 # Ports Configuration
 ###############################################################################
-# Ports should be managed externally via an OS role.
+# Manage firewall with r_pufky.srv.ufw.
 #
 # Reference:
-# * https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html
+# * https://github.com/r-pufky/ansible_ufw
 
-ports:
+vsftpd_ports:
   - {proto: 'tcp', from_ip: 'any', to_port: 20, direction: 'in', comment: 'ftp data'}
   - {proto: 'tcp', from_ip: 'any', to_port: 21, direction: 'in', comment: 'ftp control'}

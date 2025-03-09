@@ -1,0 +1,129 @@
+---
+# yamllint disable rule:line-length
+- name: 'VSFTPd.d | verify'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'VSFTPd.d | verify | gather service status'
+      ansible.builtin.service_facts:
+
+    - name: 'VSFTPd.d | verify | query banned_emails'
+      ansible.builtin.copy:
+        src: 'files/banned_emails'
+        dest: '/etc/vsftpd.d/banned_emails'
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      check_mode: true
+      diff: true
+      register: _test_vsftpd_banned_emails
+
+    - name: 'VSFTPd.d | verify | assert banned_emails'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_banned_emails.changed
+        fail_msg: >
+          /etc/vsftpd.d/banned_emails is not in expected format:
+          {{ _test_vsftpd_banned_emails.diff }}.
+
+    - name: 'VSFTPd.d | verify | query banner_file'
+      ansible.builtin.copy:
+        src: 'files/banner_file'
+        dest: '/etc/vsftpd.d/banner_file'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+      check_mode: true
+      diff: true
+      register: _test_vsftpd_banner_file
+
+    - name: 'VSFTPd.d | verify | assert banner_file'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_banner_file.changed
+        fail_msg: >
+          /etc/vsftpd.d/banner_file is not in expected format:
+          {{ _test_vsftpd_banner_file.diff }}.
+
+    - name: 'VSFTPd.d | verify | query chroot_list'
+      ansible.builtin.copy:
+        src: 'files/chroot_list'
+        dest: '/etc/vsftpd.d/chroot_list'
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      check_mode: true
+      diff: true
+      register: _test_vsftpd_chroot_list
+
+    - name: 'VSFTPd.d | verify | assert chroot_list'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_chroot_list.changed
+        fail_msg: >
+          /etc/vsftpd.d/chroot_list is not in expected format:
+          {{ _test_vsftpd_chroot_list.diff }}.
+
+    - name: 'VSFTPd.d | verify | query user_list'
+      ansible.builtin.copy:
+        src: 'files/user_list'
+        dest: '/etc/vsftpd.d/user_list'
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      check_mode: true
+      diff: true
+      register: _test_vsftpd_user_list
+
+    - name: 'VSFTPd.d | verify | assert user_list'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_user_list.changed
+        fail_msg: >
+          /etc/vsftpd.d/user_list is not in expected format:
+          {{ _test_vsftpd_user_list.diff }}.
+
+    - name: 'VSFTPd.d | verify | query email_passwords'
+      ansible.builtin.copy:
+        src: 'files/email_passwords'
+        dest: '/etc/vsftpd.d/email_passwords'
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      check_mode: true
+      diff: true
+      register: _test_vsftpd_email_passwords
+
+    - name: 'VSFTPd.d | verify | assert email_passwords'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_email_passwords.changed
+        fail_msg: >
+          /etc/vsftpd.d/email_passwords is not in expected format:
+          {{ _test_vsftpd_email_passwords.diff }}.
+
+    - name: 'VSFTPd.d | verify | query vsftpd.conf'
+      ansible.builtin.copy:
+        src: 'files/vsftpd.conf'
+        dest: '/etc/vsftpd.conf'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+      check_mode: true
+      diff: true
+      register: _test_vsftpd_config
+
+    - name: 'VSFTPd.d | verify | assert vsftpd.conf'
+      ansible.builtin.assert:
+        that:
+          - not _test_vsftpd_config.changed
+        fail_msg: >
+          /etc/vsftpd.conf is not in expected format:
+          {{ _test_vsftpd_config.diff }}.
+
+    - name: 'VSFTPd.d | verify | assert vsftpd.service active'
+      ansible.builtin.assert:
+        that:
+          - '"vsftpd.service" in ansible_facts.services'
+          - 'ansible_facts["services"]["vsftpd.service"]["state"] == "running"'
+        fail_msg: 'vsftpd.service should be enabled and running.'
