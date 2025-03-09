@@ -1,5 +1,9 @@
 ---
-- ansible.builtin.include_tasks: manage_users.yml
-- ansible.builtin.include_tasks: packages.yml
-- ansible.builtin.include_tasks: config.yml
-- ansible.builtin.include_tasks: virtual_users.yml
+- name: 'Prep'
+  ansible.builtin.include_tasks: 'prep.yml'
+- name: 'Install'
+  ansible.builtin.include_tasks: 'install.yml'
+- name: 'Config'
+  ansible.builtin.include_tasks: 'config.yml'
+- name: 'Virtual users'
+  ansible.builtin.include_tasks: 'virtual_users.yml'

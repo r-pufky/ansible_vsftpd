@@ -1,10 +1,10 @@
 ---
 ###############################################################################
-# vsftpd Handlers
+# VSFTPd Handlers
 ###############################################################################
 
-- name: 'restart vsftpd'
+- name: 'Handlers | restart VSFTPd'
   ansible.builtin.systemd:
-    name:    'vsftpd'
-    state:   'restarted'
+    name: 'vsftpd'
+    state: 'restarted'
     enabled: true

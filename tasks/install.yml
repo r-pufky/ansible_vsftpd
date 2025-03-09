@@ -1,0 +1,22 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# VSFTPd Install
+###############################################################################
+
+- name: 'Install | packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.apt'
+  vars:
+    apt_packages:
+      - '{{ vsftpd_role_packages }}'
+      - '{{ vsftpd_role_virtual_user_packages if vsftpd_service_virtual_users | length > 0 else [] }}'
+    apt_package_update_cache: true
+
+- name: 'Prep | create service config directory'
+  ansible.builtin.file:
+    path: '{{ vsftpd_role_service_dir }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'

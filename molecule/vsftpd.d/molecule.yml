@@ -1,0 +1,76 @@
+---
+# yamllint disable rule:line-length
+#
+# ca cert from install /etc/ssl/certs/ca-certificates.crt
+#
+# openssl dsaparam -out dsa.params 2048
+# openssl gendsa -out dsa.key dsa.params
+# openssl dsa -in dsa.key -pubout -out dsa.cert
+#
+# snakeoil pulled from install.
+#
+# Confirm:
+# * vsftpd.d/ options are deployed correctly.
+# * standard service override works correctly (service running).
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        vsftpd_config_banner: 'test banner'
+        vsftpd_config_banned_emails:
+          - 'test@example.com'
+          - 'test2@example.com'
+        vsftpd_config_chroot_list:
+          - 'chroot_user'
+          - 'chroot_user2'
+        vsftpd_config_userlist:
+          - 'user1'
+          - 'user2'
+        vsftpd_config_email_passwords:
+          - 'test_password'
+          - 'test_password2'
+        vsftpd_config_ca_certs_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/ca.cert'
+        vsftpd_config_dsa_cert_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/dsa.cert'
+        vsftpd_config_dsa_private_key_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/dsa.key'
+        vsftpd_config_rsa_cert_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/ssl-cert-snakeoil.pem'
+        vsftpd_config_rsa_private_key_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/ssl-cert-snakeoil.key'
+        vsftpd_config_user_config_dir: '{{ lookup("env", "MOLECULE_SCENARIO_DIRECTORY") }}/files/user_config'
+platforms:
+  - name: 'vsftpd-debian-12-vsftpd.d'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    # - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # service drop-ins always enforce.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

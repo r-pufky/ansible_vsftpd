@@ -1,55 +1,54 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
-# Manager vsftpd Virtual Users
+# Manager VSFTPd Virtual Users
 ###############################################################################
 # Create virtual users.
 #
+# Args:
+#   _vsftpd_virtual_users_file: str - absolute path to virtual_users.
 #
-#vsftpd_virtual_users
 # Reference:
+# * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
 # * https://www.howtoforge.com/how-to-install-vsftpd-ftp-server-on-debian-11/
 # * https://askubuntu.com/questions/575523/how-to-setup-virtual-users-for-vsftpd-with-access-to-a-specific-sub-directory
 # * https://linuxconfig.org/how-to-setup-vsftpd-on-debian
 
-- name: 'virtual | enabling virtual users'
+- name: 'Virtual users | enable'
+  when: vsftpd_service_virtual_users | length > 0
   block:
-    - name: 'virtual | clear virtual users'
+    - name: 'Virtual users | enable | clear virtual users'
       ansible.builtin.file:
-        path:  '{{ vsftpd_default_virtual_users_file }}'
+        path: '{{ _vsftpd_virtual_users_file }}'
         state: 'absent'
-      failed_when: false
-      changed_when: false
 
-    - name: 'virtual | add virtual users'
+    - name: 'Virtual users | enable | add virtual users'
       community.general.htpasswd:
-        path:     '{{ vsftpd_default_virtual_users_file }}'
-        name:     '{{ item.user }}'
+        path: '{{ _vsftpd_virtual_users_file }}'
+        name: '{{ item.user }}'
         password: '{{ item.pass }}'
         crypt_scheme: 'md5_crypt'
         owner: 'root'
         group: 'root'
-        mode:  0640
+        mode: '0640'
         state: 'present'
-      loop: '{{ vsftpd_virtual_users }}'
-      no_log: true # passwords
+      loop: '{{ vsftpd_service_virtual_users }}'
+      loop_control:
+        label: '{{ item.user }}'
 
-    - name: 'virtual | add vsftpd virtual pam module'
+    - name: 'Virtual users | enable | add PAM vsftpd_virtual module'
       ansible.builtin.template:
-        src:   'vsftpd_virtual.j2'
-        dest:  '{{ vsftpd_default_virtual_users_pam_file }}'
+        src: 'vsftpd_virtual.j2'
+        dest: '{{ vsftpd_role_pam_virtual_users_module }}'
         owner: 'root'
         group: 'root'
-        mode:  0640
-  when: vsftpd_virtual_users|length > 0
+        mode: '0644'
 
-- name: 'virtual | disabling virtual users'
-  block:
-    - name: 'virtual | clear virtual users'
-      ansible.builtin.file:
-        path:  '{{ item }}'
-        state: 'absent'
-      failed_when: false
-      loop:
-        - '{{ vsftpd_default_virtual_users_file }}'
-        - '{{ vsftpd_default_virtual_users_pam_file }}'
-  when: vsftpd_virtual_users|length == 0
+- name: 'Virtual users | disable'
+  when: vsftpd_service_virtual_users | length == 0
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: 'absent'
+  loop:
+    - '{{ _vsftpd_virtual_users_file }}'
+    - '{{ vsftpd_role_pam_virtual_users_module }}'

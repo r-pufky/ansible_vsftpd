@@ -1,9 +1,10 @@
 ---
-# Ansible galaxy packages
+# yamllint disable rule:line-length
 
 collections:
-  # https://docs.ansible.com/ansible/latest/collections/community/general/
-  # htpasswd
-  - community.general
+  - name: 'community.general.htpasswd'  # https://docs.ansible.com/ansible/latest/collections/community/general/
 
-roles: []
+roles:
+  - name: 'r_pufky.srv.apt'  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.systemd'  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.users'  # https://github.com/r-pufky/ansible_collection_srv

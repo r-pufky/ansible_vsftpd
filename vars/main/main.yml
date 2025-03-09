@@ -1,0 +1,45 @@
+---
+###############################################################################
+# Default VSFTPd Role Options
+###############################################################################
+
+# Last time VSFTPd options were validated against a default configuration.
+vsftpd_role_validate_date: '2025-03-03'
+vsftpd_role_validate_release: 'bookworm'
+vsftpd_role_validate_version: '3.0.3-13'
+
+vsftpd_role_service_dir: '/etc/vsftpd.d'
+vsftpd_role_pam_virtual_users_module: '/etc/pam.d/vsftpd_virtual'
+
+###############################################################################
+# APT Packages
+###############################################################################
+
+vsftpd_role_packages:
+  - 'vsftpd'
+
+vsftpd_role_virtual_user_packages:
+  - 'python3-passlib'  # md5_crypt for community.general.htpasswd.
+  - 'libpam-pwdfile'  # pam_pwdfile.so for virtual_users.
+
+###############################################################################
+# Default Radarr User/Group
+###############################################################################
+
+vsftpd_role_group:
+  name: 'ftp'
+  gid: 666
+
+vsftpd_role_user:
+  name: 'ftp'
+  group: 'ftp'
+  uid: 666
+  shell: '/usr/sbin/nologin'
+  home: '/srv/ftp'
+  comment: 'ftp daemon,,,'
+  create_home: true
+  password: '!'
+  password_lock: true
+  update_password: 'always'
+  expires: -1
+  system: true
