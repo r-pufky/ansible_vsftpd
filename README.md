@@ -99,13 +99,23 @@ See `vsftpd_service_local_root_mode`, `vsftpd_service_anon_root_mode`, and
 Reference:
 * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
 
+## Development
+Configure [environment](https://github.com/r-pufky/ansible_collection_srv/blob/main/docs/dev/environment/README.md)
+
+Run all unit tests:
+``` bash
+molecule test --all
+```
+
 ## Issues
 Create a bug and provide as much information as possible.
 
 Associate pull requests with a submitted bug.
 
 ## License
-[AGPL-3.0 License](https://github.com/r-pufky/ansible_vsftpd/blob/main/LICENSE)
+[AGPL-3.0 License](https://www.tldrlegal.com/license/gnu-affero-general-public-license-v3-agpl-3-0)
+ [(direct link)](https://github.com/r-pufky/ansible_vsftpd/blob/main/LICENSE)
 
 ## Author Information
-https://keybase.io/rpufky
+PGP Fingerprint: [466EEC2B67516C7117C85CE3A0BC35D16698BAB9](https://keys.openpgp.org/vks/v1/by-fingerprint/466EEC2B67516C7117C85CE3A0BC35D16698BAB9)
+| [github gist](https://gist.github.com/r-pufky/a8df36977c55b5bb20829267c4c49d22)
