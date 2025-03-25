@@ -295,7 +295,7 @@
   notify: 'Handlers | restart VSFTPd'
   when: vsftpd_config_user_config_dir | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_user_config_dir if vsftpd_config_user_config_dir.endswith("/") else vsftpd_config_user_config_dir + "/" }}'
+    src: '{{ vsftpd_config_user_config_dir if vsftpd_config_user_config_dir.endswith("/") else vsftpd_config_user_config_dir ~ "/" }}'
     dest: '{{ _vsftpd_user_config }}'
     owner: 'root'
     group: 'root'
