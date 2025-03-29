@@ -94,7 +94,11 @@ in:
 
 Check your configuration and set the backing user home directory read-only.
 See `vsftpd_service_local_root_mode`, `vsftpd_service_anon_root_mode`, and
-`vsftpd_user_home_mode`. Typically `0550` permissions resolve.
+`vsftpd_user_home_mode`. Ensure `vsftpd_service_local_root_recursive_enable`,
+`vsftpd_service_anon_root_recursive_enable` are not plowing directory
+permissions.
+
+Typically `0550` permissions resolve.
 
 Reference:
 * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/

@@ -188,7 +188,7 @@
     owner: '{{ vsftpd_service_local_root_user | default("ftp") }}'
     group: '{{ vsftpd_service_local_root_group | default("ftp") }}'
     mode: '{{ vsftpd_service_local_root_mode | default("0770") }}'
-    recurse: true
+    recurse: '{{ vsftpd_service_local_root_recursive_enable | default(true) }}'
     state: 'directory'
 
 - name: 'Config | set anonymous user login root directory'
@@ -198,7 +198,7 @@
     owner: '{{ vsftpd_service_anon_root_user | default("ftp") }}'
     group: '{{ vsftpd_service_anon_root_group | default("ftp") }}'
     mode: '{{ vsftpd_service_anon_root_mode | default("0770") }}'
-    recurse: true
+    recurse: '{{ vsftpd_service_anon_recursive_enable | default(true) }}'
     state: 'directory'
 
 - name: 'Config | set ca.cert'
