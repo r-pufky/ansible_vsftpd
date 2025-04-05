@@ -33,7 +33,7 @@
           - 'ansible_facts["services"]["vsftpd.service"]["state"] == "running"'
         fail_msg: 'vsftpd.service should be enabled and running.'
 
-    - name: 'Default | verify | query local user login success'
+    - name: 'Default | verify | query local user login success'  # noqa command-instead-of-module test login
       ansible.builtin.command: 'wget --spider --tries=1 --user=test --password=test ftp://127.0.0.1'
       changed_when: false
       register: _test_vsftpd_test_login
