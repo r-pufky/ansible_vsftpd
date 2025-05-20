@@ -1,6 +1,12 @@
 ---
-# Confirm:
+###############################################################################
+# Virtual Users
+###############################################################################
+# Virtual users can be created and login to FTP server.
+#
+# Tests:
 # * virtual users are created and can successfully login to ftp server.
+
 dependency:
   name: 'galaxy'
 driver:

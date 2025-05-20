@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 - name: 'Default | verify'
   hosts: 'all'
   gather_facts: false
@@ -7,41 +6,44 @@
     - name: 'Default | verify | gather service status'
       ansible.builtin.service_facts:
 
-    - name: 'Default | verify | query vsftpd.conf'
-      ansible.builtin.copy:
-        src: 'files/vsftpd.conf'
-        dest: '/etc/vsftpd.conf'
-        owner: 'root'
-        group: 'root'
-        mode: '0644'
-      check_mode: true
-      diff: true
-      register: _test_vsftpd_config
-
-    - name: 'Default | verify | assert vsftpd.conf'
-      ansible.builtin.assert:
-        that:
-          - not _test_vsftpd_config.changed
-        fail_msg: >
-          /etc/vsftpd.conf is not in expected format:
-          {{ _test_vsftpd_config.diff }}.
 
     - name: 'Default | verify | assert vsftpd.service active'
       ansible.builtin.assert:
+        quiet: true
         that:
           - '"vsftpd.service" in ansible_facts.services'
           - 'ansible_facts["services"]["vsftpd.service"]["state"] == "running"'
-        fail_msg: 'vsftpd.service should be enabled and running.'
+        fail_msg: '✘ vsftpd.service should be enabled and running.'
 
-    - name: 'Default | verify | query local user login success'  # noqa command-instead-of-module test login
-      ansible.builtin.command: 'wget --spider --tries=1 --user=test --password=test ftp://127.0.0.1'
+    - name: 'Default | verify | /etc/vsftpd.conf'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'copy.yml'
+      vars:
+        test_name: 'Default | verify | /etc/vsftpd.conf'
+        test_src: 'files/vsftpd.conf'
+        test_file: '/etc/vsftpd.conf'
+        test_owner: 'root'
+        test_group: 'root'
+        test_mode: '0644'
+
+    - name: 'Default | verify | query local user login success'
+      ansible.builtin.command:
+        argv:
+          - 'wget'
+          - '--spider'
+          - '--tries=1'
+          - '--user=test'
+          - '--password=test'
+          - 'ftp://127.0.0.1'
       changed_when: false
       register: _test_vsftpd_test_login
 
     - name: 'Default | verify | assert local user login success'
       ansible.builtin.assert:
+        quiet: true
         that:
           - _test_vsftpd_test_login.rc == 0
         fail_msg: >
-          test@127.0.0.1 should successfully login.
+          '✘ test@127.0.0.1 should successfully login.
           ({{ _test_vsftpd_test_login.stderr }}).

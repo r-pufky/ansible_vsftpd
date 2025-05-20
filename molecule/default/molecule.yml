@@ -1,10 +1,15 @@
 ---
-# yamllint disable rule:line-length
-# Confirm:
+###############################################################################
+# Default
+###############################################################################
+# Default values results in running service.
+#
+# Tests:
 # * Test local user setup and login success.
 # * standard service override works correctly (service running).
 # * hardened service override works correctly (service running).
 # * all remaining default options works correctly.
+
 dependency:
   name: 'galaxy'
 driver:

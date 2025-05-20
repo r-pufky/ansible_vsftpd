@@ -27,7 +27,7 @@
 - name: 'Prep | manage users'
   when: vsftpd_create_user
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.users'
+    name: 'r_pufky.deb.users'
     tasks_from: 'role_account_add.yml'
   vars:
     users_role_group: '{{ vsftpd_role_group }}'
@@ -41,12 +41,16 @@
   register: _vsftpd_user
 
 - name: 'Prep | set user home directory'
-  ansible.builtin.file:
-    path: '{{ _vsftpd_user.home }}'
-    owner: '{{ _vsftpd_user.name }}'
-    group: '{{ _vsftpd_user.group }}'
-    mode: '{{ vsftpd_user_home_mode }}'
-    state: 'directory'
+  ansible.builtin.include_role:
+    name: 'r_pufky.lib.utils'
+    tasks_from: 'remote_file.yml'
+  vars:
+    file_path: '{{ _vsftpd_user.home }}'
+    file_owner: '{{ _vsftpd_user.name }}'
+    file_group: '{{ _vsftpd_user.group }}'
+    file_mode: '{{ vsftpd_user_home_mode }}'
+    file_recurse: false
+    file_state: 'directory'
 
 - name: 'Prep | parse locations'
   ansible.builtin.set_fact:
@@ -54,7 +58,8 @@
     _vsftpd_banned_emails_file: '{{ vsftpd_role_service_dir }}/banned_emails'
     _vsftpd_chroot_list_file: '{{ vsftpd_role_service_dir }}/chroot_list'
     _vsftpd_userlist_file: '{{ vsftpd_role_service_dir }}/user_list'
-    _vsftpd_email_password_file: '{{ vsftpd_role_service_dir }}/email_passwords'
+    _vsftpd_email_password_file:
+      '{{ vsftpd_role_service_dir }}/email_passwords'
     _vsftpd_virtual_users_file: '{{ vsftpd_role_service_dir }}/virtual_users'
     _vsftpd_ca_certs_file: '{{ vsftpd_role_service_dir }}/ca.cert'
     _vsftpd_dsa_cert_file: '{{ vsftpd_role_service_dir }}/dsa.cert'
@@ -69,133 +74,417 @@
   ansible.builtin.set_fact:
     _vsftpd_config:
       accept_timeout: '{{ vsftpd_config_accept_timeout | default(60) }}'
-      allow_anon_ssl: '{{ "YES" if vsftpd_config_allow_anon_ssl | default(false) else "NO" }}'
+      allow_anon_ssl: '{{
+          "YES"
+          if vsftpd_config_allow_anon_ssl | default(false) else
+          "NO"
+        }}'
       anon_max_rate: '{{ vsftpd_config_anon_max_rate | default(0) }}'
-      anon_mkdir_write_enable: '{{ "YES" if vsftpd_config_anon_mkdir_write_enable | default(false) else "NO" }}'
-      anon_other_write_enable: '{{ "YES" if vsftpd_config_anon_other_write_enable | default(false) else "NO" }}'
+      anon_mkdir_write_enable: '{{
+          "YES"
+          if vsftpd_config_anon_mkdir_write_enable | default(false) else
+          "NO"
+        }}'
+      anon_other_write_enable: '{{
+          "YES"
+          if vsftpd_config_anon_other_write_enable | default(false) else
+          "NO"
+        }}'
       anon_root: '{{ vsftpd_config_anon_root | default("") }}'
       anon_umask: '{{ vsftpd_config_anon_umask | default("077") }}'
-      anon_upload_enable: '{{ "YES" if vsftpd_config_anon_upload_enable | default(false) else "NO" }}'
-      anon_world_readable_only: '{{ "YES" if vsftpd_config_anon_world_readable_only | default(false) else "NO" }}'
-      anonymous_enable: '{{ "YES" if vsftpd_config_anonymous_enable | default(true) else "NO" }}'
-      ascii_download_enable: '{{ "YES" if vsftpd_config_ascii_download_enable | default(false) else "NO" }}'
-      ascii_upload_enable: '{{ "YES" if vsftpd_config_ascii_upload_enable | default(false) else "NO" }}'
-      async_abor_enable: '{{ "YES" if vsftpd_config_async_abor_enable | default(false) else "NO" }}'
-      background: '{{ "YES" if vsftpd_config_background | default(true) else "NO" }}'
+      anon_upload_enable: '{{
+          "YES"
+          if vsftpd_config_anon_upload_enable | default(false) else
+          "NO"
+        }}'
+      anon_world_readable_only: '{{
+          "YES"
+          if vsftpd_config_anon_world_readable_only | default(false) else
+          "NO"
+        }}'
+      anonymous_enable: '{{
+          "YES"
+          if vsftpd_config_anonymous_enable | default(true) else
+          "NO"
+        }}'
+      ascii_download_enable: '{{
+          "YES"
+          if vsftpd_config_ascii_download_enable | default(false) else
+          "NO"
+        }}'
+      ascii_upload_enable: '{{
+          "YES"
+          if vsftpd_config_ascii_upload_enable | default(false) else
+          "NO"
+        }}'
+      async_abor_enable: '{{
+          "YES"
+          if vsftpd_config_async_abor_enable | default(false) else
+          "NO"
+        }}'
+      background:
+        '{{ "YES" if vsftpd_config_background | default(true) else "NO" }}'
       banned_email_file: '{{ _vsftpd_banned_emails_file if vsftpd_config_banned_emails | length > 0 else "" }}'
-      banner_file: '{{ _vsftpd_banner_file if vsftpd_config_banner | length > 0 else "" }}'
-      ca_certs_file: '{{ _vsftpd_ca_certs_file if vsftpd_config_ca_certs_file | length > 0 else "" }}'
-      check_shell: '{{ "YES" if vsftpd_config_check_shell | default(true) else "NO" }}'
-      chmod_enable: '{{ "YES" if vsftpd_config_chmod_enable | default(true) else "NO" }}'
-      chown_upload_mode: '{{ vsftpd_config_chown_upload_mode | default("0600") }}'
-      chown_uploads: '{{ "YES" if vsftpd_config_chown_uploads | default(false) else "NO" }}'
+      banner_file: '{{
+          _vsftpd_banner_file
+          if vsftpd_config_banner | length > 0 else
+          ""
+        }}'
+      ca_certs_file: '{{
+          _vsftpd_ca_certs_file
+          if vsftpd_config_ca_certs_file | length > 0 else
+          ""
+        }}'
+      check_shell:
+        '{{ "YES" if vsftpd_config_check_shell | default(true) else "NO" }}'
+      chmod_enable:
+        '{{ "YES" if vsftpd_config_chmod_enable | default(true) else "NO" }}'
+      chown_upload_mode:
+        '{{ vsftpd_config_chown_upload_mode | default("0600") }}'
+      chown_uploads:
+        '{{ "YES" if vsftpd_config_chown_uploads | default(false) else "NO" }}'
       chown_username: '{{ vsftpd_config_chown_username | default("root") }}'
-      chroot_list_enable: '{{ "YES" if vsftpd_config_chroot_list_enable | default(false) else "NO" }}'
-      chroot_list_file: '{{ _vsftpd_chroot_list_file if vsftpd_config_chroot_list | length > 0 else "" }}'
-      chroot_local_user: '{{ "YES" if vsftpd_config_chroot_local_user | default(false) else "NO" }}'
-      cmds_allowed: '{{ vsftpd_config_cmds_allowed | default([]) | join(",") }}'
+      chroot_list_enable: '{{
+          "YES"
+          if vsftpd_config_chroot_list_enable | default(false) else
+          "NO"
+        }}'
+      chroot_list_file: '{{
+          _vsftpd_chroot_list_file
+          if vsftpd_config_chroot_list | length > 0 else
+          ""
+        }}'
+      chroot_local_user: '{{
+          "YES"
+          if vsftpd_config_chroot_local_user | default(false) else
+          "NO"
+        }}'
+      cmds_allowed:
+        '{{ vsftpd_config_cmds_allowed | default([]) | join(",") }}'
       cmds_denied: '{{ vsftpd_config_cmds_denied | default([]) | join(",") }}'
-      connect_from_port_20: '{{ "YES" if vsftpd_config_connect_from_port_20 | default(false) else "NO" }}'
+      connect_from_port_20: '{{
+          "YES"
+          if vsftpd_config_connect_from_port_20 | default(false) else
+          "NO"
+        }}'
       connect_timeout: '{{ vsftpd_config_connect_timeout | default(60) }}'
-      data_connection_timeout: '{{ vsftpd_config_data_connection_timeout | default(300) }}'
-      debug_ssl: '{{ "YES" if vsftpd_config_debug_ssl | default(false) else "NO" }}'
+      data_connection_timeout:
+        '{{ vsftpd_config_data_connection_timeout | default(300) }}'
+      debug_ssl:
+        '{{ "YES" if vsftpd_config_debug_ssl | default(false) else "NO" }}'
       delay_failed_login: '{{ vsftpd_config_delay_failed_login | default(1) }}'
-      delay_successful_login: '{{ vsftpd_config_delay_successful_login | default(0) }}'
-      delete_failed_uploads: '{{ "YES" if vsftpd_config_delete_failed_uploads | default(false) else "NO" }}'
-      deny_email_enable: '{{ "YES" if vsftpd_config_deny_email_enable | default(false) else "NO" }}'
-      deny_file: '{{ "{" + vsftpd_config_deny_file | join(",") + "}" if vsftpd_config_deny_file | length > 0 else "" }}'
-      dirlist_enable: '{{ "YES" if vsftpd_config_dirlist_enable | default(true) else "NO" }}'
-      dirmessage_enable: '{{ "YES" if vsftpd_config_dirmessage_enable | default(true) else "NO" }}'
-      download_enable: '{{ "YES" if vsftpd_config_download_enable | default(true) else "NO" }}'
-      download_file: '{{ "{" + vsftpd_config_download_file | join(",") + "}" if vsftpd_config_download_file | length > 0 else "" }}'
-      dsa_cert_file: '{{ _vsftpd_dsa_cert_file if vsftpd_config_dsa_cert_file | length > 0 else "" }}'
-      dsa_private_key_file: '{{ _vsftpd_dsa_private_key_file if vsftpd_config_dsa_private_key_file | length > 0 else "" }}'
-      dual_log_enable: '{{ "YES" if vsftpd_config_dual_log_enable | default(false) else "NO" }}'
-      email_password_file: '{{ _vsftpd_email_password_file if vsftpd_config_email_passwords | length > 0 else "" }}'
+      delay_successful_login:
+        '{{ vsftpd_config_delay_successful_login | default(0) }}'
+      delete_failed_uploads: '{{
+          "YES"
+          if vsftpd_config_delete_failed_uploads | default(false) else
+          "NO"
+        }}'
+      deny_email_enable: '{{
+          "YES"
+          if vsftpd_config_deny_email_enable | default(false) else
+          "NO"
+        }}'
+      deny_file: '{{
+          "{" + vsftpd_config_deny_file | join(",") + "}"
+          if vsftpd_config_deny_file | length > 0 else
+          ""
+        }}'
+      dirlist_enable:
+        '{{ "YES" if vsftpd_config_dirlist_enable | default(true) else "NO" }}'
+      dirmessage_enable: '{{
+          "YES"
+          if vsftpd_config_dirmessage_enable | default(true) else
+          "NO"
+        }}'
+      download_enable: '{{
+          "YES"
+          if vsftpd_config_download_enable | default(true) else
+          "NO"
+        }}'
+      download_file: '{{
+          "{" + vsftpd_config_download_file | join(",") + "}"
+          if vsftpd_config_download_file | length > 0 else
+          ""
+        }}'
+      dsa_cert_file: '{{
+          _vsftpd_dsa_cert_file
+          if vsftpd_config_dsa_cert_file | length > 0 else
+          ""
+        }}'
+      dsa_private_key_file: '{{
+          _vsftpd_dsa_private_key_file
+          if vsftpd_config_dsa_private_key_file | length > 0 else
+          ""
+        }}'
+      dual_log_enable: '{{
+          "YES"
+          if vsftpd_config_dual_log_enable | default(false) else
+          "NO"
+        }}'
+      email_password_file: '{{
+          _vsftpd_email_password_file
+          if vsftpd_config_email_passwords | length > 0 else
+          ""
+        }}'
       file_open_mode: '{{ vsftpd_config_file_open_mode | default("0666") }}'
-      force_anon_data_ssl: '{{ "YES" if vsftpd_config_force_anon_data_ssl | default(false) else "NO" }}'
-      force_anon_logins_ssl: '{{ "YES" if vsftpd_config_force_anon_logins_ssl | default(false) else "NO" }}'
-      force_dot_files: '{{ "YES" if vsftpd_config_force_dot_files | default(false) else "NO" }}'
-      force_local_data_ssl: '{{ "YES" if vsftpd_config_force_local_data_ssl | default(true) else "NO" }}'
-      force_local_logins_ssl: '{{ "YES" if vsftpd_config_force_local_logins_ssl | default(true) else "NO" }}'
+      force_anon_data_ssl: '{{
+          "YES"
+          if vsftpd_config_force_anon_data_ssl | default(false) else
+          "NO"
+        }}'
+      force_anon_logins_ssl: '{{
+          "YES"
+          if vsftpd_config_force_anon_logins_ssl | default(false) else
+          "NO"
+        }}'
+      force_dot_files: '{{
+          "YES"
+          if vsftpd_config_force_dot_files | default(false) else
+          "NO"
+        }}'
+      force_local_data_ssl: '{{
+          "YES"
+          if vsftpd_config_force_local_data_ssl | default(true) else
+          "NO"
+        }}'
+      force_local_logins_ssl: '{{
+          "YES"
+          if vsftpd_config_force_local_logins_ssl | default(true) else
+          "NO"
+        }}'
       ftp_data_port: '{{ vsftpd_config_ftp_data_port | default(20) }}'
       ftp_username: '{{ vsftpd_config_ftp_username | default("ftp") }}'
       ftpd_banner: '{{ vsftpd_config_ftpd_banner | default("") }}'
       # Enable virtual users if set (guest_enable=true).
-      guest_enable: '{{ "YES" if vsftpd_config_guest_enable | default(false) or vsftpd_service_virtual_users | length > 0 else "NO" }}'
+      guest_enable: '{{
+          "YES"
+          if vsftpd_config_guest_enable | default(false) or vsftpd_service_virtual_users | length > 0 else
+          "NO"
+        }}'
       guest_username: '{{ vsftpd_config_guest_username | default("ftp") }}'
-      hide_file: '{{ "{" + vsftpd_config_hide_file | join(",") + "}" if vsftpd_config_hide_file | length > 0 else "" }}'
-      hide_ids: '{{ "YES" if vsftpd_config_hide_ids | default(false) else "NO" }}'
-      idle_session_timeout: '{{ vsftpd_config_idle_session_timeout | default(300) }}'
-      implicit_ssl: '{{ "YES" if vsftpd_config_implicit_ssl | default(false) else "NO" }}'
+      hide_file: '{{
+          "{" + vsftpd_config_hide_file | join(",") + "}"
+          if vsftpd_config_hide_file | length > 0 else
+          ""
+        }}'
+      hide_ids:
+        '{{ "YES" if vsftpd_config_hide_ids | default(false) else "NO" }}'
+      idle_session_timeout:
+        '{{ vsftpd_config_idle_session_timeout | default(300) }}'
+      implicit_ssl:
+        '{{ "YES" if vsftpd_config_implicit_ssl | default(false) else "NO" }}'
       listen: '{{ "YES" if vsftpd_config_listen | default(false) else "NO" }}'
       listen_address6: '{{ vsftpd_config_listen_address6 | default("") }}'
       listen_address: '{{ vsftpd_config_listen_address | default("") }}'
-      listen_ipv6: '{{ "YES" if vsftpd_config_listen_ipv6 | default(true) else "NO" }}'
+      listen_ipv6:
+        '{{ "YES" if vsftpd_config_listen_ipv6 | default(true) else "NO" }}'
       listen_port: '{{ vsftpd_config_listen_port | default(21) }}'
-      local_enable: '{{ "YES" if vsftpd_config_local_enable | default(true) else "NO" }}'
+      local_enable:
+        '{{ "YES" if vsftpd_config_local_enable | default(true) else "NO" }}'
       local_max_rate: '{{ vsftpd_config_local_max_rate | default(0) }}'
       local_root: '{{ vsftpd_config_local_root | default("") }}'
       local_umask: '{{ vsftpd_config_local_umask | default("077") }}'
-      lock_upload_files: '{{ "YES" if vsftpd_config_lock_upload_files | default(true) else "NO" }}'
-      log_ftp_protocol: '{{ "YES" if vsftpd_config_log_ftp_protocol | default(false) else "NO" }}'
-      ls_recurse_enable: '{{ "YES" if vsftpd_config_ls_recurse_enable | default(false) else "NO" }}'
+      lock_upload_files: '{{
+          "YES"
+          if vsftpd_config_lock_upload_files | default(true) else
+          "NO"
+        }}'
+      log_ftp_protocol: '{{
+          "YES"
+          if vsftpd_config_log_ftp_protocol | default(false) else
+          "NO"
+        }}'
+      ls_recurse_enable: '{{
+          "YES"
+          if vsftpd_config_ls_recurse_enable | default(false) else
+          "NO"
+        }}'
       max_clients: '{{ vsftpd_config_max_clients | default(2000) }}'
       max_login_fails: '{{ vsftpd_config_max_login_fails | default(3) }}'
       max_per_ip: '{{ vsftpd_config_max_per_ip | default(50) }}'
-      mdtm_write: '{{ "YES" if vsftpd_config_mdtm_write | default(true) else "NO" }}'
+      mdtm_write:
+        '{{ "YES" if vsftpd_config_mdtm_write | default(true) else "NO" }}'
       message_file: '{{ vsftpd_config_message_file | default(".message") }}'
-      no_anon_password: '{{ "YES" if vsftpd_config_no_anon_password | default(false) else "NO" }}'
-      no_log_lock: '{{ "YES" if vsftpd_config_no_log_lock | default(false) else "NO" }}'
+      no_anon_password: '{{
+          "YES"
+          if vsftpd_config_no_anon_password | default(false) else
+          "NO"
+        }}'
+      no_log_lock:
+        '{{ "YES" if vsftpd_config_no_log_lock | default(false) else "NO" }}'
       nopriv_user: '{{ vsftpd_config_nopriv_user | default("nobody") }}'
-      one_process_model: '{{ "YES" if vsftpd_config_one_process_model | default(false) else "NO" }}'
+      one_process_model: '{{
+          "YES"
+          if vsftpd_config_one_process_model | default(false) else
+          "NO"
+        }}'
       # Enable virtual users if set (vsftpd_virtual module).
-      pam_service_name: '{{ "vsftpd_virtual" if vsftpd_service_virtual_users | length > 0 else vsftpd_config_pam_service_name }}'
-      passwd_chroot_enable: '{{ "YES" if vsftpd_config_passwd_chroot_enable | default(false) else "NO" }}'
-      pasv_addr_resolve: '{{ "YES" if vsftpd_config_pasv_addr_resolve | default(false) else "NO" }}'
+      pam_service_name: '{{
+          "vsftpd_virtual"
+          if vsftpd_service_virtual_users | length > 0 else
+          vsftpd_config_pam_service_name
+        }}'
+      passwd_chroot_enable: '{{
+          "YES"
+          if vsftpd_config_passwd_chroot_enable | default(false) else
+          "NO"
+        }}'
+      pasv_addr_resolve: '{{
+          "YES"
+          if vsftpd_config_pasv_addr_resolve | default(false) else
+          "NO"
+        }}'
       pasv_address: '{{ vsftpd_config_pasv_address | default("") }}'
-      pasv_enable: '{{ "YES" if vsftpd_config_pasv_enable | default(true) else "NO" }}'
+      pasv_enable:
+        '{{ "YES" if vsftpd_config_pasv_enable | default(true) else "NO" }}'
       pasv_max_port: '{{ vsftpd_config_pasv_max_port | default(0) }}'
       pasv_min_port: '{{ vsftpd_config_pasv_min_port | default(0) }}'
-      pasv_promiscuous: '{{ "YES" if vsftpd_config_pasv_promiscuous | default(false) else "NO" }}'
-      port_enable: '{{ "YES" if vsftpd_config_port_enable | default(true) else "NO" }}'
-      port_promiscuous: '{{ "YES" if vsftpd_config_port_promiscuous | default(false) else "NO" }}'
-      require_cert: '{{ "YES" if vsftpd_config_require_cert | default(false) else "NO" }}'
-      require_ssl_reuse: '{{ "YES" if vsftpd_config_require_ssl_reuse | default(true) else "NO" }}'
-      rsa_cert_file: '{{ _vsftpd_rsa_cert_file if vsftpd_config_rsa_cert_file | length > 0 else "/usr/share/ssl/certs/vsftpd.pem" }}'
-      rsa_private_key_file: '{{ _vsftpd_rsa_private_key_file if vsftpd_config_rsa_private_key_file | length > 0 else "/etc/ssl/private/ssl-cert-snakeoil.key" }}'
-      run_as_launching_user: '{{ "YES" if vsftpd_config_run_as_launching_user | default(false) else "NO" }}'
-      secure_chroot_dir: '{{ vsftpd_config_secure_chroot_dir | default("/usr/share/empty") }}'
-      secure_email_list_enable: '{{ "YES" if vsftpd_config_secure_email_list_enable | default(false) else "NO" }}'
-      session_support: '{{ "YES" if vsftpd_config_session_support | default(false) else "NO" }}'
-      setproctitle_enable: '{{ "YES" if vsftpd_config_setproctitle_enable | default(false) else "NO" }}'
+      pasv_promiscuous: '{{
+          "YES"
+          if vsftpd_config_pasv_promiscuous | default(false) else
+          "NO"
+        }}'
+      port_enable:
+        '{{ "YES" if vsftpd_config_port_enable | default(true) else "NO" }}'
+      port_promiscuous: '{{
+          "YES"
+          if vsftpd_config_port_promiscuous | default(false) else
+          "NO"
+        }}'
+      require_cert:
+        '{{ "YES" if vsftpd_config_require_cert | default(false) else "NO" }}'
+      require_ssl_reuse: '{{
+          "YES"
+          if vsftpd_config_require_ssl_reuse | default(true) else
+          "NO"
+        }}'
+      rsa_cert_file: '{{
+          _vsftpd_rsa_cert_file
+          if vsftpd_config_rsa_cert_file | length > 0 else
+          "/usr/share/ssl/certs/vsftpd.pem"
+        }}'
+      rsa_private_key_file: '{{
+          _vsftpd_rsa_private_key_file
+          if vsftpd_config_rsa_private_key_file | length > 0 else
+          "/etc/ssl/private/ssl-cert-snakeoil.key"
+        }}'
+      run_as_launching_user: '{{
+          "YES"
+          if vsftpd_config_run_as_launching_user | default(false) else
+          "NO"
+        }}'
+      secure_chroot_dir: '{{
+          vsftpd_config_secure_chroot_dir | default("/usr/share/empty")
+        }}'
+      secure_email_list_enable: '{{
+          "YES"
+          if vsftpd_config_secure_email_list_enable | default(false) else
+          "NO"
+        }}'
+      session_support: '{{
+          "YES"
+          if vsftpd_config_session_support | default(false) else
+          "NO"
+        }}'
+      setproctitle_enable: '{{
+          "YES"
+          if vsftpd_config_setproctitle_enable | default(false) else
+          "NO"
+        }}'
       ssl_ciphers: '{{ vsftpd_config_ssl_ciphers | default("DES-CBC3-SHA") }}'
-      ssl_enable: '{{ "YES" if vsftpd_config_ssl_enable | default(false) else "NO" }}'
-      ssl_request_cert: '{{ "YES" if vsftpd_config_ssl_request_cert | default(true) else "NO" }}'
-      ssl_sslv2: '{{ "YES" if vsftpd_config_ssl_sslv2 | default(false) else "NO" }}'
-      ssl_sslv3: '{{ "YES" if vsftpd_config_ssl_sslv3 | default(false) else "NO" }}'
-      ssl_tlsv1: '{{ "YES" if vsftpd_config_ssl_tlsv1 | default(true) else "NO" }}'
-      strict_ssl_read_eof: '{{ "YES" if vsftpd_config_strict_ssl_read_eof | default(false) else "NO" }}'
-      strict_ssl_write_shutdown: '{{ "YES" if vsftpd_config_strict_ssl_write_shutdown | default(false) else "NO" }}'
-      syslog_enable: '{{ "YES" if vsftpd_config_syslog_enable | default(false) else "NO" }}'
-      tcp_wrappers: '{{ "YES" if vsftpd_config_tcp_wrappers | default(false) else "NO" }}'
-      text_userdb_names: '{{ "YES" if vsftpd_config_text_userdb_names | default(false) else "NO" }}'
-      tilde_user_enable: '{{ "YES" if vsftpd_config_tilde_user_enable | default(false) else "NO" }}'
+      ssl_enable:
+        '{{ "YES" if vsftpd_config_ssl_enable | default(false) else "NO" }}'
+      ssl_request_cert: '{{
+          "YES"
+          if vsftpd_config_ssl_request_cert | default(true) else
+          "NO"
+        }}'
+      ssl_sslv2:
+        '{{ "YES" if vsftpd_config_ssl_sslv2 | default(false) else "NO" }}'
+      ssl_sslv3:
+        '{{ "YES" if vsftpd_config_ssl_sslv3 | default(false) else "NO" }}'
+      ssl_tlsv1:
+        '{{ "YES" if vsftpd_config_ssl_tlsv1 | default(true) else "NO" }}'
+      strict_ssl_read_eof: '{{
+          "YES"
+          if vsftpd_config_strict_ssl_read_eof | default(false) else
+          "NO"
+        }}'
+      strict_ssl_write_shutdown: '{{
+          "YES"
+          if vsftpd_config_strict_ssl_write_shutdown | default(false) else
+          "NO"
+        }}'
+      syslog_enable:
+        '{{ "YES" if vsftpd_config_syslog_enable | default(false) else "NO" }}'
+      tcp_wrappers:
+        '{{ "YES" if vsftpd_config_tcp_wrappers | default(false) else "NO" }}'
+      text_userdb_names: '{{
+          "YES"
+          if vsftpd_config_text_userdb_names | default(false) else
+          "NO"
+        }}'
+      tilde_user_enable: '{{
+          "YES"
+          if vsftpd_config_tilde_user_enable | default(false) else
+          "NO"
+        }}'
       trans_chunk_size: '{{ vsftpd_config_trans_chunk_size | default(0) }}'
-      upload_file: '{{ "{" + vsftpd_config_upload_file | join(",") + "}" if vsftpd_config_upload_file | length > 0 else "" }}'
-      use_localtime: '{{ "YES" if vsftpd_config_use_localtime | default(true) else "NO" }}'
-      use_sendfile: '{{ "YES" if vsftpd_config_use_sendfile | default(true) else "NO" }}'
-      user_config_dir: '{{ _vsftpd_user_config if vsftpd_config_user_config_dir | length > 0 else "" }}'
+      upload_file: '{{
+          "{" + vsftpd_config_upload_file | join(",") + "}"
+          if vsftpd_config_upload_file | length > 0 else
+          ""
+        }}'
+      use_localtime:
+        '{{ "YES" if vsftpd_config_use_localtime | default(true) else "NO" }}'
+      use_sendfile:
+        '{{ "YES" if vsftpd_config_use_sendfile | default(true) else "NO" }}'
+      user_config_dir: '{{
+          _vsftpd_user_config
+          if vsftpd_config_user_config_dir | length > 0 else
+          ""
+        }}'
       user_sub_token: '{{ vsftpd_config_user_sub_token | default("") }}'
-      userlist_deny: '{{ "YES" if vsftpd_config_userlist_deny | default(true) else "NO" }}'
-      userlist_enable: '{{ "YES" if vsftpd_config_userlist_enable | default(false) else "NO" }}'
-      userlist_file: '{{ _vsftpd_userlist_file if vsftpd_config_userlist | length > 0 else "" }}'
-      validate_cert: '{{ "YES" if vsftpd_config_validate_cert | default(false) else "NO" }}'
-      vsftpd_log_file: '{{ vsftpd_config_vsftpd_log_file | default("/var/log/vsftpd.log") }}'
-      virtual_use_local_privs: '{{ "YES" if vsftpd_config_virtual_use_local_privs | default(false) else "NO" }}'
-      write_enable: '{{ "YES" if vsftpd_config_write_enable | default(false) else "NO" }}'
-      xferlog_enable: '{{ "YES" if vsftpd_config_xferlog_enable | default(false) else "NO" }}'
-      xferlog_file: '{{ vsftpd_config_xferlog_file | default("/var/log/xferlog") }}'
-      xferlog_std_format: '{{ "YES" if vsftpd_config_xferlog_std_format | default(false) else "NO" }}'
+      userlist_deny:
+        '{{ "YES" if vsftpd_config_userlist_deny | default(true) else "NO" }}'
+      userlist_enable: '{{
+          "YES"
+          if vsftpd_config_userlist_enable | default(false) else
+          "NO"
+        }}'
+      userlist_file: '{{
+          _vsftpd_userlist_file
+          if vsftpd_config_userlist | length > 0 else
+          ""
+        }}'
+      validate_cert:
+        '{{ "YES" if vsftpd_config_validate_cert | default(false) else "NO" }}'
+      vsftpd_log_file: '{{
+          vsftpd_config_vsftpd_log_file | default("/var/log/vsftpd.log")
+        }}'
+      virtual_use_local_privs: '{{
+          "YES"
+          if vsftpd_config_virtual_use_local_privs | default(false) else
+          "NO"
+        }}'
+      write_enable:
+        '{{ "YES" if vsftpd_config_write_enable | default(false) else "NO" }}'
+      xferlog_enable: '{{
+          "YES"
+          if vsftpd_config_xferlog_enable | default(false) else
+          "NO"
+        }}'
+      xferlog_file:
+        '{{ vsftpd_config_xferlog_file | default("/var/log/xferlog") }}'
+      xferlog_std_format: '{{
+          "YES"
+          if vsftpd_config_xferlog_std_format | default(false) else
+          "NO"
+        }}'
       # Debian specific patches
-      utf8_filesystem: '{{ "YES" if vsftpd_config_debian_utf8_filesystem | default(false) else "NO" }}'
+      utf8_filesystem: '{{
+          "YES"
+          if vsftpd_config_debian_utf8_filesystem | default(false) else
+          "NO"
+        }}'

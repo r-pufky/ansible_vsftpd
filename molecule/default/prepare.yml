@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 - name: 'Default | prepare'
   hosts: 'all'
   gather_facts: false
@@ -9,4 +8,4 @@
         name: 'test'
         create_home: true
         shell: /bin/bash
-        password: '$y$j9T$hz4BpLr1xSfrN98ukZ.Sm.$K4k./xtB.bEmwL9X3fOhRII.q5uaMGvFDqL.AOY/dv.'
+        password: '$y$j9T$hz4BpLr1xSfrN98ukZ.Sm.$K4k./xtB.bEmwL9X3fOhRII.q5uaMGvFDqL.AOY/dv.'  # yamllint disable-line rule:line-length

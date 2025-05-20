@@ -39,11 +39,12 @@
 # * https://security.appspot.com/vsftpd/vsftpd_conf.html
 # * https://unix.stackexchange.com/questions/181436/vsftpd-wont-start-systemd1-vsftpd-service-main-process-exited-code-exite
 # * https://www.server-world.info/en/note?os=Debian_12&p=ftp&f=1
+# yamllint enable rule:line-length
 
 - name: 'Install | set service hardening drop-in'
   when: vsftpd_service_harden_enable
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.systemd'
+    name: 'r_pufky.deb.systemd'
   vars:
     systemd_daemon_reload_enable: true
     systemd_services:
@@ -66,7 +67,7 @@
 - name: 'Install | set service drop-in'
   when: not vsftpd_service_harden_enable
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.systemd'
+    name: 'r_pufky.deb.systemd'
   vars:
     systemd_daemon_reload_enable: true
     systemd_services:
@@ -295,7 +296,11 @@
   notify: 'Handlers | restart VSFTPd'
   when: vsftpd_config_user_config_dir | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_user_config_dir if vsftpd_config_user_config_dir.endswith("/") else vsftpd_config_user_config_dir ~ "/" }}'
+    src: '{{
+        vsftpd_config_user_config_dir
+        if vsftpd_config_user_config_dir.endswith("/") else
+        vsftpd_config_user_config_dir ~ "/"
+      }}'
     dest: '{{ _vsftpd_user_config }}'
     owner: 'root'
     group: 'root'

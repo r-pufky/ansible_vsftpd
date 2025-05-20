@@ -1,5 +1,8 @@
 ---
-# yamllint disable rule:line-length
+###############################################################################
+# VSFTPd.d
+###############################################################################
+# VSFTPd works with custom certificates.
 #
 # ca cert from install /etc/ssl/certs/ca-certificates.crt
 #
@@ -9,9 +12,10 @@
 #
 # snakeoil pulled from install.
 #
-# Confirm:
+# Tests:
 # * vsftpd.d/ options are deployed correctly.
-# * standard service override works correctly (service running).
+# * Standard service override works correctly (service running).
+
 dependency:
   name: 'galaxy'
 driver:
@@ -40,12 +44,30 @@ provisioner:
         vsftpd_config_email_passwords:
           - 'test_password'
           - 'test_password2'
-        vsftpd_config_ca_certs_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/ca.pem'
-        vsftpd_config_dsa_cert_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/dsa.cert'
-        vsftpd_config_dsa_private_key_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/dsakey.pem'
-        vsftpd_config_rsa_cert_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/ssl-cert-snakeoil.pem'
-        vsftpd_config_rsa_private_key_file: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/ssl-cert-snakeoil.key'
-        vsftpd_config_user_config_dir: '{{ lookup("env", "MOLECULE_SCENARIO_DIRECTORY") }}/files/user_config'
+        vsftpd_config_ca_certs_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/ca.pem"
+          }}'
+        vsftpd_config_dsa_cert_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/dsa.cert"
+          }}'
+        vsftpd_config_dsa_private_key_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/dsakey.pem"
+          }}'
+        vsftpd_config_rsa_cert_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/ssl-cert-snakeoil.pem"
+          }}'
+        vsftpd_config_rsa_private_key_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/ssl-cert-snakeoil.key"
+          }}'
+        vsftpd_config_user_config_dir: '{{
+            lookup("env", "MOLECULE_SCENARIO_DIRECTORY") ~
+            "/files/user_config"
+          }}'
 platforms:
   - name: 'vsftpd-debian-12-vsftpd.d'
     image: 'ghcr.io/hifis-net/debian-systemd:12'

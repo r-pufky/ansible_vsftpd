@@ -13,6 +13,7 @@
 # * https://www.howtoforge.com/how-to-install-vsftpd-ftp-server-on-debian-11/
 # * https://askubuntu.com/questions/575523/how-to-setup-virtual-users-for-vsftpd-with-access-to-a-specific-sub-directory
 # * https://linuxconfig.org/how-to-setup-vsftpd-on-debian
+# yamllint enable rule:line-length
 
 - name: 'Virtual users | enable'
   when: vsftpd_service_virtual_users | length > 0

@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: 'vsftpd'
   author: 'r_pufky'
   description: 'Very Secure FTP Daemon'
   company: 'N/A'

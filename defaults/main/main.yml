@@ -130,7 +130,7 @@ vsftpd_group: 'ftp'
 
 # Create vsftpd_user, vsftpd_group if not detected?
 #
-# Applied via r_pufky.srv.users, see vars/main.yml for default user attributes.
+# Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
 #
 # Default: True.
 vsftpd_create_user: true

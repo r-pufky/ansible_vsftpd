@@ -1,13 +1,20 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Ports Configuration
 ###############################################################################
-# Manage firewall with r_pufky.srv.ufw.
+# Manage firewall with r_pufky.deb.ufw.
 #
 # Reference:
 # * https://github.com/r-pufky/ansible_ufw
 
 vsftpd_ports:
-  - {proto: 'tcp', from_ip: 'any', to_port: 20, direction: 'in', comment: 'ftp data'}
-  - {proto: 'tcp', from_ip: 'any', to_port: 21, direction: 'in', comment: 'ftp control'}
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 20
+    direction: 'in'
+    comment: 'FTP data'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 21
+    direction: 'in'
+    comment: 'FTP control'

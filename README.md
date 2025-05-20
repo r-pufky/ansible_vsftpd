@@ -4,14 +4,12 @@ VSFTPd service configuration.
 ## Requirements
 [supported platforms](https://github.com/r-pufky/ansible_vsftpd/blob/main/meta/main.yml)
 
-[collections/roles](https://github.com/r-pufky/ansible_vsftpd/blob/main/meta/requirements.yml)
-
 ## Role Variables
 [defaults](https://github.com/r-pufky/ansible_vsftpd/tree/main/defaults/main/)
 
 ## Dependencies
-Part of the [r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv)
-collection.
+**galaxy-ng** roles cannot be used independently. Part of
+[r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv) collection.
 
 ## Example Playbook
 Read through defaults and [arch documentation](https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon)
