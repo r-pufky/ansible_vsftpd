@@ -2,14 +2,33 @@
 ###############################################################################
 # Default VSFTPd Role Options
 ###############################################################################
+#
+# Updates:
+# * New MAJOR, MINOR releases should hard branch at version before starting
+#   (e.g. 3.0.x branch).
+# * Debian OS version is irrelevant (tied to APT package version).
+# * Keep a separate change log as changes are made, you will not remember all
+#   of them.
+# * Use debian docs to validate package/process changes. Reference source docs
+#   if needed.
+# * Update role defaults (includes updating defaults, tasks):
+#   * Use configuration docs to add new variables.
+#   * Use defaults/ to remove any changed/deprecated variables.
+# * Update tests for any changes.
+# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Tag with MAJOR.MINOR version, with PATCH representing role change.
+#
+# Reference:
+# * https://manpages.debian.org/bookworm/vsftpd/vsftpd.conf.5.en.html
+# * https://security.appspot.com/vsftpd.html
 
 # Last time VSFTPd options were validated against a default configuration.
-vsftpd_role_validate_date: '2025-03-03'
+vsftpd_role_validate_date: '2025-06-03'
 vsftpd_role_validate_release: 'bookworm'
 vsftpd_role_validate_version: '3.0.3-13'
 
 vsftpd_role_service_dir: '/etc/vsftpd.d'
-vsftpd_role_pam_virtual_users_module: '/etc/pam.d/vsftpd_virtual'
+vsftpd_role_pam_dir: '/etc/pam.d'
 
 ###############################################################################
 # APT Packages

@@ -928,7 +928,7 @@ vsftpd_config_session_support: false
 # Default: False.
 vsftpd_config_setproctitle_enable: false
 
-# Allowed SSL ciphers for encrpyted SSL connections.
+# Allowed SSL ciphers for encrypted SSL connections.
 #
 # This option can be used to select which SSL ciphers vsftpd will allow for
 # encrypted SSL connections. See the ciphers man page for further details. Note

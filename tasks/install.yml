@@ -1,6 +1,6 @@
 ---
 ###############################################################################
-# VSFTPd Install
+# Install Packages
 ###############################################################################
 
 - name: 'Install | packages'
@@ -11,7 +11,7 @@
       - '{{ vsftpd_role_packages }}'
       - '{{
           vsftpd_role_virtual_user_packages
-          if vsftpd_service_virtual_users | length > 0 else
+          if vsftpd_service_virtual_users.raw | length > 0 else
           []
         }}'
     apt_package_update_cache: true

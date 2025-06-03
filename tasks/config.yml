@@ -1,7 +1,7 @@
 ---
 # yamllint disable rule:line-length
 ###############################################################################
-# VSFTPd Configuration
+# Config Service
 ###############################################################################
 # VSFTPd configuration requires YES/NO strings. Convert boolean values to these
 # strings.
@@ -22,17 +22,8 @@
 #   vsftpd_user_home_mode: '0550'
 #
 # Args:
-#   _vsftpd_config: dict - sanitize config options.
-#   _vsftpd_banner_file: str - absolute path to banner_file.
-#   _vsftpd_banned_emails_file: str - absolute path to banned_emails.
-#   _vsftpd_chroot_list_file: str - absolute path to chroot_list.
-#   _vsftpd_email_password_file: str - absolute path to chroot_list.
-#   _vsftpd_virtual_users_file: str - absolute path to virtual_users.
-#   _vsftpd_ca_certs_file: str - absolute path to ca.cert.
-#   _vsftpd_dsa_cert_file: str - absolute path to dsa.cert.
-#   _vsftpd_rsa_cert_file: str - absolute path to rsa.pem.
-#   _vsftpd_rsa_private_key_file: str - absolute path to rsa.key.
-#   _vsftpd_user_config: str - absolute path to user_config directory.
+#   _vsftpd_config_map: list of dict - Annotated config map.
+#   _vsftpd_config_order: list of str - Config section order.
 #
 # Reference:
 # * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
@@ -42,7 +33,7 @@
 # yamllint enable rule:line-length
 
 - name: 'Install | set service hardening drop-in'
-  when: vsftpd_service_harden_enable
+  when: vsftpd_service_harden_enable.raw
   ansible.builtin.include_role:
     name: 'r_pufky.deb.systemd'
   vars:
@@ -54,18 +45,19 @@
         service:
           exec_start_pre:
             - ''
-            - '-/bin/mkdir -p {{ vsftpd_config_secure_chroot_dir }}'
+            - '-/bin/mkdir -p {{ vsftpd_config_secure_chroot_dir.raw }}'
         exec:
           private_tmp: true
           protect_system: 'strict'
           protect_home: true
           protect_kernel_tunables: true
-          read_write_paths: '{{ vsftpd_service_harden_rw_paths }}'
-          read_only_paths: '{{ vsftpd_service_harden_ro_paths }}'
-          inaccessible_paths: '{{ vsftpd_service_harden_inaccessible_paths }}'
+          read_write_paths: '{{ vsftpd_service_harden_rw_paths.raw }}'
+          read_only_paths: '{{ vsftpd_service_harden_ro_paths.raw }}'
+          inaccessible_paths:
+            '{{ vsftpd_service_harden_inaccessible_paths.raw }}'
 
 - name: 'Install | set service drop-in'
-  when: not vsftpd_service_harden_enable
+  when: not vsftpd_service_harden_enable.raw
   ansible.builtin.include_role:
     name: 'r_pufky.deb.systemd'
   vars:
@@ -77,10 +69,9 @@
         service:
           exec_start_pre:
             - ''
-            - '-/bin/mkdir -p {{ vsftpd_config_secure_chroot_dir }}'
+            - '-/bin/mkdir -p {{ vsftpd_config_secure_chroot_dir.raw }}'
 
 - name: 'Config | set vsftpd.conf'
-  notify: 'Handlers | restart VSFTPd'
   ansible.builtin.template:
     src: 'vsftpd.conf.j2'
     dest: '/etc/vsftpd.conf'
@@ -89,219 +80,190 @@
     mode: '0644'
 
 - name: 'Config | set banner_file'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_banner | length > 0
+  when: vsftpd_config_banner.raw | length > 0
   ansible.builtin.copy:
-    dest: '{{ _vsftpd_banner_file }}'
+    dest: '{{ vsftpd_config_banner.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0644'
-    content: '{{ vsftpd_config_banner }}'
+    content: '{{ vsftpd_config_banner.parsed }}'
 
 - name: 'Config | remove banner_file'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_banner | length == 0
+  when: vsftpd_config_banner.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_banner_file }}'
+    path: '{{ vsftpd_config_banner.raw }}'
     state: 'absent'
 
 - name: 'Config | set banned_emails'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_banned_emails | length > 0
+  when: vsftpd_config_banned_emails.raw | length > 0
   ansible.builtin.template:
     src: 'vsftpd.d.j2'
-    dest: '{{ _vsftpd_banned_emails_file }}'
+    dest: '{{ vsftpd_config_banned_emails.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0600'
   vars:
-    items: '{{ vsftpd_config_banned_emails }}'
+    items: '{{ vsftpd_config_banned_emails.parsed }}'
 
 - name: 'Config | remove banned_emails'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_banned_emails | length == 0
+  when: vsftpd_config_banned_emails.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_banned_emails_file }}'
+    path: '{{ vsftpd_config_banned_emails.raw }}'
     state: 'absent'
 
 - name: 'Config | set chroot_list'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_chroot_list | length > 0
+  when: vsftpd_config_chroot_list.raw | length > 0
   ansible.builtin.template:
     src: 'vsftpd.d.j2'
-    dest: '{{ _vsftpd_chroot_list_file }}'
+    dest: '{{ vsftpd_config_chroot_list.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0600'
   vars:
-    items: '{{ vsftpd_config_chroot_list }}'
+    items: '{{ vsftpd_config_chroot_list.parsed }}'
 
 - name: 'Config | remove chroot_list'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_chroot_list | length == 0
+  when: vsftpd_config_chroot_list.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_chroot_list_file }}'
+    path: '{{ vsftpd_config_chroot_list.raw }}'
     state: 'absent'
 
 - name: 'Config | set user_list'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_userlist | length > 0
+  when: vsftpd_config_userlist.raw | length > 0
   ansible.builtin.template:
     src: 'vsftpd.d.j2'
-    dest: '{{ _vsftpd_userlist_file }}'
+    dest: '{{ vsftpd_config_userlist.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0600'
   vars:
-    items: '{{ vsftpd_config_userlist }}'
+    items: '{{ vsftpd_config_userlist.parsed }}'
 
 - name: 'Config | remove user_list'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_userlist | length == 0
+  when: vsftpd_config_userlist.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_userlist_file }}'
+    path: '{{ vsftpd_config_userlist.raw }}'
     state: 'absent'
 
 - name: 'Config | set email_passwords'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_email_passwords | length > 0
+  when: vsftpd_config_email_passwords.raw | length > 0
   ansible.builtin.template:
     src: 'vsftpd.d.j2'
-    dest: '{{ _vsftpd_email_password_file }}'
+    dest: '{{ vsftpd_config_email_passwords.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0600'
   vars:
-    items: '{{ vsftpd_config_email_passwords }}'
-  no_log: true  # passwords
+    items: '{{ vsftpd_config_email_passwords.parsed }}'
+  no_log: true  # Passwords.
 
 - name: 'Config | remove email_passwords'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_email_passwords | length == 0
+  when: vsftpd_config_email_passwords.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_email_password_file }}'
+    path: '{{ vsftpd_config_email_passwords.raw }}'
     state: 'absent'
 
 - name: 'Config | set local user login root directory'
-  when: vsftpd_config_local_root | length > 0
+  when: vsftpd_config_local_root.raw | length > 0
   ansible.builtin.file:
-    path: '{{ vsftpd_config_local_root }}'
-    owner: '{{ vsftpd_service_local_root_user | default("ftp") }}'
-    group: '{{ vsftpd_service_local_root_group | default("ftp") }}'
-    mode: '{{ vsftpd_service_local_root_mode | default("0770") }}'
-    recurse: '{{ vsftpd_service_local_root_recursive_enable | default(true) }}'
+    path: '{{ vsftpd_config_local_root.raw }}'
+    owner: '{{ vsftpd_service_local_root_user.parsed }}'
+    group: '{{ vsftpd_service_local_root_group.parsed }}'
+    mode: '{{ vsftpd_service_local_root_mode.raw }}'
+    recurse: '{{ vsftpd_service_local_root_recursive_enable.raw }}'
     state: 'directory'
+  become: '{{ true if vsftpd_user_data_manage_enable.raw else omit }}'
+  become_user:
+    '{{ vsftpd_user.raw if vsftpd_user_data_manage_enable.raw else omit }}'
 
 - name: 'Config | set anonymous user login root directory'
-  when: vsftpd_config_anon_root | length > 0
+  when: vsftpd_config_anon_root.raw | length > 0
   ansible.builtin.file:
-    path: '{{ vsftpd_config_anon_root }}'
-    owner: '{{ vsftpd_service_anon_root_user | default("ftp") }}'
-    group: '{{ vsftpd_service_anon_root_group | default("ftp") }}'
-    mode: '{{ vsftpd_service_anon_root_mode | default("0770") }}'
-    recurse: '{{ vsftpd_service_anon_recursive_enable | default(true) }}'
+    path: '{{ vsftpd_config_anon_root.raw }}'
+    owner: '{{ vsftpd_service_anon_root_user.parsed }}'
+    group: '{{ vsftpd_service_anon_root_group.parsed }}'
+    mode: '{{ vsftpd_service_anon_root_mode.raw }}'
+    recurse: '{{ vsftpd_service_anon_root_recursive_enable.raw }}'
     state: 'directory'
+  become: '{{ true if vsftpd_user_data_manage_enable.raw else omit }}'
+  become_user:
+    '{{ vsftpd_user.raw if vsftpd_user_data_manage_enable.raw else omit }}'
 
 - name: 'Config | set ca.cert'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_ca_certs_file | length > 0
+  when: vsftpd_config_ca_certs_file.raw | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_ca_certs_file }}'
-    dest: '{{ _vsftpd_ca_certs_file }}'
+    src: '{{ vsftpd_config_ca_certs_file.parsed }}'
+    dest: '{{ vsftpd_config_ca_certs_file.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0400'
     force: true
 
 - name: 'Config | remove ca.cert'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_ca_certs_file | length == 0
+  when: vsftpd_config_ca_certs_file.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_ca_certs_file }}'
+    path: '{{ vsftpd_config_ca_certs_file.raw }}'
     state: 'absent'
 
 - name: 'Config | set dsa.cert'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_dsa_cert_file | length > 0
+  when: vsftpd_config_dsa_cert_file.raw | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_dsa_cert_file }}'
-    dest: '{{ _vsftpd_dsa_cert_file }}'
+    src: '{{ vsftpd_config_dsa_cert_file.parsed }}'
+    dest: '{{ vsftpd_config_dsa_cert_file.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0400'
     force: true
 
 - name: 'Config | remove dsa.cert'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_dsa_cert_file | length == 0
+  when: vsftpd_config_dsa_cert_file.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_dsa_cert_file }}'
+    path: '{{ vsftpd_config_dsa_cert_file.raw }}'
     state: 'absent'
 
 - name: 'Config | set dsa.key'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_dsa_private_key_file | length > 0
+  when: vsftpd_config_dsa_private_key_file.raw | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_dsa_private_key_file }}'
-    dest: '{{ _vsftpd_dsa_private_key_file }}'
+    src: '{{ vsftpd_config_dsa_private_key_file.parsed }}'
+    dest: '{{ vsftpd_config_dsa_private_key_file.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0400'
     force: true
 
 - name: 'Config | remove dsa.key'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_dsa_private_key_file | length == 0
+  when: vsftpd_config_dsa_private_key_file.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_dsa_private_key_file }}'
+    path: '{{ vsftpd_config_dsa_private_key_file.raw }}'
     state: 'absent'
 
+# When moving from custom -> snakeoil RSA keys; previous location information
+# is lost and cannot remove old custom cert.
 - name: 'Config | set rsa.pem'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_rsa_cert_file | length > 0
+  when: vsftpd_config_rsa_cert_file.parsed | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_rsa_cert_file }}'
-    dest: '{{ _vsftpd_rsa_cert_file }}'
+    src: '{{ vsftpd_config_rsa_cert_file.parsed }}'
+    dest: '{{ vsftpd_config_rsa_cert_file.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0644'
     force: true
 
-- name: 'Config | remove rsa.pem'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_rsa_cert_file | length == 0
-  ansible.builtin.file:
-    path: '{{ _vsftpd_rsa_cert_file }}'
-    state: 'absent'
-
 - name: 'Config | set rsa.key'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_rsa_private_key_file | length > 0
+  when: vsftpd_config_rsa_private_key_file.parsed | length > 0
   ansible.builtin.copy:
-    src: '{{ vsftpd_config_rsa_private_key_file }}'
-    dest: '{{ _vsftpd_rsa_private_key_file }}'
+    src: '{{ vsftpd_config_rsa_private_key_file.parsed }}'
+    dest: '{{ vsftpd_config_rsa_private_key_file.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0400'
     force: true
 
-- name: 'Config | remove rsa.key'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_rsa_private_key_file | length == 0
-  ansible.builtin.file:
-    path: '{{ _vsftpd_rsa_private_key_file }}'
-    state: 'absent'
-
 - name: 'Config | set user_config'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_user_config_dir | length > 0
+  when: vsftpd_config_user_config_dir.raw | length > 0
   ansible.builtin.copy:
-    src: '{{
-        vsftpd_config_user_config_dir
-        if vsftpd_config_user_config_dir.endswith("/") else
-        vsftpd_config_user_config_dir ~ "/"
-      }}'
-    dest: '{{ _vsftpd_user_config }}'
+    src: '{{ vsftpd_config_user_config_dir.parsed }}'
+    dest: '{{ vsftpd_config_user_config_dir.raw }}'
     owner: 'root'
     group: 'root'
     mode: '0644'
@@ -309,8 +271,7 @@
     force: true
 
 - name: 'Config | remove user_config'
-  notify: 'Handlers | restart VSFTPd'
-  when: vsftpd_config_user_config_dir | length == 0
+  when: vsftpd_config_user_config_dir.raw | length == 0
   ansible.builtin.file:
-    path: '{{ _vsftpd_user_config }}'
+    path: '{{ vsftpd_config_user_config_dir.raw }}'
     state: 'absent'

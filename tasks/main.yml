@@ -1,4 +1,6 @@
 ---
+- name: 'Annotate'
+  ansible.builtin.include_tasks: 'annotate.yml'
 - name: 'Prep'
   ansible.builtin.include_tasks: 'prep.yml'
 - name: 'Install'
@@ -7,3 +9,5 @@
   ansible.builtin.include_tasks: 'config.yml'
 - name: 'Virtual users'
   ansible.builtin.include_tasks: 'virtual_users.yml'
+- name: 'Validate'
+  ansible.builtin.import_tasks: 'validate.yml'

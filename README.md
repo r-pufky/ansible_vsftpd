@@ -7,6 +7,11 @@ VSFTPd service configuration.
 ## Role Variables
 [defaults](https://github.com/r-pufky/ansible_vsftpd/tree/main/defaults/main/)
 
+### Ports
+All ports and protocols have been defined for the role.
+
+[defaults/ports.yml](https://github.com/r-pufky/ansible_vsftpd/blob/main/defaults/main/ports.yml)
+
 ## Dependencies
 **galaxy-ng** roles cannot be used independently. Part of
 [r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv) collection.
@@ -23,7 +28,6 @@ is managed outside of this role.
 ``` yaml
 vsftpd_config_write_enable: true
 vsftpd_config_chroot_local_user: true
-vsftpd_config_allow_writeable_chroot: true
 vsftpd_config_chroot_list_enable: true
 vsftpd_config_chroot_list:
   - 'test_local_user'

@@ -1,0 +1,30 @@
+---
+###############################################################################
+# Validate
+###############################################################################
+# Start VSFTPd services and confirm they are active and running.
+
+- name: 'Validate | start services'
+  notify: 'Handlers | restart VSFTPd'
+  ansible.builtin.meta: 'flush_handlers'
+
+- name: 'Validate | query service status'
+  ansible.builtin.service_facts:
+
+- name: 'Validate | assert services running'
+  ansible.builtin.assert:
+    quiet: true
+    that: ansible_facts.services[item].state == 'running'
+    fail_msg: '✘ {{ item }} should be running.'
+  loop:
+    - 'vsftpd.service'
+
+- name: 'Validate | cleanup data'
+  ansible.builtin.set_fact:
+    _vsftpd_config_map: '{{ {} }}'
+    _vsftpd_config_order: '{{ [] }}'
+    _vsftpd_user_query: '{{ {} }}'
+    _vsftpd_user_local_root_query: '{{ {} }}'
+    _vsftpd_user_local_group_query: '{{ {} }}'
+    _vsftpd_user_anon_root_query: '{{ {} }}'
+    _vsftpd_user_anon_group_query: '{{ {} }}'

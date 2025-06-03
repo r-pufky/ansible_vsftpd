@@ -5,9 +5,6 @@
 ###############################################################################
 # Create virtual users.
 #
-# Args:
-#   _vsftpd_virtual_users_file: str - absolute path to virtual_users.
-#
 # Reference:
 # * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
 # * https://www.howtoforge.com/how-to-install-vsftpd-ftp-server-on-debian-11/
@@ -16,16 +13,16 @@
 # yamllint enable rule:line-length
 
 - name: 'Virtual users | enable'
-  when: vsftpd_service_virtual_users | length > 0
+  when: vsftpd_service_virtual_users.raw | length > 0
   block:
     - name: 'Virtual users | enable | clear virtual users'
       ansible.builtin.file:
-        path: '{{ _vsftpd_virtual_users_file }}'
+        path: '{{ vsftpd_service_virtual_users.parsed }}'
         state: 'absent'
 
     - name: 'Virtual users | enable | add virtual users'
       community.general.htpasswd:
-        path: '{{ _vsftpd_virtual_users_file }}'
+        path: '{{ vsftpd_service_virtual_users.parsed }}'
         name: '{{ item.user }}'
         password: '{{ item.pass }}'
         crypt_scheme: 'md5_crypt'
@@ -33,23 +30,23 @@
         group: 'root'
         mode: '0640'
         state: 'present'
-      loop: '{{ vsftpd_service_virtual_users }}'
+      loop: '{{ vsftpd_service_virtual_users.raw }}'
       loop_control:
         label: '{{ item.user }}'
 
     - name: 'Virtual users | enable | add PAM vsftpd_virtual module'
       ansible.builtin.template:
         src: 'vsftpd_virtual.j2'
-        dest: '{{ vsftpd_role_pam_virtual_users_module }}'
+        dest: '{{ vsftpd_config_pam_service_name.parsed }}'
         owner: 'root'
         group: 'root'
         mode: '0644'
 
 - name: 'Virtual users | disable'
-  when: vsftpd_service_virtual_users | length == 0
+  when: vsftpd_service_virtual_users.raw | length == 0
   ansible.builtin.file:
     path: '{{ item }}'
     state: 'absent'
   loop:
-    - '{{ _vsftpd_virtual_users_file }}'
-    - '{{ vsftpd_role_pam_virtual_users_module }}'
+    - '{{ vsftpd_service_virtual_users.parsed }}'
+    - '{{ vsftpd_config_pam_service_name.parsed }}'

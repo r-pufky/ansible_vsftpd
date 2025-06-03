@@ -1,3 +1,12 @@
-{% for key, value in _vsftpd_config.items() %}
-{{ key}}={{ value }}
+{% for header in _vsftpd_config_order %}
+# {{ header }}
+{% for section in _vsftpd_config_map | selectattr("value.section", "match", header) | sort(attribute="value.order") %}
+{% if not section.value.deprecated %}
+{% if section.value.hint == 'bool' %}
+{{ section.value.key }}={{ 'YES' if section.value.raw else 'NO' }}
+{% else %}
+{{ section.value.key }}={{ section.value.raw }}
+{% endif %}
+{% endif %}
+{% endfor %}
 {% endfor %}

@@ -27,7 +27,6 @@ provisioner:
       all:
         vsftpd_config_write_enable: true
         vsftpd_config_chroot_local_user: true
-        vsftpd_config_allow_writeable_chroot: true
         vsftpd_config_chroot_list_enable: true
         vsftpd_config_chroot_list:
           - 'test'

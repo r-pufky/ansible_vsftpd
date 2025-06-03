@@ -3,17 +3,6 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'VSFTPd.d | verify | gather service status'
-      ansible.builtin.service_facts:
-
-    - name: 'VSFTPd.d | verify | assert vsftpd.service active'
-      ansible.builtin.assert:
-        quiet: true
-        that:
-          - '"vsftpd.service" in ansible_facts.services'
-          - 'ansible_facts["services"]["vsftpd.service"]["state"] == "running"'
-        fail_msg: '✘ vsftpd.service should be enabled and running.'
-
     - name: 'VSFTPd.d | verify | /etc/vsftpd.d'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
@@ -25,7 +14,6 @@
         test_owner: 'root'
         test_group: 'root'
         test_mode: '{{ item.mode }}'
-        test_diff: true
       loop:
         - {file: 'banned_emails', mode: '0600'}
         - {file: 'banner_file', mode: '0644'}
