@@ -1,7 +1,7 @@
 ---
 # yamllint disable rule:line-length
 ###############################################################################
-# Manager VSFTPd Virtual Users
+# Manager Virtual Users
 ###############################################################################
 # Create virtual users.
 #
@@ -13,16 +13,16 @@
 # yamllint enable rule:line-length
 
 - name: 'Virtual users | enable'
-  when: vsftpd_service_virtual_users.raw | length > 0
+  when: vsftpd_srv_virtual_users.raw | length > 0
   block:
     - name: 'Virtual users | enable | clear virtual users'
       ansible.builtin.file:
-        path: '{{ vsftpd_service_virtual_users.parsed }}'
+        path: '{{ vsftpd_srv_virtual_users.parsed }}'
         state: 'absent'
 
     - name: 'Virtual users | enable | add virtual users'
       community.general.htpasswd:
-        path: '{{ vsftpd_service_virtual_users.parsed }}'
+        path: '{{ vsftpd_srv_virtual_users.parsed }}'
         name: '{{ item.user }}'
         password: '{{ item.pass }}'
         crypt_scheme: 'md5_crypt'
@@ -30,23 +30,23 @@
         group: 'root'
         mode: '0640'
         state: 'present'
-      loop: '{{ vsftpd_service_virtual_users.raw }}'
+      loop: '{{ vsftpd_srv_virtual_users.raw }}'
       loop_control:
         label: '{{ item.user }}'
 
     - name: 'Virtual users | enable | add PAM vsftpd_virtual module'
       ansible.builtin.template:
         src: 'vsftpd_virtual.j2'
-        dest: '{{ vsftpd_config_pam_service_name.parsed }}'
+        dest: '{{ vsftpd_cfg_pam_service_name.parsed }}'
         owner: 'root'
         group: 'root'
         mode: '0644'
 
 - name: 'Virtual users | disable'
-  when: vsftpd_service_virtual_users.raw | length == 0
+  when: vsftpd_srv_virtual_users.raw | length == 0
   ansible.builtin.file:
     path: '{{ item }}'
     state: 'absent'
   loop:
-    - '{{ vsftpd_service_virtual_users.parsed }}'
-    - '{{ vsftpd_config_pam_service_name.parsed }}'
+    - '{{ vsftpd_srv_virtual_users.parsed }}'
+    - '{{ vsftpd_cfg_pam_service_name.parsed }}'

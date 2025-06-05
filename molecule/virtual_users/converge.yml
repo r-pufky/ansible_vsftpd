@@ -1,8 +1,8 @@
 ---
-- name: 'Default | converge'
+- name: 'Converge'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Default | converge | apply r_pufky.srv.vsftpd'
+    - name: 'Converge | apply r_pufky.srv.vsftpd'
       ansible.builtin.include_role:
         name: 'r_pufky.srv.vsftpd'

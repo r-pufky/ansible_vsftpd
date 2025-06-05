@@ -9,3 +9,10 @@
         create_home: true
         shell: /bin/bash
         password: '$y$j9T$hz4BpLr1xSfrN98ukZ.Sm.$K4k./xtB.bEmwL9X3fOhRII.q5uaMGvFDqL.AOY/dv.'  # yamllint disable-line rule:line-length
+
+    - name: 'Prepare | simulate user media restriction'
+      ansible.builtin.file:
+        path: '/data'
+        owner: 950
+        group: 950
+        state: 'directory'

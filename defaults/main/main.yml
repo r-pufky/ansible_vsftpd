@@ -7,7 +7,7 @@
 # Virtual FTP users.
 #
 # Virtual users will be created automatically and have permissions from the
-# vsftpd_config_guest_username account.
+# vsftpd_cfg_guest_username account.
 #
 # Chroot environments require read-only root directories; otherwise logins
 # result in:
@@ -15,16 +15,16 @@
 #   500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
 #
 # Check your configuration and set the backing user home directory read-only.
-# See vsftpd_service_local_root_mode, vsftpd_service_anon_root_mode, and
-# vsftpd_user_home_mode. Ensure vsftpd_service_local_root_recursive_enable,
-# vsftpd_service_anon_root_recursive_enable are not plowing directory
+# See vsftpd_srv_local_root_mode, vsftpd_srv_anon_root_mode, and
+# vsftpd_srv_user_home_mode. Ensure vsftpd_srv_local_root_recursive_enable,
+# vsftpd_srv_anon_root_recursive_enable are not plowing directory
 # permissions.
 #
 # Special Case:
-#   * Forces vsftpd_config_guest_enable=true.
-#   * Forces vsftpd_config_pam_service_name='vsftpd_virtual'.
+#   * Forces vsftpd_cfg_guest_enable=true.
+#   * Forces vsftpd_cfg_pam_service_name='vsftpd_virtual'.
 #
-# vsftpd_service_virtual_users:
+# vsftpd_srv_virtual_users:
 #       list of dict - virtual user names and passwords.
 #     - user: str - username.
 #       pass: str - password.
@@ -33,7 +33,7 @@
 #
 # Reference:
 # * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
-vsftpd_service_virtual_users: []
+vsftpd_srv_virtual_users: []
 
 ###############################################################################
 # VSFTPd Service Hardening
@@ -43,15 +43,15 @@ vsftpd_service_virtual_users: []
 # * ProtectSystem=strict
 # * ProtectHome=true
 # * ProtectKernelTunables=true
-# * ReadWritePaths=vsftpd_service_harden_rw_paths
-# * ReadOnlyPaths=vsftpd_service_harden_ro_paths
-# * InaccessiblePaths=vsftpd_service_harden_inaccessible_paths
+# * ReadWritePaths=vsftpd_srv_harden_rw_paths
+# * ReadOnlyPaths=vsftpd_srv_harden_ro_paths
+# * InaccessiblePaths=vsftpd_srv_harden_inaccessible_paths
 #
 # Reference:
 # * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
 
 # Harden VSFTPd service? Default: False.
-vsftpd_service_harden_enable: false
+vsftpd_srv_harden_enable: false
 
 # Absolute paths to allow VSFTPd service to write to.
 #
@@ -59,34 +59,34 @@ vsftpd_service_harden_enable: false
 # defined in service configuration.
 #
 # Default:
-#   - '{{ vsftpd_config_local_root }}'
-#   - '{{ vsftpd_config_anon_root }}'
-#   - '{{ vsftpd_config_vsftpd_log_file }}'
-#   - '{{ vsftpd_config_xferlog_file }}'
+#   - '{{ vsftpd_cfg_local_root }}'
+#   - '{{ vsftpd_cfg_anon_root }}'
+#   - '{{ vsftpd_cfg_vsftpd_log_file }}'
+#   - '{{ vsftpd_cfg_xferlog_file }}'
 #   - '/srv/ftp'  # service user home directory.
-vsftpd_service_harden_rw_paths:
-  - '{{ vsftpd_config_local_root }}'
-  - '{{ vsftpd_config_anon_root }}'
-  - '{{ vsftpd_config_vsftpd_log_file }}'
-  - '{{ vsftpd_config_xferlog_file }}'
+vsftpd_srv_harden_rw_paths:
+  - '{{ vsftpd_cfg_local_root }}'
+  - '{{ vsftpd_cfg_anon_root }}'
+  - '{{ vsftpd_cfg_vsftpd_log_file }}'
+  - '{{ vsftpd_cfg_xferlog_file }}'
   - '/srv/ftp'
 
 # Absolute paths to allow VSFTPd service to read from.
 #
 # Restricts service to only read from given paths. Include any custom paths
-# defined in service configuration. vsftpd_service_harden_rw_paths takes
+# defined in service configuration. vsftpd_srv_harden_rw_paths takes
 # precedence.
 #
 # Default: [] (disabled).
-vsftpd_service_harden_ro_paths: []
+vsftpd_srv_harden_ro_paths: []
 
 # Absolute paths to make inaccessible to VSFTPd.
 #
-# Useful for filtering out subpaths listed in vsftpd_service_harden_rw_paths
-# and vsftpd_service_harden_ro_paths.
+# Useful for filtering out subpaths listed in vsftpd_srv_harden_rw_paths
+# and vsftpd_srv_harden_ro_paths.
 #
 # Default: [] (disabled).
-vsftpd_service_harden_inaccessible_paths: []
+vsftpd_srv_harden_inaccessible_paths: []
 
 ###############################################################################
 # VSFTPd User
@@ -94,10 +94,10 @@ vsftpd_service_harden_inaccessible_paths: []
 
 # User that VSFTPd will run under.
 #
-# Enable vsftpd_create_user if this account is not externally managed.
+# Enable vsftpd_srv_create_user if this account is not externally managed.
 #
 # Default: 'ftp'.
-vsftpd_user: 'ftp'
+vsftpd_srv_user: 'ftp'
 
 # VSTPd user home directory permissions.
 #
@@ -109,66 +109,71 @@ vsftpd_user: 'ftp'
 # Chroot environments with the service local user must set user home directory
 # read-only:
 #
-#   vsftpd_user_home_mode: '0550'
+#   vsftpd_srv_user_home_mode: '0550'
 #
-# Ensure vsftpd_service_local_root_recursive_enable,
-# vsftpd_service_anon_root_recursive_enable are not plowing directory
+# Ensure vsftpd_srv_local_root_recursive_enable,
+# vsftpd_srv_anon_root_recursive_enable are not plowing directory
 # permissions.
 #
 # Default: '0755'.
 #
 # Reference:
 # * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
-vsftpd_user_home_mode: '0755'
+vsftpd_srv_user_home_mode: '0755'
 
 # Group that VSFTPd will run under.
 #
-# Enable vsftpd_create_user if this group is not externally managed.
+# Enable vsftpd_srv_create_user if this group is not externally managed.
 #
 # Default: 'ftp'.
-vsftpd_group: 'ftp'
+vsftpd_srv_group: 'ftp'
 
-# Create vsftpd_user, vsftpd_group if not detected?
+# Create vsftpd_srv_user, vsftpd_srv_group if not detected?
 #
 # Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
 #
 # Default: True.
-vsftpd_create_user: true
+vsftpd_srv_create_user: true
 
 # Enable user management of data/media files?
 #
-# Use vsftpd_user to execute data/media management commands. Role applies media
+# Use vsftpd_srv_user to execute data/media management commands. Role applies media
 # permissions using 'root' by default. For mounted data locations (NFS with
 # squashed mounts, mapped container mounts, etc) the local root user will not
 # have sufficient privileges to modify these files.
 #
+# Applies to:
+# * vsftpd_cfg_local_root
+# * vsftpd_cfg_anon_root
+# * vsftpd_srv_user
+#
 # Default: False.
-vsftpd_user_data_manage_enable: false
+vsftpd_srv_user_data_manage_enable: false
 
 ###############################################################################
 # VSFTPd Local Root User Permissions
 ###############################################################################
 
-# vsftpd_config_local_root directory user.
+# vsftpd_cfg_local_root directory user.
 #
-# Requires vsftpd_config_local_root to be set.
-#
-# Default: 'ftp'.
-vsftpd_service_local_root_user: 'ftp'
-
-# vsftpd_config_local_root directory group.
-#
-# Requires vsftpd_config_local_root to be set.
+# Requires vsftpd_cfg_local_root to be set.
 #
 # Default: 'ftp'.
-vsftpd_service_local_root_group: 'ftp'
+vsftpd_srv_local_root_user: 'ftp'
 
-# vsftpd_config_local_root directory mode.
+# vsftpd_cfg_local_root directory group.
 #
-# Requires vsftpd_config_local_root to be set.
+# Requires vsftpd_cfg_local_root to be set.
+#
+# Default: 'ftp'.
+vsftpd_srv_local_root_group: 'ftp'
+
+# vsftpd_cfg_local_root directory mode.
+#
+# Requires vsftpd_cfg_local_root to be set.
 #
 # Default: '0770'.
-vsftpd_service_local_root_mode: '0770'
+vsftpd_srv_local_root_mode: '0770'
 
 # Recursively set local root permissions?
 #
@@ -176,32 +181,32 @@ vsftpd_service_local_root_mode: '0770'
 # affected. Disabling will only set the root directory.
 #
 # Default: True.
-vsftpd_service_local_root_recursive_enable: true
+vsftpd_srv_local_root_recursive_enable: true
 
 ###############################################################################
 # VSFTPd Local Anonymous User Permissions
 ###############################################################################
 
-# vsftpd_config_anon_root directory user.
+# vsftpd_cfg_anon_root directory user.
 #
-# Requires vsftpd_config_anon_root to be set.
-#
-# Default: 'ftp'.
-vsftpd_service_anon_root_user: 'ftp'
-
-# vsftpd_config_anon_root directory group.
-#
-# Requires vsftpd_config_anon_root to be set.
+# Requires vsftpd_cfg_anon_root to be set.
 #
 # Default: 'ftp'.
-vsftpd_service_anon_root_group: 'ftp'
+vsftpd_srv_anon_root_user: 'ftp'
 
-# vsftpd_config_anon_root directory mode.
+# vsftpd_cfg_anon_root directory group.
 #
-# Requires vsftpd_config_anon_root to be set.
+# Requires vsftpd_cfg_anon_root to be set.
+#
+# Default: 'ftp'.
+vsftpd_srv_anon_root_group: 'ftp'
+
+# vsftpd_cfg_anon_root directory mode.
+#
+# Requires vsftpd_cfg_anon_root to be set.
 #
 # Default: '0770'.
-vsftpd_service_anon_root_mode: '0770'
+vsftpd_srv_anon_root_mode: '0770'
 
 # Recursively set anonymous root permissions?
 #
@@ -209,4 +214,4 @@ vsftpd_service_anon_root_mode: '0770'
 # affected. Disabling will only set the root directory.
 #
 # Default: True.
-vsftpd_service_anon_root_recursive_enable: true
+vsftpd_srv_anon_root_recursive_enable: true

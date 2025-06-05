@@ -1,14 +1,14 @@
 ---
-- name: 'VSFTPd.d | verify'
+- name: 'Verify'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'VSFTPd.d | verify | /etc/vsftpd.d'
+    - name: 'Verify | /etc/vsftpd.d'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'VSFTPd.d | verify | /etc/vsftpd.d/{{ item.file }}'
+        test_name: 'Verify | /etc/vsftpd.d/{{ item.file }}'
         test_src: 'files/{{ item.file }}'
         test_file: '/etc/vsftpd.d/{{ item.file }}'
         test_owner: 'root'
@@ -23,12 +23,12 @@
       loop_control:
         label: '{{ item.file }}'
 
-    - name: 'VSFTPd.d | verify | /etc/vsftpd.conf'
+    - name: 'Verify | /etc/vsftpd.conf'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'VSFTPd.d | verify | /etc/vsftpd.conf'
+        test_name: 'Verify | /etc/vsftpd.conf'
         test_src: 'files/vsftpd.conf'
         test_file: '/etc/vsftpd.conf'
         test_owner: 'root'

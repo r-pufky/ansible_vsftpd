@@ -7,7 +7,7 @@
 # Reference:
 # * https://github.com/r-pufky/ansible_ufw
 
-vsftpd_ports:
+vsftpd_srv_ports:
   - proto: 'tcp'
     from_ip: 'any'
     to_port: 20

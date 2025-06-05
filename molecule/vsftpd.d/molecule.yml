@@ -31,40 +31,40 @@ provisioner:
   inventory:
     group_vars:
       all:
-        vsftpd_config_banner: 'test banner'
-        vsftpd_config_banned_emails:
+        vsftpd_cfg_banner: 'test banner'
+        vsftpd_cfg_banned_emails:
           - 'test@example.com'
           - 'test2@example.com'
-        vsftpd_config_chroot_list:
+        vsftpd_cfg_chroot_list:
           - 'chroot_user'
           - 'chroot_user2'
-        vsftpd_config_userlist:
+        vsftpd_cfg_userlist:
           - 'user1'
           - 'user2'
-        vsftpd_config_email_passwords:
+        vsftpd_cfg_email_passwords:
           - 'test_password'
           - 'test_password2'
-        vsftpd_config_ca_certs_file: '{{
+        vsftpd_cfg_ca_certs_file: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/ca.pem"
           }}'
-        vsftpd_config_dsa_cert_file: '{{
+        vsftpd_cfg_dsa_cert_file: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/dsa.cert"
           }}'
-        vsftpd_config_dsa_private_key_file: '{{
+        vsftpd_cfg_dsa_private_key_file: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/dsakey.pem"
           }}'
-        vsftpd_config_rsa_cert_file: '{{
+        vsftpd_cfg_rsa_cert_file: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/ssl-cert-snakeoil.pem"
           }}'
-        vsftpd_config_rsa_private_key_file: '{{
+        vsftpd_cfg_rsa_private_key_file: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/ssl-cert-snakeoil.key"
           }}'
-        vsftpd_config_user_config_dir: '{{
+        vsftpd_cfg_user_config_dir: '{{
             lookup("env", "MOLECULE_SCENARIO_DIRECTORY") ~
             "/files/user_config"
           }}'

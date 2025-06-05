@@ -21,10 +21,10 @@
 
 - name: 'Validate | cleanup data'
   ansible.builtin.set_fact:
-    _vsftpd_config_map: '{{ {} }}'
-    _vsftpd_config_order: '{{ [] }}'
-    _vsftpd_user_query: '{{ {} }}'
-    _vsftpd_user_local_root_query: '{{ {} }}'
-    _vsftpd_user_local_group_query: '{{ {} }}'
-    _vsftpd_user_anon_root_query: '{{ {} }}'
-    _vsftpd_user_anon_group_query: '{{ {} }}'
+    _vsftpd_cfg_map: '{{ {} }}'
+    _vsftpd_cfg_order: '{{ [] }}'
+    _vsftpd_srv_user_query: '{{ {} }}'
+    _vsftpd_srv_user_local_root_query: '{{ {} }}'
+    _vsftpd_srv_user_local_group_query: '{{ {} }}'
+    _vsftpd_srv_user_anon_root_query: '{{ {} }}'
+    _vsftpd_srv_user_anon_group_query: '{{ {} }}'

@@ -1,14 +1,14 @@
 ---
-- name: 'Default | verify'
+- name: 'Verify'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Virtual users | verify | /etc/vsftpd.conf'
+    - name: 'Verify | /etc/vsftpd.conf'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'lineinfile.yml'
       vars:
-        test_name: 'Virtual users | verify | /etc/vsftpd.conf {{ item }}'
+        test_name: 'Verify | /etc/vsftpd.conf {{ item }}'
         test_file: '/etc/vsftpd.conf'
         test_line: '{{ item }}'
         test_state: 'present'
@@ -16,7 +16,7 @@
         - 'guest_enable=YES'
         - 'pam_service_name=vsftpd_virtual'
 
-    - name: 'Default | verify | query virtual user test login success'
+    - name: 'Verify | query virtual user test login success'
       ansible.builtin.command:
         argv:
           - 'wget'
@@ -28,7 +28,7 @@
       changed_when: false
       register: _test_vsftpd_test_login
 
-    - name: 'Default | verify | assert virtual user test login success'
+    - name: 'Verify | assert virtual user test login success'
       ansible.builtin.assert:
         quiet: true
         that: _test_vsftpd_test_login.rc == 0
@@ -36,7 +36,7 @@
           ✘ test@127.0.0.1 should successfully login.
           ({{ _test_vsftpd_test_login.stderr }}).
 
-    - name: 'Default | verify | query virtual user test2 login success'
+    - name: 'Verify | query virtual user test2 login success'
       ansible.builtin.command:
         argv:
           - 'wget'
@@ -48,7 +48,7 @@
       changed_when: false
       register: _test_vsftpd_test_login
 
-    - name: 'Default | verify | assert virtual user test2 login success'
+    - name: 'Verify | assert virtual user test2 login success'
       ansible.builtin.assert:
         quiet: true
         that: _test_vsftpd_test_login.rc == 0

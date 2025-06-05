@@ -10,18 +10,18 @@
 # * https://security.appspot.com/vsftpd.html
 
 - name: 'Prep | assert mutually exclusive listen options'
-  when: vsftpd_config_listen.raw or vsftpd_config_listen_ipv6.raw
+  when: vsftpd_cfg_listen.raw or vsftpd_cfg_listen_ipv6.raw
   ansible.builtin.assert:
     quiet: true
-    that: vsftpd_config_listen.raw != vsftpd_config_listen_ipv6.raw
+    that: vsftpd_cfg_listen.raw != vsftpd_cfg_listen_ipv6.raw
     fail_msg: |
-      ✘ vsftpd_config_listen, vsftpd_config_listen_ipv6 are mutually exclusive.
+      ✘ vsftpd_cfg_listen, vsftpd_cfg_listen_ipv6 are mutually exclusive.
 
-           vsftpd_config_listen: {{ vsftpd_config_listen.raw }}
-      vsftpd_config_listen_ipv6: {{ vsftpd_config_listen_ipv6.raw }}
+           vsftpd_cfg_listen: {{ vsftpd_cfg_listen.raw }}
+      vsftpd_cfg_listen_ipv6: {{ vsftpd_cfg_listen_ipv6.raw }}
 
 - name: 'Prep | manage users'
-  when: vsftpd_create_user.raw
+  when: vsftpd_srv_create_user.raw
   ansible.builtin.include_role:
     name: 'r_pufky.deb.users'
     tasks_from: 'role_account_add.yml'
@@ -29,94 +29,97 @@
     users_role_user: '{{ vsftpd_role_user }}'
     users_role_group: '{{ vsftpd_role_group }}'
 
-- name: 'Prep | enumerate system user {{ vsftpd_user.raw }}'
+- name: 'Prep | enumerate system user {{ vsftpd_srv_user.raw }}'
   ansible.builtin.user:
-    name: '{{ vsftpd_user.raw }}'
+    name: '{{ vsftpd_srv_user.raw }}'
     state: 'present'
   check_mode: true
   changed_when: false
-  register: _vsftpd_user_query
+  register: _vsftpd_srv_user_query
 
 - name: 'Prep | parse system user UID/GID'
   ansible.builtin.set_fact:
-    vsftpd_user: '{{
-        vsftpd_user |
-        combine({"parsed": _vsftpd_user_query.uid})
+    vsftpd_srv_user: '{{
+        vsftpd_srv_user |
+        combine({"parsed": _vsftpd_srv_user_query.uid})
       }}'
-    vsftpd_group: '{{
-        vsftpd_group |
-        combine({"parsed": _vsftpd_user_query.group})
+    vsftpd_srv_group: '{{
+        vsftpd_srv_group |
+        combine({"parsed": _vsftpd_srv_user_query.group})
       }}'
 
 - name: 'Prep | set user home directory'
   ansible.builtin.file:
-    path: '{{ _vsftpd_user_query.home }}'
-    owner: '{{ vsftpd_user.parsed }}'
-    group: '{{ vsftpd_group.parsed }}'
-    mode: '{{ vsftpd_user_home_mode.raw }}'
+    path: '{{ _vsftpd_srv_user_query.home }}'
+    owner: '{{ vsftpd_srv_user.parsed }}'
+    group: '{{ vsftpd_srv_group.parsed }}'
+    mode: '{{ vsftpd_srv_user_home_mode.raw }}'
     state: 'directory'
-  become: '{{ true if vsftpd_user_data_manage_enable.raw else omit }}'
-  become_user:
-    '{{ vsftpd_user.raw if vsftpd_user_data_manage_enable.raw else omit }}'
+  become: '{{ true if vsftpd_srv_user_data_manage_enable.raw else omit }}'
+  become_user: '{{
+      vsftpd_srv_user.raw
+      if vsftpd_srv_user_data_manage_enable.raw else
+      omit
+    }}'
 
 - name:
-    'Prep | enumerate local root user {{ vsftpd_service_local_root_user.raw }}'
+    'Prep | enumerate local root user {{ vsftpd_srv_local_root_user.raw }}'
   ansible.builtin.user:
-    name: '{{ vsftpd_service_local_root_user.raw }}'
+    name: '{{ vsftpd_srv_local_root_user.raw }}'
     state: 'present'
   check_mode: true
   changed_when: false
-  register: _vsftpd_user_local_root_query
+  register: _vsftpd_srv_user_local_root_query
 
 - name: >
     Prep | enumerate local root group
-    {{ vsftpd_service_local_root_group.raw }}
+    {{ vsftpd_srv_local_root_group.raw }}
   ansible.builtin.group:
-    name: '{{ vsftpd_service_local_root_group.raw }}'
+    name: '{{ vsftpd_srv_local_root_group.raw }}'
     state: 'present'
   check_mode: true
   changed_when: false
-  register: _vsftpd_user_local_group_query
+  register: _vsftpd_srv_user_local_group_query
 
 - name: 'Prep | parse local root UID/GID'
   ansible.builtin.set_fact:
-    vsftpd_service_local_root_user: '{{
-        vsftpd_service_local_root_user |
-        combine({"parsed": _vsftpd_user_local_root_query.uid})
+    vsftpd_srv_local_root_user: '{{
+        vsftpd_srv_local_root_user |
+        combine({"parsed": _vsftpd_srv_user_local_root_query.uid})
       }}'
-    vsftpd_service_local_root_group: '{{
-        vsftpd_service_local_root_group |
-        combine({"parsed": _vsftpd_user_local_group_query.gid})
+    vsftpd_srv_local_root_group: '{{
+        vsftpd_srv_local_root_group |
+        combine({"parsed": _vsftpd_srv_user_local_group_query.gid})
       }}'
 
 - name:
-    'Prep | enumerate anon root user {{ vsftpd_service_anon_root_user.raw }}'
+    'Prep | enumerate anon root user {{ vsftpd_srv_anon_root_user.raw }}'
   ansible.builtin.user:
-    name: '{{ vsftpd_service_anon_root_user.raw }}'
+    name: '{{ vsftpd_srv_anon_root_user.raw }}'
     state: 'present'
   check_mode: true
   changed_when: false
-  register: _vsftpd_user_anon_root_query
+  register: _vsftpd_srv_user_anon_root_query
 
 - name: >
     Prep | enumerate anon root group
-    {{ vsftpd_service_anon_root_group.raw }}
+    {{ vsftpd_srv_anon_root_group.raw }}
   ansible.builtin.group:
-    name: '{{ vsftpd_service_anon_root_group.raw }}'
+    name: '{{ vsftpd_srv_anon_root_group.raw }}'
     state: 'present'
   check_mode: true
   changed_when: false
-  register: _vsftpd_user_anon_group_query
+  register: _vsftpd_srv_user_anon_group_query
 
 - name: 'Prep | parse local root UID/GID'
   ansible.builtin.set_fact:
-    vsftpd_service_anon_root_user: '{{
-        vsftpd_service_anon_root_user |
-        combine({"parsed": _vsftpd_user_anon_root_query.uid})
+    vsftpd_srv_anon_root_user: '{{
+        vsftpd_srv_anon_root_user |
+        combine({"parsed": _vsftpd_srv_user_anon_root_query.uid})
       }}'
-    vsftpd_service_anon_root_group: '{{
-        vsftpd_service_anon_root_group |
-        combine({"parsed": _vsftpd_user_anon_group_query.gid})
+    vsftpd_srv_anon_root_group: '{{
+        vsftpd_srv_anon_root_group |
+        combine({"parsed": _vsftpd_srv_user_anon_group_query.gid})
       }}'
 
 - name: 'Prep | stop services'

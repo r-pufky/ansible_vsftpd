@@ -1,10 +1,12 @@
 ---
 ###############################################################################
-# Default
+# User Data
 ###############################################################################
-# Default values results in running service.
+# Default test with user data management enabled.
+#
 #
 # Tests:
+# * vsftpd_srv_user_data_manage_enable=true.
 # * Test local user setup and login success.
 # * standard service override works correctly (service running).
 # * hardened service override works correctly (service running).
@@ -25,6 +27,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        vsftpd_srv_user_data_manage_enable: true
         vsftpd_cfg_write_enable: true
         vsftpd_cfg_chroot_local_user: true
         vsftpd_cfg_chroot_list_enable: true
@@ -35,14 +38,14 @@ provisioner:
       vsftpd-debian-12-default-hardened:
         vsftpd_srv_harden_enable: true
 platforms:
-  - name: 'vsftpd-debian-12-default'
+  - name: 'vsftpd-debian-12-user_data'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
     command: '/lib/systemd/systemd'
     pre_build_image: true
-  - name: 'vsftpd-debian-12-default-hardened'
+  - name: 'vsftpd-debian-12-user_data-hardened'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
     systemd: 'always'
     volumes:

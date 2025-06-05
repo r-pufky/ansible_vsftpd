@@ -26,13 +26,13 @@ Setup FTP server allowing `test_local_user` local user login. `test_local_user`
 is managed outside of this role.
 
 ``` yaml
-vsftpd_config_write_enable: true
-vsftpd_config_chroot_local_user: true
-vsftpd_config_chroot_list_enable: true
-vsftpd_config_chroot_list:
+vsftpd_cfg_write_enable: true
+vsftpd_cfg_chroot_local_user: true
+vsftpd_cfg_chroot_list_enable: true
+vsftpd_cfg_chroot_list:
   - 'test_local_user'
-vsftpd_config_ls_recurse_enable: true
-vsftpd_service_harden_enable: true
+vsftpd_cfg_ls_recurse_enable: true
+vsftpd_srv_harden_enable: true
 ```
 
 ``` yaml
@@ -49,20 +49,20 @@ account. Virtual user configuration is automatically managed, see defaults.
 
 host_vars/vsftpd.example.com/vars/vsftpd.yml
 ``` yaml
-vsftpd_user_home_mode: '0550'
-vsftpd_service_virtual_users:
+vsftpd_srv_user_home_mode: '0550'
+vsftpd_srv_virtual_users:
   - user: 'test'
     pass: '{{ vault_test }}'
   - user: 'test2'
     pass: '{{ vault_test2 }}'
-vsftpd_config_anonymous_enable: false
-vsftpd_config_local_enable: true
-vsftpd_config_write_enable: true
-vsftpd_config_chroot_local_user: true
-vsftpd_config_guest_enable: true
-vsftpd_config_guest_username: 'ftp'
-vsftpd_config_virtual_use_local_privs: true
-vsftpd_service_harden_enable: true
+vsftpd_cfg_anonymous_enable: false
+vsftpd_cfg_local_enable: true
+vsftpd_cfg_write_enable: true
+vsftpd_cfg_chroot_local_user: true
+vsftpd_cfg_guest_enable: true
+vsftpd_cfg_guest_username: 'ftp'
+vsftpd_cfg_virtual_use_local_privs: true
+vsftpd_srv_harden_enable: true
 ```
 
 ``` yaml
@@ -95,9 +95,9 @@ in:
 ```
 
 Check your configuration and set the backing user home directory read-only.
-See `vsftpd_service_local_root_mode`, `vsftpd_service_anon_root_mode`, and
-`vsftpd_user_home_mode`. Ensure `vsftpd_service_local_root_recursive_enable`,
-`vsftpd_service_anon_root_recursive_enable` are not plowing directory
+See `vsftpd_srv_local_root_mode`, `vsftpd_srv_anon_root_mode`, and
+`vsftpd_srv_user_home_mode`. Ensure `vsftpd_srv_local_root_recursive_enable`,
+`vsftpd_srv_anon_root_recursive_enable` are not plowing directory
 permissions.
 
 Typically `0550` permissions resolve.
