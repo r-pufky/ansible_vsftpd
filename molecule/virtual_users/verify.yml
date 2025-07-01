@@ -12,6 +12,7 @@
         test_file: '/etc/vsftpd.conf'
         test_line: '{{ item }}'
         test_state: 'present'
+        test_diff: true
       loop:
         - 'guest_enable=YES'
         - 'pam_service_name=vsftpd_virtual'

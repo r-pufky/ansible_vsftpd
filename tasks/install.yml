@@ -11,10 +11,16 @@
       - '{{ vsftpd_role_packages }}'
       - '{{
           vsftpd_role_virtual_user_packages
-          if vsftpd_srv_virtual_users.raw | length > 0 else
+          if _vsftpd_srv_virtual_users.raw | length > 0 else
           []
         }}'
     apt_package_update_cache: true
+
+- name: 'Prep | stop services'
+  ansible.builtin.systemd:
+    name: 'vsftpd'
+    state: 'stopped'
+  failed_when: false
 
 - name: 'Prep | create service config directory'
   ansible.builtin.file:

@@ -1,12 +1,12 @@
-{% for header in _vsftpd_cfg_order %}
+{% for header in _vsftpd_order %}
 # {{ header }}
-{% for section in _vsftpd_cfg_map | selectattr("value.section", "match", header) | sort(attribute="value.order") %}
-{% if not section.value.deprecated %}
-{% if section.value.hint == 'bool' %}
+{%   for section in _vsftpd_map | selectattr("value.section", "match", header) | sort(attribute="value.order") %}
+{%     if not section.value.deprecated %}
+{%       if section.value.hint == 'bool' %}
 {{ section.value.key }}={{ 'YES' if section.value.raw else 'NO' }}
-{% else %}
+{%       else %}
 {{ section.value.key }}={{ section.value.raw }}
-{% endif %}
-{% endif %}
-{% endfor %}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
 {% endfor %}

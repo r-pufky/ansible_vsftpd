@@ -14,6 +14,7 @@
         test_owner: 'root'
         test_group: 'root'
         test_mode: '{{ item.mode }}'
+        test_diff: true
       loop:
         - {file: 'banned_emails', mode: '0600'}
         - {file: 'banner_file', mode: '0644'}
@@ -34,3 +35,4 @@
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0644'
+        test_diff: true

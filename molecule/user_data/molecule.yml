@@ -4,7 +4,6 @@
 ###############################################################################
 # Default test with user data management enabled.
 #
-#
 # Tests:
 # * vsftpd_srv_user_data_manage_enable=true.
 # * Test local user setup and login success.

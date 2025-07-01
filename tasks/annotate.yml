@@ -14,11 +14,12 @@
 # * All data touched by user is in a standard, expected format.
 #
 # Annotated Defaults:
-# {VAR}: dict - Annotated and sanitized default variable.
+# _{VAR}: dict - Annotated and sanitized default variable.
 #   section: str - Section name.
 #   key: str - Config file key.
 #   raw: any - Raw config file value (set from defaults > role defaults).
 #   parsed: any - Processed raw config file value. Optional.
+#   role: any - Role specific config usage. Optional.
 #   hint: str - Value rendering type hint (docstring types).
 #   added: str - Release version variable added.
 #       Special Case:
@@ -28,8 +29,8 @@
 #   order: int - Order item should appear in rendered files.
 #
 # Generates:
-#   _vsftpd_cfg_map: list of dict - Annotated config map.
-#   _vsftpd_cfg_order: list of str - Config section order.
+#   _vsftpd_map: list of dict - Annotated config map.
+#   _vsftpd_order: list of str - Config section order.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -54,7 +55,7 @@
 
 - name: 'Annotate | sanitize & annotate config defaults'
   ansible.builtin.set_fact:
-    vsftpd_cfg_accept_timeout: {
+    _vsftpd_cfg_accept_timeout: {
       section: 'Default',
       key: 'accept_timeout',
       raw: '{{ vsftpd_cfg_accept_timeout | default(60) }}',
@@ -64,7 +65,7 @@
       deprecated: false,
       order: 1,
     }
-    vsftpd_cfg_allow_anon_ssl: {
+    _vsftpd_cfg_allow_anon_ssl: {
       section: 'Default',
       key: 'allow_anon_ssl',
       raw: '{{ vsftpd_cfg_allow_anon_ssl | default(false) }}',
@@ -74,7 +75,7 @@
       deprecated: false,
       order: 2,
     }
-    vsftpd_cfg_anon_max_rate: {
+    _vsftpd_cfg_anon_max_rate: {
       section: 'Default',
       key: 'anon_max_rate',
       raw: '{{ vsftpd_cfg_anon_max_rate | default(0) }}',
@@ -84,7 +85,7 @@
       deprecated: false,
       order: 3,
     }
-    vsftpd_cfg_anon_mkdir_write_enable: {
+    _vsftpd_cfg_anon_mkdir_write_enable: {
       section: 'Default',
       key: 'anon_mkdir_write_enable',
       raw: '{{ vsftpd_cfg_anon_mkdir_write_enable | default(false) }}',
@@ -94,7 +95,7 @@
       deprecated: false,
       order: 4,
     }
-    vsftpd_cfg_anon_other_write_enable: {
+    _vsftpd_cfg_anon_other_write_enable: {
       section: 'Default',
       key: 'anon_other_write_enable',
       raw: '{{ vsftpd_cfg_anon_other_write_enable | default(false) }}',
@@ -104,7 +105,7 @@
       deprecated: false,
       order: 5,
     }
-    vsftpd_cfg_anon_root: {
+    _vsftpd_cfg_anon_root: {
       section: 'Default',
       key: 'anon_root',
       raw: '{{ vsftpd_cfg_anon_root | default("") }}',
@@ -114,7 +115,7 @@
       deprecated: false,
       order: 6,
     }
-    vsftpd_cfg_anon_umask: {
+    _vsftpd_cfg_anon_umask: {
       section: 'Default',
       key: 'anon_umask',
       raw: '{{ vsftpd_cfg_anon_umask | default("077") }}',
@@ -124,7 +125,7 @@
       deprecated: false,
       order: 7,
     }
-    vsftpd_cfg_anon_upload_enable: {
+    _vsftpd_cfg_anon_upload_enable: {
       section: 'Default',
       key: 'anon_upload_enable',
       raw: '{{ vsftpd_cfg_anon_upload_enable | default(false) }}',
@@ -134,7 +135,7 @@
       deprecated: false,
       order: 8,
     }
-    vsftpd_cfg_anon_world_readable_only: {
+    _vsftpd_cfg_anon_world_readable_only: {
       section: 'Default',
       key: 'anon_world_readable_only',
       raw: '{{ vsftpd_cfg_anon_world_readable_only | default(true) }}',
@@ -144,7 +145,7 @@
       deprecated: false,
       order: 9,
     }
-    vsftpd_cfg_anonymous_enable: {
+    _vsftpd_cfg_anonymous_enable: {
       section: 'Default',
       key: 'anonymous_enable',
       raw: '{{ vsftpd_cfg_anonymous_enable | default(false) }}',
@@ -154,7 +155,7 @@
       deprecated: false,
       order: 10,
     }
-    vsftpd_cfg_ascii_download_enable: {
+    _vsftpd_cfg_ascii_download_enable: {
       section: 'Default',
       key: 'ascii_download_enable',
       raw: '{{ vsftpd_cfg_ascii_download_enable | default(false) }}',
@@ -164,7 +165,7 @@
       deprecated: false,
       order: 11,
     }
-    vsftpd_cfg_ascii_upload_enable: {
+    _vsftpd_cfg_ascii_upload_enable: {
       section: 'Default',
       key: 'ascii_upload_enable',
       raw: '{{ vsftpd_cfg_ascii_upload_enable | default(false) }}',
@@ -174,7 +175,7 @@
       deprecated: false,
       order: 12,
     }
-    vsftpd_cfg_async_abor_enable: {
+    _vsftpd_cfg_async_abor_enable: {
       section: 'Default',
       key: 'async_abor_enable',
       raw: '{{ vsftpd_cfg_async_abor_enable | default(false) }}',
@@ -184,7 +185,7 @@
       deprecated: false,
       order: 13,
     }
-    vsftpd_cfg_background: {
+    _vsftpd_cfg_background: {
       section: 'Default',
       key: 'background',
       raw: '{{ vsftpd_cfg_background | default(false) }}',
@@ -194,7 +195,7 @@
       deprecated: false,
       order: 14,
     }
-    vsftpd_cfg_banned_emails: {
+    _vsftpd_cfg_banned_emails: {
       section: 'Default',
       key: 'banned_email_file',
       raw: '{{
@@ -209,7 +210,7 @@
       deprecated: false,
       order: 15,
     }
-    vsftpd_cfg_banner: {
+    _vsftpd_cfg_banner: {
       section: 'Default',
       key: 'banner_file',
       raw: '{{
@@ -224,7 +225,7 @@
       deprecated: false,
       order: 16,
     }
-    vsftpd_cfg_ca_certs_file: {
+    _vsftpd_cfg_ca_certs_file: {
       section: 'Default',
       key: 'ca_certs_file',
       raw: '{{
@@ -239,7 +240,7 @@
       deprecated: false,
       order: 17,
     }
-    vsftpd_cfg_check_shell: {
+    _vsftpd_cfg_check_shell: {
       section: 'Default',
       key: 'check_shell',
       raw: '{{ vsftpd_cfg_check_shell | default(true) }}',
@@ -249,7 +250,7 @@
       deprecated: false,
       order: 18,
     }
-    vsftpd_cfg_chmod_enable: {
+    _vsftpd_cfg_chmod_enable: {
       section: 'Default',
       key: 'chmod_enable',
       raw: '{{ vsftpd_cfg_chmod_enable | default(true) }}',
@@ -259,7 +260,7 @@
       deprecated: false,
       order: 19,
     }
-    vsftpd_cfg_chown_upload_mode: {
+    _vsftpd_cfg_chown_upload_mode: {
       section: 'Default',
       key: 'chown_upload_mode',
       raw: '{{ vsftpd_cfg_chown_upload_mode | default("0600") }}',
@@ -269,7 +270,7 @@
       deprecated: false,
       order: 20,
     }
-    vsftpd_cfg_chown_uploads: {
+    _vsftpd_cfg_chown_uploads: {
       section: 'Default',
       key: 'chown_uploads',
       raw: '{{ vsftpd_cfg_chown_uploads | default(false) }}',
@@ -279,7 +280,7 @@
       deprecated: false,
       order: 21,
     }
-    vsftpd_cfg_chown_username: {
+    _vsftpd_cfg_chown_username: {
       section: 'Default',
       key: 'chown_username',
       raw: '{{ vsftpd_cfg_chown_username | default("root") }}',
@@ -289,7 +290,7 @@
       deprecated: false,
       order: 22,
     }
-    vsftpd_cfg_chroot_list_enable: {
+    _vsftpd_cfg_chroot_list_enable: {
       section: 'Default',
       key: 'chroot_list_enable',
       raw: '{{ vsftpd_cfg_chroot_list_enable | default(false) }}',
@@ -299,7 +300,7 @@
       deprecated: false,
       order: 23,
     }
-    vsftpd_cfg_chroot_list: {
+    _vsftpd_cfg_chroot_list: {
       section: 'Default',
       key: 'chroot_list_file',
       raw: '{{
@@ -314,7 +315,7 @@
       deprecated: false,
       order: 24,
     }
-    vsftpd_cfg_chroot_local_user: {
+    _vsftpd_cfg_chroot_local_user: {
       section: 'Default',
       key: 'chroot_local_user',
       raw: '{{ vsftpd_cfg_chroot_local_user | default(false) }}',
@@ -324,7 +325,7 @@
       deprecated: false,
       order: 25,
     }
-    vsftpd_cfg_cmds_allowed: {
+    _vsftpd_cfg_cmds_allowed: {
       section: 'Default',
       key: 'cmds_allowed',
       raw: '{{ vsftpd_cfg_cmds_allowed | default([]) | join(",") }}',
@@ -334,7 +335,7 @@
       deprecated: false,
       order: 26,
     }
-    vsftpd_cfg_cmds_denied: {
+    _vsftpd_cfg_cmds_denied: {
       section: 'Default',
       key: 'cmds_denied',
       raw: '{{ vsftpd_cfg_cmds_denied | default([]) | join(",") }}',
@@ -344,7 +345,7 @@
       deprecated: false,
       order: 27,
     }
-    vsftpd_cfg_connect_from_port_20: {
+    _vsftpd_cfg_connect_from_port_20: {
       section: 'Default',
       key: 'connect_from_port_20',
       raw: '{{ vsftpd_cfg_connect_from_port_20 | default(true) }}',
@@ -354,7 +355,7 @@
       deprecated: false,
       order: 28,
     }
-    vsftpd_cfg_connect_timeout: {
+    _vsftpd_cfg_connect_timeout: {
       section: 'Default',
       key: 'connect_timeout',
       raw: '{{ vsftpd_cfg_connect_timeout | default(60) }}',
@@ -364,7 +365,7 @@
       deprecated: false,
       order: 29,
     }
-    vsftpd_cfg_data_connection_timeout: {
+    _vsftpd_cfg_data_connection_timeout: {
       section: 'Default',
       key: 'data_connection_timeout',
       raw: '{{ vsftpd_cfg_data_connection_timeout | default(300) }}',
@@ -374,7 +375,7 @@
       deprecated: false,
       order: 30,
     }
-    vsftpd_cfg_debug_ssl: {
+    _vsftpd_cfg_debug_ssl: {
       section: 'Default',
       key: 'debug_ssl',
       raw: '{{ vsftpd_cfg_debug_ssl | default(false) }}',
@@ -384,7 +385,7 @@
       deprecated: false,
       order: 31,
     }
-    vsftpd_cfg_delay_failed_login: {
+    _vsftpd_cfg_delay_failed_login: {
       section: 'Default',
       key: 'delay_failed_login',
       raw: '{{ vsftpd_cfg_delay_failed_login | default(1) }}',
@@ -394,7 +395,7 @@
       deprecated: false,
       order: 32,
     }
-    vsftpd_cfg_delay_successful_login: {
+    _vsftpd_cfg_delay_successful_login: {
       section: 'Default',
       key: 'delay_successful_login',
       raw: '{{ vsftpd_cfg_delay_successful_login | default(0) }}',
@@ -404,7 +405,7 @@
       deprecated: false,
       order: 33,
     }
-    vsftpd_cfg_delete_failed_uploads: {
+    _vsftpd_cfg_delete_failed_uploads: {
       section: 'Default',
       key: 'delete_failed_uploads',
       raw: '{{ vsftpd_cfg_delete_failed_uploads | default(false) }}',
@@ -414,7 +415,7 @@
       deprecated: false,
       order: 34,
     }
-    vsftpd_cfg_deny_email_enable: {
+    _vsftpd_cfg_deny_email_enable: {
       section: 'Default',
       key: 'deny_email_enable',
       raw: '{{ vsftpd_cfg_deny_email_enable | default(false) }}',
@@ -424,7 +425,7 @@
       deprecated: false,
       order: 35,
     }
-    vsftpd_cfg_deny_file: {
+    _vsftpd_cfg_deny_file: {
       section: 'Default',
       key: 'deny_file',
       raw: '{{
@@ -438,7 +439,7 @@
       deprecated: false,
       order: 36,
     }
-    vsftpd_cfg_dirlist_enable: {
+    _vsftpd_cfg_dirlist_enable: {
       section: 'Default',
       key: 'dirlist_enable',
       raw: '{{ vsftpd_cfg_dirlist_enable | default(true) }}',
@@ -448,7 +449,7 @@
       deprecated: false,
       order: 37,
     }
-    vsftpd_cfg_dirmessage_enable: {
+    _vsftpd_cfg_dirmessage_enable: {
       section: 'Default',
       key: 'dirmessage_enable',
       raw: '{{ vsftpd_cfg_dirmessage_enable | default(true) }}',
@@ -458,7 +459,7 @@
       deprecated: false,
       order: 38,
     }
-    vsftpd_cfg_download_enable: {
+    _vsftpd_cfg_download_enable: {
       section: 'Default',
       key: 'download_enable',
       raw: '{{ vsftpd_cfg_download_enable | default(true) }}',
@@ -468,7 +469,7 @@
       deprecated: false,
       order: 39,
     }
-    vsftpd_cfg_download_file: {
+    _vsftpd_cfg_download_file: {
       section: 'Default',
       key: 'download_file',
       raw: '{{
@@ -482,7 +483,7 @@
       deprecated: false,
       order: 40,
     }
-    vsftpd_cfg_dsa_cert_file: {
+    _vsftpd_cfg_dsa_cert_file: {
       section: 'Default',
       key: 'dsa_cert_file',
       raw: '{{
@@ -497,7 +498,7 @@
       deprecated: false,
       order: 41,
     }
-    vsftpd_cfg_dsa_private_key_file: {
+    _vsftpd_cfg_dsa_private_key_file: {
       section: 'Default',
       key: 'dsa_private_key_file',
       raw: '{{
@@ -512,7 +513,7 @@
       deprecated: false,
       order: 42,
     }
-    vsftpd_cfg_dual_log_enable: {
+    _vsftpd_cfg_dual_log_enable: {
       section: 'Default',
       key: 'dual_log_enable',
       raw: '{{ vsftpd_cfg_dual_log_enable | default(false) }}',
@@ -522,7 +523,7 @@
       deprecated: false,
       order: 43,
     }
-    vsftpd_cfg_email_passwords: {
+    _vsftpd_cfg_email_passwords: {
       section: 'Default',
       key: 'email_password_file',
       raw: '{{
@@ -537,7 +538,7 @@
       deprecated: false,
       order: 44,
     }
-    vsftpd_cfg_file_open_mode: {
+    _vsftpd_cfg_file_open_mode: {
       section: 'Default',
       key: 'file_open_mode',
       raw: '{{ vsftpd_cfg_file_open_mode | default("0666") }}',
@@ -547,7 +548,7 @@
       deprecated: false,
       order: 45,
     }
-    vsftpd_cfg_force_anon_data_ssl: {
+    _vsftpd_cfg_force_anon_data_ssl: {
       section: 'Default',
       key: 'force_anon_data_ssl',
       raw: '{{ vsftpd_cfg_force_anon_data_ssl | default(false) }}',
@@ -557,7 +558,7 @@
       deprecated: false,
       order: 46,
     }
-    vsftpd_cfg_force_anon_logins_ssl: {
+    _vsftpd_cfg_force_anon_logins_ssl: {
       section: 'Default',
       key: 'force_anon_logins_ssl',
       raw: '{{ vsftpd_cfg_force_anon_logins_ssl | default(false) }}',
@@ -567,7 +568,7 @@
       deprecated: false,
       order: 47,
     }
-    vsftpd_cfg_force_dot_files: {
+    _vsftpd_cfg_force_dot_files: {
       section: 'Default',
       key: 'force_dot_files',
       raw: '{{ vsftpd_cfg_force_dot_files | default(false) }}',
@@ -577,7 +578,7 @@
       deprecated: false,
       order: 48,
     }
-    vsftpd_cfg_force_local_data_ssl: {
+    _vsftpd_cfg_force_local_data_ssl: {
       section: 'Default',
       key: 'force_local_data_ssl',
       raw: '{{ vsftpd_cfg_force_local_data_ssl | default(true) }}',
@@ -587,7 +588,7 @@
       deprecated: false,
       order: 49,
     }
-    vsftpd_cfg_force_local_logins_ssl: {
+    _vsftpd_cfg_force_local_logins_ssl: {
       section: 'Default',
       key: 'force_local_logins_ssl',
       raw: '{{ vsftpd_cfg_force_local_logins_ssl | default(true) }}',
@@ -597,7 +598,7 @@
       deprecated: false,
       order: 50,
     }
-    vsftpd_cfg_ftp_data_port: {
+    _vsftpd_cfg_ftp_data_port: {
       section: 'Default',
       key: 'ftp_data_port',
       raw: '{{ vsftpd_cfg_ftp_data_port | default(20) }}',
@@ -607,7 +608,7 @@
       deprecated: false,
       order: 51,
     }
-    vsftpd_cfg_ftp_username: {
+    _vsftpd_cfg_ftp_username: {
       section: 'Default',
       key: 'ftp_username',
       raw: '{{ vsftpd_cfg_ftp_username | default("ftp") }}',
@@ -617,7 +618,7 @@
       deprecated: false,
       order: 52,
     }
-    vsftpd_cfg_ftpd_banner: {
+    _vsftpd_cfg_ftpd_banner: {
       section: 'Default',
       key: 'ftpd_banner',
       raw: '{{ vsftpd_cfg_ftpd_banner | default("") }}',
@@ -627,7 +628,7 @@
       deprecated: false,
       order: 53,
     }
-    vsftpd_cfg_guest_enable: {
+    _vsftpd_cfg_guest_enable: {
       section: 'Default',
       key: 'guest_enable',
       raw: '{{
@@ -640,7 +641,7 @@
       deprecated: false,
       order: 54,
     }
-    vsftpd_cfg_guest_username: {
+    _vsftpd_cfg_guest_username: {
       section: 'Default',
       key: 'guest_username',
       raw: '{{ vsftpd_cfg_guest_username | default("ftp") }}',
@@ -650,7 +651,7 @@
       deprecated: false,
       order: 55,
     }
-    vsftpd_cfg_hide_file: {
+    _vsftpd_cfg_hide_file: {
       section: 'Default',
       key: 'hide_file',
       raw: '{{
@@ -664,7 +665,7 @@
       deprecated: false,
       order: 56,
     }
-    vsftpd_cfg_hide_ids: {
+    _vsftpd_cfg_hide_ids: {
       section: 'Default',
       key: 'hide_ids',
       raw: '{{ vsftpd_cfg_hide_ids | default(false) }}',
@@ -674,7 +675,7 @@
       deprecated: false,
       order: 57,
     }
-    vsftpd_cfg_idle_session_timeout: {
+    _vsftpd_cfg_idle_session_timeout: {
       section: 'Default',
       key: 'idle_session_timeout',
       raw: '{{ vsftpd_cfg_idle_session_timeout | default(300) }}',
@@ -684,7 +685,7 @@
       deprecated: false,
       order: 58,
     }
-    vsftpd_cfg_implicit_ssl: {
+    _vsftpd_cfg_implicit_ssl: {
       section: 'Default',
       key: 'implicit_ssl',
       raw: '{{ vsftpd_cfg_implicit_ssl | default(false) }}',
@@ -694,7 +695,7 @@
       deprecated: false,
       order: 59,
     }
-    vsftpd_cfg_listen: {
+    _vsftpd_cfg_listen: {
       section: 'Default',
       key: 'listen',
       raw: '{{ vsftpd_cfg_listen | default(false) }}',
@@ -704,7 +705,7 @@
       deprecated: false,
       order: 60,
     }
-    vsftpd_cfg_listen_address6: {
+    _vsftpd_cfg_listen_address6: {
       section: 'Default',
       key: 'listen_address6',
       raw: '{{ vsftpd_cfg_listen_address6 | default("") }}',
@@ -714,7 +715,7 @@
       deprecated: false,
       order: 61,
     }
-    vsftpd_cfg_listen_address: {
+    _vsftpd_cfg_listen_address: {
       section: 'Default',
       key: 'listen_address',
       raw: '{{ vsftpd_cfg_listen_address | default("") }}',
@@ -724,7 +725,7 @@
       deprecated: false,
       order: 62,
     }
-    vsftpd_cfg_listen_ipv6: {
+    _vsftpd_cfg_listen_ipv6: {
       section: 'Default',
       key: 'listen_ipv6',
       raw: '{{ vsftpd_cfg_listen_ipv6 | default(true) }}',
@@ -734,7 +735,7 @@
       deprecated: false,
       order: 63,
     }
-    vsftpd_cfg_listen_port: {
+    _vsftpd_cfg_listen_port: {
       section: 'Default',
       key: 'listen_port',
       raw: '{{ vsftpd_cfg_listen_port | default(21) }}',
@@ -744,7 +745,7 @@
       deprecated: false,
       order: 64,
     }
-    vsftpd_cfg_local_enable: {
+    _vsftpd_cfg_local_enable: {
       section: 'Default',
       key: 'local_enable',
       raw: '{{ vsftpd_cfg_local_enable | default(true) }}',
@@ -754,7 +755,7 @@
       deprecated: false,
       order: 65,
     }
-    vsftpd_cfg_local_max_rate: {
+    _vsftpd_cfg_local_max_rate: {
       section: 'Default',
       key: 'local_max_rate',
       raw: '{{ vsftpd_cfg_local_max_rate | default(0) }}',
@@ -764,7 +765,7 @@
       deprecated: false,
       order: 66,
     }
-    vsftpd_cfg_local_root: {
+    _vsftpd_cfg_local_root: {
       section: 'Default',
       key: 'local_root',
       raw: '{{ vsftpd_cfg_local_root | default("") }}',
@@ -774,7 +775,7 @@
       deprecated: false,
       order: 67,
     }
-    vsftpd_cfg_local_umask: {
+    _vsftpd_cfg_local_umask: {
       section: 'Default',
       key: 'local_umask',
       raw: '{{ vsftpd_cfg_local_umask | default("077") }}',
@@ -784,7 +785,7 @@
       deprecated: false,
       order: 68,
     }
-    vsftpd_cfg_lock_upload_files: {
+    _vsftpd_cfg_lock_upload_files: {
       section: 'Default',
       key: 'lock_upload_files',
       raw: '{{ vsftpd_cfg_lock_upload_files | default(true) }}',
@@ -794,7 +795,7 @@
       deprecated: false,
       order: 69,
     }
-    vsftpd_cfg_log_ftp_protocol: {
+    _vsftpd_cfg_log_ftp_protocol: {
       section: 'Default',
       key: 'log_ftp_protocol',
       raw: '{{ vsftpd_cfg_log_ftp_protocol | default(false) }}',
@@ -804,7 +805,7 @@
       deprecated: false,
       order: 70,
     }
-    vsftpd_cfg_ls_recurse_enable: {
+    _vsftpd_cfg_ls_recurse_enable: {
       section: 'Default',
       key: 'ls_recurse_enable',
       raw: '{{ vsftpd_cfg_ls_recurse_enable | default(false) }}',
@@ -814,7 +815,7 @@
       deprecated: false,
       order: 71,
     }
-    vsftpd_cfg_max_clients: {
+    _vsftpd_cfg_max_clients: {
       section: 'Default',
       key: 'max_clients',
       raw: '{{ vsftpd_cfg_max_clients | default(2000) }}',
@@ -824,7 +825,7 @@
       deprecated: false,
       order: 72,
     }
-    vsftpd_cfg_max_login_fails: {
+    _vsftpd_cfg_max_login_fails: {
       section: 'Default',
       key: 'max_login_fails',
       raw: '{{ vsftpd_cfg_max_login_fails | default(3) }}',
@@ -834,7 +835,7 @@
       deprecated: false,
       order: 73,
     }
-    vsftpd_cfg_max_per_ip: {
+    _vsftpd_cfg_max_per_ip: {
       section: 'Default',
       key: 'max_per_ip',
       raw: '{{ vsftpd_cfg_max_per_ip | default(50) }}',
@@ -844,7 +845,7 @@
       deprecated: false,
       order: 74,
     }
-    vsftpd_cfg_mdtm_write: {
+    _vsftpd_cfg_mdtm_write: {
       section: 'Default',
       key: 'mdtm_write',
       raw: '{{ vsftpd_cfg_mdtm_write | default(true) }}',
@@ -854,7 +855,7 @@
       deprecated: false,
       order: 75,
     }
-    vsftpd_cfg_message_file: {
+    _vsftpd_cfg_message_file: {
       section: 'Default',
       key: 'message_file',
       raw: '{{ vsftpd_cfg_message_file | default(".message") }}',
@@ -864,7 +865,7 @@
       deprecated: false,
       order: 76,
     }
-    vsftpd_cfg_no_anon_password: {
+    _vsftpd_cfg_no_anon_password: {
       section: 'Default',
       key: 'no_anon_password',
       raw: '{{ vsftpd_cfg_no_anon_password | default(false) }}',
@@ -874,7 +875,7 @@
       deprecated: false,
       order: 77,
     }
-    vsftpd_cfg_no_log_lock: {
+    _vsftpd_cfg_no_log_lock: {
       section: 'Default',
       key: 'no_log_lock',
       raw: '{{ vsftpd_cfg_no_log_lock | default(false) }}',
@@ -884,7 +885,7 @@
       deprecated: false,
       order: 78,
     }
-    vsftpd_cfg_nopriv_user: {
+    _vsftpd_cfg_nopriv_user: {
       section: 'Default',
       key: 'nopriv_user',
       raw: '{{ vsftpd_cfg_nopriv_user | default("nobody") }}',
@@ -894,7 +895,7 @@
       deprecated: false,
       order: 79,
     }
-    vsftpd_cfg_one_process_model: {
+    _vsftpd_cfg_one_process_model: {
       section: 'Default',
       key: 'one_process_model',
       raw: '{{ vsftpd_cfg_one_process_model | default(false) }}',
@@ -904,7 +905,7 @@
       deprecated: false,
       order: 80,
     }
-    vsftpd_cfg_pam_service_name: {
+    _vsftpd_cfg_pam_service_name: {
       section: 'Default',
       key: 'pam_service_name',
       raw: '{{
@@ -924,7 +925,7 @@
       deprecated: false,
       order: 81,
     }
-    vsftpd_cfg_passwd_chroot_enable: {
+    _vsftpd_cfg_passwd_chroot_enable: {
       section: 'Default',
       key: 'passwd_chroot_enable',
       raw: '{{ vsftpd_cfg_passwd_chroot_enable | default(false) }}',
@@ -934,7 +935,7 @@
       deprecated: false,
       order: 82,
     }
-    vsftpd_cfg_pasv_addr_resolve: {
+    _vsftpd_cfg_pasv_addr_resolve: {
       section: 'Default',
       key: 'pasv_addr_resolve',
       raw: '{{ vsftpd_cfg_pasv_addr_resolve | default(false) }}',
@@ -944,7 +945,7 @@
       deprecated: false,
       order: 83,
     }
-    vsftpd_cfg_pasv_address: {
+    _vsftpd_cfg_pasv_address: {
       section: 'Default',
       key: 'pasv_address',
       raw: '{{ vsftpd_cfg_pasv_address | default("") }}',
@@ -954,7 +955,7 @@
       deprecated: false,
       order: 84,
     }
-    vsftpd_cfg_pasv_enable: {
+    _vsftpd_cfg_pasv_enable: {
       section: 'Default',
       key: 'pasv_enable',
       raw: '{{ vsftpd_cfg_pasv_enable | default(true) }}',
@@ -964,7 +965,7 @@
       deprecated: false,
       order: 85,
     }
-    vsftpd_cfg_pasv_max_port: {
+    _vsftpd_cfg_pasv_max_port: {
       section: 'Default',
       key: 'pasv_max_port',
       raw: '{{ vsftpd_cfg_pasv_max_port | default(0) }}',
@@ -974,7 +975,7 @@
       deprecated: false,
       order: 86,
     }
-    vsftpd_cfg_pasv_min_port: {
+    _vsftpd_cfg_pasv_min_port: {
       section: 'Default',
       key: 'pasv_min_port',
       raw: '{{ vsftpd_cfg_pasv_min_port | default(0) }}',
@@ -984,7 +985,7 @@
       deprecated: false,
       order: 87,
     }
-    vsftpd_cfg_pasv_promiscuous: {
+    _vsftpd_cfg_pasv_promiscuous: {
       section: 'Default',
       key: 'pasv_promiscuous',
       raw: '{{ vsftpd_cfg_pasv_promiscuous | default(false) }}',
@@ -994,7 +995,7 @@
       deprecated: false,
       order: 88,
     }
-    vsftpd_cfg_port_enable: {
+    _vsftpd_cfg_port_enable: {
       section: 'Default',
       key: 'port_enable',
       raw: '{{ vsftpd_cfg_port_enable | default(true) }}',
@@ -1004,7 +1005,7 @@
       deprecated: false,
       order: 89,
     }
-    vsftpd_cfg_port_promiscuous: {
+    _vsftpd_cfg_port_promiscuous: {
       section: 'Default',
       key: 'port_promiscuous',
       raw: '{{ vsftpd_cfg_port_promiscuous | default(false) }}',
@@ -1014,7 +1015,7 @@
       deprecated: false,
       order: 90,
     }
-    vsftpd_cfg_require_cert: {
+    _vsftpd_cfg_require_cert: {
       section: 'Default',
       key: 'require_cert',
       raw: '{{ vsftpd_cfg_require_cert | default(false) }}',
@@ -1024,7 +1025,7 @@
       deprecated: false,
       order: 91,
     }
-    vsftpd_cfg_require_ssl_reuse: {
+    _vsftpd_cfg_require_ssl_reuse: {
       section: 'Default',
       key: 'require_ssl_reuse',
       raw: '{{ vsftpd_cfg_require_ssl_reuse | default(true) }}',
@@ -1034,7 +1035,7 @@
       deprecated: false,
       order: 92,
     }
-    vsftpd_cfg_rsa_cert_file: {
+    _vsftpd_cfg_rsa_cert_file: {
       section: 'Default',
       key: 'rsa_cert_file',
       raw: '{{
@@ -1049,7 +1050,7 @@
       deprecated: false,
       order: 93,
     }
-    vsftpd_cfg_rsa_private_key_file: {
+    _vsftpd_cfg_rsa_private_key_file: {
       section: 'Default',
       key: 'rsa_private_key_file',
       raw: '{{
@@ -1064,7 +1065,7 @@
       deprecated: false,
       order: 94,
     }
-    vsftpd_cfg_run_as_launching_user: {
+    _vsftpd_cfg_run_as_launching_user: {
       section: 'Default',
       key: 'run_as_launching_user',
       raw: '{{ vsftpd_cfg_run_as_launching_user | default(false) }}',
@@ -1074,7 +1075,7 @@
       deprecated: false,
       order: 95,
     }
-    vsftpd_cfg_secure_chroot_dir: {
+    _vsftpd_cfg_secure_chroot_dir: {
       section: 'Default',
       key: 'secure_chroot_dir',
       raw:
@@ -1085,7 +1086,7 @@
       deprecated: false,
       order: 96,
     }
-    vsftpd_cfg_secure_email_list_enable: {
+    _vsftpd_cfg_secure_email_list_enable: {
       section: 'Default',
       key: 'secure_email_list_enable',
       raw: '{{ vsftpd_cfg_secure_email_list_enable | default(false) }}',
@@ -1095,7 +1096,7 @@
       deprecated: false,
       order: 97,
     }
-    vsftpd_cfg_session_support: {
+    _vsftpd_cfg_session_support: {
       section: 'Default',
       key: 'session_support',
       raw: '{{ vsftpd_cfg_session_support | default(false) }}',
@@ -1105,7 +1106,7 @@
       deprecated: false,
       order: 98,
     }
-    vsftpd_cfg_setproctitle_enable: {
+    _vsftpd_cfg_setproctitle_enable: {
       section: 'Default',
       key: 'setproctitle_enable',
       raw: '{{ vsftpd_cfg_setproctitle_enable | default(false) }}',
@@ -1115,7 +1116,7 @@
       deprecated: false,
       order: 99,
     }
-    vsftpd_cfg_ssl_ciphers: {
+    _vsftpd_cfg_ssl_ciphers: {
       section: 'Default',
       key: 'ssl_ciphers',
       raw: '{{ vsftpd_cfg_ssl_ciphers | default("DES-CBC3-SHA") }}',
@@ -1125,7 +1126,7 @@
       deprecated: false,
       order: 100,
     }
-    vsftpd_cfg_ssl_enable: {
+    _vsftpd_cfg_ssl_enable: {
       section: 'Default',
       key: 'ssl_enable',
       raw: '{{ vsftpd_cfg_ssl_enable | default(false) }}',
@@ -1135,7 +1136,7 @@
       deprecated: false,
       order: 101,
     }
-    vsftpd_cfg_ssl_request_cert: {
+    _vsftpd_cfg_ssl_request_cert: {
       section: 'Default',
       key: 'ssl_request_cert',
       raw: '{{ vsftpd_cfg_ssl_request_cert | default(true) }}',
@@ -1145,7 +1146,7 @@
       deprecated: false,
       order: 102,
     }
-    vsftpd_cfg_ssl_sslv2: {
+    _vsftpd_cfg_ssl_sslv2: {
       section: 'Default',
       key: 'ssl_sslv2',
       raw: '{{ vsftpd_cfg_ssl_sslv2 | default(false) }}',
@@ -1155,7 +1156,7 @@
       deprecated: false,
       order: 103,
     }
-    vsftpd_cfg_ssl_sslv3: {
+    _vsftpd_cfg_ssl_sslv3: {
       section: 'Default',
       key: 'ssl_sslv3',
       raw: '{{ vsftpd_cfg_ssl_sslv3 | default(false) }}',
@@ -1165,7 +1166,7 @@
       deprecated: false,
       order: 104,
     }
-    vsftpd_cfg_ssl_tlsv1: {
+    _vsftpd_cfg_ssl_tlsv1: {
       section: 'Default',
       key: 'ssl_tlsv1',
       raw: '{{ vsftpd_cfg_ssl_tlsv1 | default(true) }}',
@@ -1175,7 +1176,7 @@
       deprecated: false,
       order: 105,
     }
-    vsftpd_cfg_strict_ssl_read_eof: {
+    _vsftpd_cfg_strict_ssl_read_eof: {
       section: 'Default',
       key: 'strict_ssl_read_eof',
       raw: '{{ vsftpd_cfg_strict_ssl_read_eof | default(false) }}',
@@ -1185,7 +1186,7 @@
       deprecated: false,
       order: 106,
     }
-    vsftpd_cfg_strict_ssl_write_shutdown: {
+    _vsftpd_cfg_strict_ssl_write_shutdown: {
       section: 'Default',
       key: 'strict_ssl_write_shutdown',
       raw: '{{ vsftpd_cfg_strict_ssl_write_shutdown | default(false) }}',
@@ -1195,7 +1196,7 @@
       deprecated: false,
       order: 107,
     }
-    vsftpd_cfg_syslog_enable: {
+    _vsftpd_cfg_syslog_enable: {
       section: 'Default',
       key: 'syslog_enable',
       raw: '{{ vsftpd_cfg_syslog_enable | default(false) }}',
@@ -1205,7 +1206,7 @@
       deprecated: false,
       order: 108,
     }
-    vsftpd_cfg_tcp_wrappers: {
+    _vsftpd_cfg_tcp_wrappers: {
       section: 'Default',
       key: 'tcp_wrappers',
       raw: '{{ vsftpd_cfg_tcp_wrappers | default(false) }}',
@@ -1215,7 +1216,7 @@
       deprecated: false,
       order: 109,
     }
-    vsftpd_cfg_text_userdb_names: {
+    _vsftpd_cfg_text_userdb_names: {
       section: 'Default',
       key: 'text_userdb_names',
       raw: '{{ vsftpd_cfg_text_userdb_names | default(false) }}',
@@ -1225,7 +1226,7 @@
       deprecated: false,
       order: 110,
     }
-    vsftpd_cfg_tilde_user_enable: {
+    _vsftpd_cfg_tilde_user_enable: {
       section: 'Default',
       key: 'tilde_user_enable',
       raw: '{{ vsftpd_cfg_tilde_user_enable | default(false) }}',
@@ -1235,7 +1236,7 @@
       deprecated: false,
       order: 111,
     }
-    vsftpd_cfg_trans_chunk_size: {
+    _vsftpd_cfg_trans_chunk_size: {
       section: 'Default',
       key: 'trans_chunk_size',
       raw: '{{ vsftpd_cfg_trans_chunk_size | default(0) }}',
@@ -1245,7 +1246,7 @@
       deprecated: false,
       order: 112,
     }
-    vsftpd_cfg_upload_file: {
+    _vsftpd_cfg_upload_file: {
       section: 'Default',
       key: 'upload_file',
       raw: '{{
@@ -1259,7 +1260,7 @@
       deprecated: false,
       order: 113,
     }
-    vsftpd_cfg_use_localtime: {
+    _vsftpd_cfg_use_localtime: {
       section: 'Default',
       key: 'use_localtime',
       raw: '{{ vsftpd_cfg_use_localtime | default(true) }}',
@@ -1269,7 +1270,7 @@
       deprecated: false,
       order: 114,
     }
-    vsftpd_cfg_use_sendfile: {
+    _vsftpd_cfg_use_sendfile: {
       section: 'Default',
       key: 'use_sendfile',
       raw: '{{ vsftpd_cfg_use_sendfile | default(true) }}',
@@ -1279,7 +1280,7 @@
       deprecated: false,
       order: 115,
     }
-    vsftpd_cfg_user_config_dir: {
+    _vsftpd_cfg_user_config_dir: {
       section: 'Default',
       key: 'user_config_dir',
       raw: '{{
@@ -1298,7 +1299,7 @@
       deprecated: false,
       order: 116,
     }
-    vsftpd_cfg_user_sub_token: {
+    _vsftpd_cfg_user_sub_token: {
       section: 'Default',
       key: 'user_sub_token',
       raw: '{{ vsftpd_cfg_user_sub_token | default("") }}',
@@ -1308,7 +1309,7 @@
       deprecated: false,
       order: 117,
     }
-    vsftpd_cfg_userlist_deny: {
+    _vsftpd_cfg_userlist_deny: {
       section: 'Default',
       key: 'userlist_deny',
       raw: '{{ vsftpd_cfg_userlist_deny | default(true) }}',
@@ -1318,7 +1319,7 @@
       deprecated: false,
       order: 118,
     }
-    vsftpd_cfg_userlist_enable: {
+    _vsftpd_cfg_userlist_enable: {
       section: 'Default',
       key: 'userlist_enable',
       raw: '{{ vsftpd_cfg_userlist_enable | default(false) }}',
@@ -1328,7 +1329,7 @@
       deprecated: false,
       order: 119,
     }
-    vsftpd_cfg_userlist: {
+    _vsftpd_cfg_userlist: {
       section: 'Default',
       key: 'userlist_file',
       raw: '{{
@@ -1343,7 +1344,7 @@
       deprecated: false,
       order: 120,
     }
-    vsftpd_cfg_validate_cert: {
+    _vsftpd_cfg_validate_cert: {
       section: 'Default',
       key: 'validate_cert',
       raw: '{{ vsftpd_cfg_validate_cert | default(false) }}',
@@ -1353,7 +1354,7 @@
       deprecated: false,
       order: 121,
     }
-    vsftpd_cfg_vsftpd_log_file: {
+    _vsftpd_cfg_vsftpd_log_file: {
       section: 'Default',
       key: 'vsftpd_log_file',
       raw:
@@ -1364,7 +1365,7 @@
       deprecated: false,
       order: 122,
     }
-    vsftpd_cfg_virtual_use_local_privs: {
+    _vsftpd_cfg_virtual_use_local_privs: {
       section: 'Default',
       key: 'virtual_use_local_privs',
       raw: '{{ vsftpd_cfg_virtual_use_local_privs | default(false) }}',
@@ -1374,7 +1375,7 @@
       deprecated: false,
       order: 123,
     }
-    vsftpd_cfg_write_enable: {
+    _vsftpd_cfg_write_enable: {
       section: 'Default',
       key: 'write_enable',
       raw: '{{ vsftpd_cfg_write_enable | default(false) }}',
@@ -1384,7 +1385,7 @@
       deprecated: false,
       order: 124,
     }
-    vsftpd_cfg_xferlog_enable: {
+    _vsftpd_cfg_xferlog_enable: {
       section: 'Default',
       key: 'xferlog_enable',
       raw: '{{ vsftpd_cfg_xferlog_enable | default(true) }}',
@@ -1394,7 +1395,7 @@
       deprecated: false,
       order: 125,
     }
-    vsftpd_cfg_xferlog_file: {
+    _vsftpd_cfg_xferlog_file: {
       section: 'Default',
       key: 'xferlog_file',
       raw: '{{ vsftpd_cfg_xferlog_file | default("/var/log/xferlog") }}',
@@ -1404,7 +1405,7 @@
       deprecated: false,
       order: 126,
     }
-    vsftpd_cfg_xferlog_std_format: {
+    _vsftpd_cfg_xferlog_std_format: {
       section: 'Default',
       key: 'xferlog_std_format',
       raw: '{{ vsftpd_cfg_xferlog_std_format | default(false) }}',
@@ -1414,7 +1415,7 @@
       deprecated: false,
       order: 127,
     }
-    vsftpd_cfg_debian_utf8_filesystem: {
+    _vsftpd_cfg_debian_utf8_filesystem: {
       section: 'Debian Specific Patches',
       key: 'utf8_filesystem',
       raw: '{{ vsftpd_cfg_debian_utf8_filesystem | default(false) }}',
@@ -1427,7 +1428,7 @@
 
 - name: 'Annotate | sanitize & annotate service defaults'
   ansible.builtin.set_fact:
-    vsftpd_srv_virtual_users: {
+    _vsftpd_srv_virtual_users: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_virtual_users | default([]) }}',
@@ -1436,13 +1437,13 @@
         if vsftpd_srv_virtual_users | default([]) | length > 0 else
         ""
       }}',
-      hint: 'list',
+      hint: 'list of dict',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
       order: 1,
     }
-    vsftpd_srv_harden_enable: {
+    _vsftpd_srv_harden_enable: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_harden_enable | default(false) }}',
@@ -1452,44 +1453,44 @@
       deprecated: false,
       order: 2,
     }
-    vsftpd_srv_harden_rw_paths: {
+    _vsftpd_srv_harden_rw_paths: {
       section: '',
       key: '',
       raw: '{{
         vsftpd_srv_harden_rw_paths |
-        default([vsftpd_cfg_local_root.raw,
-                 vsftpd_cfg_anon_root.raw,
-                 vsftpd_cfg_vsftpd_log_file.raw,
-                 vsftpd_cfg_xferlog_file.raw,
+        default([_vsftpd_cfg_local_root.raw,
+                 _vsftpd_cfg_anon_root.raw,
+                 _vsftpd_cfg_vsftpd_log_file.raw,
+                 _vsftpd_cfg_xferlog_file.raw,
                  "/srv/ftp"])
       }}',
-      hint: 'list',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
       order: 3,
     }
-    vsftpd_srv_harden_ro_paths: {
+    _vsftpd_srv_harden_ro_paths: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_harden_ro_paths | default([]) }}',
-      hint: 'list',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
       order: 4,
     }
-    vsftpd_srv_harden_inaccessible_paths: {
+    _vsftpd_srv_harden_inaccessible_paths: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_harden_inaccessible_paths | default([]) }}',
-      hint: 'list',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
       order: 5,
     }
-    vsftpd_srv_user: {
+    _vsftpd_srv_user: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_user | default("ftp") }}',
@@ -1500,7 +1501,7 @@
       deprecated: false,
       order: 6,
     }
-    vsftpd_srv_user_home_mode: {
+    _vsftpd_srv_user_home_mode: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_user_home_mode | default("0755") }}',
@@ -1511,7 +1512,7 @@
       deprecated: false,
       order: 7,
     }
-    vsftpd_srv_group: {
+    _vsftpd_srv_group: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_group | default("ftp") }}',
@@ -1522,7 +1523,7 @@
       deprecated: false,
       order: 8,
     }
-    vsftpd_srv_create_user: {
+    _vsftpd_srv_create_user: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_create_user | default(true) }}',
@@ -1532,7 +1533,7 @@
       deprecated: false,
       order: 9,
     }
-    vsftpd_srv_user_data_manage_enable: {
+    _vsftpd_srv_user_data_manage_enable: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_user_data_manage_enable | default(false) }}',
@@ -1542,7 +1543,7 @@
       deprecated: false,
       order: 10,
     }
-    vsftpd_srv_local_root_user: {
+    _vsftpd_srv_local_root_user: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_local_root_user | default("ftp") }}',
@@ -1553,7 +1554,7 @@
       deprecated: false,
       order: 11,
     }
-    vsftpd_srv_local_root_group: {
+    _vsftpd_srv_local_root_group: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_local_root_group | default("ftp") }}',
@@ -1564,7 +1565,7 @@
       deprecated: false,
       order: 12,
     }
-    vsftpd_srv_local_root_mode: {
+    _vsftpd_srv_local_root_mode: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_local_root_mode | default("0770") }}',
@@ -1574,7 +1575,7 @@
       deprecated: false,
       order: 13,
     }
-    vsftpd_srv_local_root_recursive_enable: {
+    _vsftpd_srv_local_root_recursive_enable: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_local_root_recursive_enable | default(true) }}',
@@ -1584,7 +1585,7 @@
       deprecated: false,
       order: 14,
     }
-    vsftpd_srv_anon_root_user: {
+    _vsftpd_srv_anon_root_user: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_anon_root_user | default("ftp") }}',
@@ -1595,7 +1596,7 @@
       deprecated: false,
       order: 15,
     }
-    vsftpd_srv_anon_root_group: {
+    _vsftpd_srv_anon_root_group: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_anon_root_group | default("ftp") }}',
@@ -1606,7 +1607,7 @@
       deprecated: false,
       order: 16
     }
-    vsftpd_srv_anon_root_mode: {
+    _vsftpd_srv_anon_root_mode: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_anon_root_mode | default("0770") }}',
@@ -1616,7 +1617,7 @@
       deprecated: false,
       order: 17,
     }
-    vsftpd_srv_anon_root_recursive_enable: {
+    _vsftpd_srv_anon_root_recursive_enable: {
       section: '',
       key: '',
       raw: '{{ vsftpd_srv_anon_root_recursive_enable | default(true) }}',
@@ -1629,10 +1630,10 @@
 
 - name: 'Annotate | generate config map'
   ansible.builtin.set_fact:
-    _vsftpd_cfg_map: '{{
+    _vsftpd_map: '{{
         hostvars[inventory_hostname] | dict2items |
-        selectattr("key", "match", "vsftpd_cfg_*")
+        selectattr("key", "match", "_vsftpd_cfg_*")
       }}'
-    _vsftpd_cfg_order:
+    _vsftpd_order:
       - 'Default'
       - 'Debian Specific Patches'

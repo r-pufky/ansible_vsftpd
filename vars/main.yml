@@ -16,7 +16,8 @@
 #   * Use defaults/ to remove any changed/deprecated variables.
 # * Update tests for any changes.
 # * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
-# * Tag with MAJOR.MINOR version, with PATCH representing role change.
+# * Tag with MAJOR.MINOR.PATCH[ROLE] version, with PATCH representing role
+#   change - e.g. Debian: 3.0.3 -> Role: 3.0.301  (01 role release).
 #
 # Reference:
 # * https://manpages.debian.org/bookworm/vsftpd/vsftpd.conf.5.en.html

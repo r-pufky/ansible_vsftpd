@@ -13,16 +13,16 @@
 # yamllint enable rule:line-length
 
 - name: 'Virtual users | enable'
-  when: vsftpd_srv_virtual_users.raw | length > 0
+  when: _vsftpd_srv_virtual_users.raw | length > 0
   block:
     - name: 'Virtual users | enable | clear virtual users'
       ansible.builtin.file:
-        path: '{{ vsftpd_srv_virtual_users.parsed }}'
+        path: '{{ _vsftpd_srv_virtual_users.parsed }}'
         state: 'absent'
 
     - name: 'Virtual users | enable | add virtual users'
       community.general.htpasswd:
-        path: '{{ vsftpd_srv_virtual_users.parsed }}'
+        path: '{{ _vsftpd_srv_virtual_users.parsed }}'
         name: '{{ item.user }}'
         password: '{{ item.pass }}'
         crypt_scheme: 'md5_crypt'
@@ -30,23 +30,23 @@
         group: 'root'
         mode: '0640'
         state: 'present'
-      loop: '{{ vsftpd_srv_virtual_users.raw }}'
+      loop: '{{ _vsftpd_srv_virtual_users.raw }}'
       loop_control:
         label: '{{ item.user }}'
 
     - name: 'Virtual users | enable | add PAM vsftpd_virtual module'
       ansible.builtin.template:
         src: 'vsftpd_virtual.j2'
-        dest: '{{ vsftpd_cfg_pam_service_name.parsed }}'
+        dest: '{{ _vsftpd_cfg_pam_service_name.parsed }}'
         owner: 'root'
         group: 'root'
         mode: '0644'
 
 - name: 'Virtual users | disable'
-  when: vsftpd_srv_virtual_users.raw | length == 0
+  when: _vsftpd_srv_virtual_users.raw | length == 0
   ansible.builtin.file:
     path: '{{ item }}'
     state: 'absent'
   loop:
-    - '{{ vsftpd_srv_virtual_users.parsed }}'
-    - '{{ vsftpd_cfg_pam_service_name.parsed }}'
+    - '{{ _vsftpd_srv_virtual_users.parsed }}'
+    - '{{ _vsftpd_cfg_pam_service_name.parsed }}'
