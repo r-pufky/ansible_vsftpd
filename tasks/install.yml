@@ -18,9 +18,11 @@
 
 - name: 'Prep | stop services'
   ansible.builtin.systemd:
-    name: 'vsftpd'
+    name: '{{ item }}'
     state: 'stopped'
   failed_when: false
+  loop:
+    - 'vsftpd.service'
 
 - name: 'Prep | create service config directory'
   ansible.builtin.file:
