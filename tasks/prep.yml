@@ -41,25 +41,26 @@
   ansible.builtin.set_fact:
     _vsftpd_srv_user: '{{
         _vsftpd_srv_user |
-        combine({"parsed": _vsftpd_srv_user_query.uid})
+        combine({"role_uid": _vsftpd_srv_user_query.uid,
+                 "role_home": _vsftpd_srv_user_query.home})
       }}'
     _vsftpd_srv_group: '{{
         _vsftpd_srv_group |
-        combine({"parsed": _vsftpd_srv_user_query.group})
+        combine({"role_gid": _vsftpd_srv_user_query.group})
       }}'
 
 - name: 'Prep | set user home directory'
   ansible.builtin.file:
-    path: '{{ _vsftpd_srv_user_query.home }}'
-    owner: '{{ _vsftpd_srv_user.parsed }}'
-    group: '{{ _vsftpd_srv_group.parsed }}'
+    path: '{{ _vsftpd_srv_user.role_home }}'
+    owner: '{{ _vsftpd_srv_user.role_uid }}'
+    group: '{{ _vsftpd_srv_group.role_gid }}'
     mode: '{{ _vsftpd_srv_user_home_mode.raw }}'
     state: 'directory'
-  become: '{{ true if _vsftpd_srv_user_data_manage_enable.raw else omit }}'
+  become: true
   become_user: '{{
       _vsftpd_srv_user.raw
       if _vsftpd_srv_user_data_manage_enable.raw else
-      omit
+      "root"
     }}'
 
 - name:
@@ -85,11 +86,11 @@
   ansible.builtin.set_fact:
     _vsftpd_srv_local_root_user: '{{
         _vsftpd_srv_local_root_user |
-        combine({"parsed": _vsftpd_srv_user_local_root_query.uid})
+        combine({"role_uid": _vsftpd_srv_user_local_root_query.uid})
       }}'
     _vsftpd_srv_local_root_group: '{{
         _vsftpd_srv_local_root_group |
-        combine({"parsed": _vsftpd_srv_user_local_group_query.gid})
+        combine({"role_gid": _vsftpd_srv_user_local_group_query.gid})
       }}'
 
 - name:
@@ -115,9 +116,9 @@
   ansible.builtin.set_fact:
     _vsftpd_srv_anon_root_user: '{{
         _vsftpd_srv_anon_root_user |
-        combine({"parsed": _vsftpd_srv_user_anon_root_query.uid})
+        combine({"role_uid": _vsftpd_srv_user_anon_root_query.uid})
       }}'
     _vsftpd_srv_anon_root_group: '{{
         _vsftpd_srv_anon_root_group |
-        combine({"parsed": _vsftpd_srv_user_anon_group_query.gid})
+        combine({"role_gid": _vsftpd_srv_user_anon_group_query.gid})
       }}'

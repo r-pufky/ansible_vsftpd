@@ -2,7 +2,11 @@
 # {{ header }}
 {%   for section in _vsftpd_map | selectattr('value.section', '==', header) | sort(attribute='value.order') %}
 {%     if not section.value.deprecated %}
-{%       if section.value.hint == 'bool' %}
+{%       if section.value.key in ['banned_email_file', 'banner_file', 'ca_certs_file', 'chroot_list_file', 'cmds_allowed', 'cmds_denied', 'deny_file', 'download_file', 'dsa_cert_file', 'dsa_private_key_file', 'email_password_file', 'hide_file', 'pam_service_name', 'rsa_cert_file', 'rsa_private_key_file', 'upload_file', 'user_config_dir', 'userlist_file'] %}
+{{ section.value.key }}={{ section.value.data }}
+{%       elif section.value.key == 'guest_enable' %}
+{{ section.value.key }}={{ 'YES' if section.value.data else 'NO' }}
+{%       elif section.value.hint == 'bool' %}
 {{ section.value.key }}={{ 'YES' if section.value.raw else 'NO' }}
 {%       else %}
 {{ section.value.key }}={{ section.value.raw }}

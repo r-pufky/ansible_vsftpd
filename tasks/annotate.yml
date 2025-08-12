@@ -13,20 +13,21 @@
 # * Simplified role updates for variable changes.
 # * All data touched by user is in a standard, expected format.
 #
-# Annotated Defaults:
+# Annotated Defaults (2.0):
 # _{VAR}: dict - Annotated and sanitized default variable.
 #   section: str - Section name.
 #   key: str - Config file key.
-#   raw: any - Raw config file value (set from defaults > role defaults).
-#   parsed: any - Processed raw config file value. Optional.
-#   role: any - Role specific config usage. Optional.
+#   raw: any - Raw value from user, defaults, or role defaults.
+#   data: any - Processed raw value for use in rendering. Optional.
+#   default: any - Role default (testing for changed defaults).
 #   hint: str - Value rendering type hint (docstring types).
+#   role_*: any - Role specific usage. Optional.
 #   added: str - Release version variable added.
 #       Special Case:
 #         0.0.0: Unknown or since role inception.
 #   sensitive: bool - True for PII/SPII data that should not be logged.
 #   deprecated: bool - True if no longer used in current role release.
-#   order: int - Order item should appear in rendered files.
+#   order: int - Order item should appear in templated files.
 #
 # Generates:
 #   _vsftpd_map: list of dict - Annotated config map.
@@ -58,7 +59,8 @@
     _vsftpd_cfg_accept_timeout: {
       section: 'Default',
       key: 'accept_timeout',
-      raw: '{{ vsftpd_cfg_accept_timeout | default(60) }}',
+      raw: '{{ vsftpd_cfg_accept_timeout }}',
+      default: 60,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -68,7 +70,8 @@
     _vsftpd_cfg_allow_anon_ssl: {
       section: 'Default',
       key: 'allow_anon_ssl',
-      raw: '{{ vsftpd_cfg_allow_anon_ssl | default(false) }}',
+      raw: '{{ vsftpd_cfg_allow_anon_ssl }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -78,7 +81,8 @@
     _vsftpd_cfg_anon_max_rate: {
       section: 'Default',
       key: 'anon_max_rate',
-      raw: '{{ vsftpd_cfg_anon_max_rate | default(0) }}',
+      raw: '{{ vsftpd_cfg_anon_max_rate }}',
+      default: 0,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -88,7 +92,8 @@
     _vsftpd_cfg_anon_mkdir_write_enable: {
       section: 'Default',
       key: 'anon_mkdir_write_enable',
-      raw: '{{ vsftpd_cfg_anon_mkdir_write_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_anon_mkdir_write_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -98,7 +103,8 @@
     _vsftpd_cfg_anon_other_write_enable: {
       section: 'Default',
       key: 'anon_other_write_enable',
-      raw: '{{ vsftpd_cfg_anon_other_write_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_anon_other_write_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -108,7 +114,8 @@
     _vsftpd_cfg_anon_root: {
       section: 'Default',
       key: 'anon_root',
-      raw: '{{ vsftpd_cfg_anon_root | default("") }}',
+      raw: '{{ vsftpd_cfg_anon_root }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -118,7 +125,8 @@
     _vsftpd_cfg_anon_umask: {
       section: 'Default',
       key: 'anon_umask',
-      raw: '{{ vsftpd_cfg_anon_umask | default("077") }}',
+      raw: '{{ vsftpd_cfg_anon_umask }}',
+      default: '077',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -128,7 +136,8 @@
     _vsftpd_cfg_anon_upload_enable: {
       section: 'Default',
       key: 'anon_upload_enable',
-      raw: '{{ vsftpd_cfg_anon_upload_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_anon_upload_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -138,7 +147,8 @@
     _vsftpd_cfg_anon_world_readable_only: {
       section: 'Default',
       key: 'anon_world_readable_only',
-      raw: '{{ vsftpd_cfg_anon_world_readable_only | default(true) }}',
+      raw: '{{ vsftpd_cfg_anon_world_readable_only }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -148,7 +158,8 @@
     _vsftpd_cfg_anonymous_enable: {
       section: 'Default',
       key: 'anonymous_enable',
-      raw: '{{ vsftpd_cfg_anonymous_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_anonymous_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -158,7 +169,8 @@
     _vsftpd_cfg_ascii_download_enable: {
       section: 'Default',
       key: 'ascii_download_enable',
-      raw: '{{ vsftpd_cfg_ascii_download_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_ascii_download_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -168,7 +180,8 @@
     _vsftpd_cfg_ascii_upload_enable: {
       section: 'Default',
       key: 'ascii_upload_enable',
-      raw: '{{ vsftpd_cfg_ascii_upload_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_ascii_upload_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -178,7 +191,8 @@
     _vsftpd_cfg_async_abor_enable: {
       section: 'Default',
       key: 'async_abor_enable',
-      raw: '{{ vsftpd_cfg_async_abor_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_async_abor_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -188,7 +202,8 @@
     _vsftpd_cfg_background: {
       section: 'Default',
       key: 'background',
-      raw: '{{ vsftpd_cfg_background | default(false) }}',
+      raw: '{{ vsftpd_cfg_background }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -198,13 +213,15 @@
     _vsftpd_cfg_banned_emails: {
       section: 'Default',
       key: 'banned_email_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_banned_emails }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/banned_emails"
-        if vsftpd_cfg_banned_emails | default([]) | length > 0 else
+        if vsftpd_cfg_banned_emails | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_banned_emails | default([]) }}',
-      hint: 'str',  # Autogenerated path from list.
+      default: [],
+      role_dest: '{{ vsftpd_role_service_dir ~ "/banned_emails" }}',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: true,
       deprecated: false,
@@ -213,12 +230,14 @@
     _vsftpd_cfg_banner: {
       section: 'Default',
       key: 'banner_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_banner }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/banner_file"
-        if vsftpd_cfg_banner | default("") | length > 0 else
+        if vsftpd_cfg_banner | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_banner | default("") }}',
+      default: '',
+      role_dest: '{{ vsftpd_role_service_dir ~ "/banner_file" }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -228,12 +247,15 @@
     _vsftpd_cfg_ca_certs_file: {
       section: 'Default',
       key: 'ca_certs_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_ca_certs_file }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/ca.cert"
-        if vsftpd_cfg_ca_certs_file | default("") | length > 0 else
+        if vsftpd_cfg_ca_certs_file | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_ca_certs_file | default("") }}',
+      default: '',
+      role_src: "{{ vsftpd_cfg_ca_certs_file | regex_replace('\\/$', '') }}",
+      role_dest: '{{ vsftpd_role_service_dir ~ "/ca.cert" }}',
       hint: 'str',
       added: '2.0.6',
       sensitive: true,
@@ -243,7 +265,8 @@
     _vsftpd_cfg_check_shell: {
       section: 'Default',
       key: 'check_shell',
-      raw: '{{ vsftpd_cfg_check_shell | default(true) }}',
+      raw: '{{ vsftpd_cfg_check_shell }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -253,7 +276,8 @@
     _vsftpd_cfg_chmod_enable: {
       section: 'Default',
       key: 'chmod_enable',
-      raw: '{{ vsftpd_cfg_chmod_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_chmod_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -263,7 +287,8 @@
     _vsftpd_cfg_chown_upload_mode: {
       section: 'Default',
       key: 'chown_upload_mode',
-      raw: '{{ vsftpd_cfg_chown_upload_mode | default("0600") }}',
+      raw: '{{ vsftpd_cfg_chown_upload_mode }}',
+      default: '0600',
       hint: 'str',
       added: '2.0.6',
       sensitive: false,
@@ -273,7 +298,8 @@
     _vsftpd_cfg_chown_uploads: {
       section: 'Default',
       key: 'chown_uploads',
-      raw: '{{ vsftpd_cfg_chown_uploads | default(false) }}',
+      raw: '{{ vsftpd_cfg_chown_uploads }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -283,7 +309,8 @@
     _vsftpd_cfg_chown_username: {
       section: 'Default',
       key: 'chown_username',
-      raw: '{{ vsftpd_cfg_chown_username | default("root") }}',
+      raw: '{{ vsftpd_cfg_chown_username }}',
+      default: 'root',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -293,7 +320,8 @@
     _vsftpd_cfg_chroot_list_enable: {
       section: 'Default',
       key: 'chroot_list_enable',
-      raw: '{{ vsftpd_cfg_chroot_list_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_chroot_list_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -303,13 +331,15 @@
     _vsftpd_cfg_chroot_list: {
       section: 'Default',
       key: 'chroot_list_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_chroot_list }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/chroot_list"
-        if vsftpd_cfg_chroot_list | default([]) | length > 0 else
+        if vsftpd_cfg_chroot_list | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_chroot_list | default([]) }}',
-      hint: 'str',  # Autogenerated path from list.
+      default: [],
+      role_dest: '{{ vsftpd_role_service_dir ~ "/chroot_list" }}',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
@@ -318,7 +348,8 @@
     _vsftpd_cfg_chroot_local_user: {
       section: 'Default',
       key: 'chroot_local_user',
-      raw: '{{ vsftpd_cfg_chroot_local_user | default(false) }}',
+      raw: '{{ vsftpd_cfg_chroot_local_user }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -328,7 +359,9 @@
     _vsftpd_cfg_cmds_allowed: {
       section: 'Default',
       key: 'cmds_allowed',
-      raw: '{{ vsftpd_cfg_cmds_allowed | default([]) | join(",") }}',
+      raw: '{{ vsftpd_cfg_cmds_allowed }}',
+      data: '{{ vsftpd_cfg_cmds_allowed | join(",") }}',
+      default: [],
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -338,7 +371,9 @@
     _vsftpd_cfg_cmds_denied: {
       section: 'Default',
       key: 'cmds_denied',
-      raw: '{{ vsftpd_cfg_cmds_denied | default([]) | join(",") }}',
+      raw: '{{ vsftpd_cfg_cmds_denied }}',
+      data: '{{ vsftpd_cfg_cmds_denied | join(",") }}',
+      default: [],
       hint: 'str',
       added: '2.1.0',
       sensitive: false,
@@ -348,7 +383,8 @@
     _vsftpd_cfg_connect_from_port_20: {
       section: 'Default',
       key: 'connect_from_port_20',
-      raw: '{{ vsftpd_cfg_connect_from_port_20 | default(true) }}',
+      raw: '{{ vsftpd_cfg_connect_from_port_20 }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -358,7 +394,8 @@
     _vsftpd_cfg_connect_timeout: {
       section: 'Default',
       key: 'connect_timeout',
-      raw: '{{ vsftpd_cfg_connect_timeout | default(60) }}',
+      raw: '{{ vsftpd_cfg_connect_timeout }}',
+      default: 60,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -368,7 +405,8 @@
     _vsftpd_cfg_data_connection_timeout: {
       section: 'Default',
       key: 'data_connection_timeout',
-      raw: '{{ vsftpd_cfg_data_connection_timeout | default(300) }}',
+      raw: '{{ vsftpd_cfg_data_connection_timeout }}',
+      default: 300,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -378,7 +416,8 @@
     _vsftpd_cfg_debug_ssl: {
       section: 'Default',
       key: 'debug_ssl',
-      raw: '{{ vsftpd_cfg_debug_ssl | default(false) }}',
+      raw: '{{ vsftpd_cfg_debug_ssl }}',
+      default: false,
       hint: 'bool',
       added: '2.0.6',
       sensitive: false,
@@ -388,7 +427,8 @@
     _vsftpd_cfg_delay_failed_login: {
       section: 'Default',
       key: 'delay_failed_login',
-      raw: '{{ vsftpd_cfg_delay_failed_login | default(1) }}',
+      raw: '{{ vsftpd_cfg_delay_failed_login }}',
+      default: 1,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -398,7 +438,8 @@
     _vsftpd_cfg_delay_successful_login: {
       section: 'Default',
       key: 'delay_successful_login',
-      raw: '{{ vsftpd_cfg_delay_successful_login | default(0) }}',
+      raw: '{{ vsftpd_cfg_delay_successful_login }}',
+      default: 0,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -408,7 +449,8 @@
     _vsftpd_cfg_delete_failed_uploads: {
       section: 'Default',
       key: 'delete_failed_uploads',
-      raw: '{{ vsftpd_cfg_delete_failed_uploads | default(false) }}',
+      raw: '{{ vsftpd_cfg_delete_failed_uploads }}',
+      default: false,
       hint: 'bool',
       added: '2.0.7',
       sensitive: false,
@@ -418,7 +460,8 @@
     _vsftpd_cfg_deny_email_enable: {
       section: 'Default',
       key: 'deny_email_enable',
-      raw: '{{ vsftpd_cfg_deny_email_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_deny_email_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -428,7 +471,8 @@
     _vsftpd_cfg_deny_file: {
       section: 'Default',
       key: 'deny_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_deny_file }}',
+      data: '{{
         "{" ~ vsftpd_cfg_deny_file | join(",") ~ "}"
         if vsftpd_cfg_deny_file | length > 0 else
         ""
@@ -442,7 +486,8 @@
     _vsftpd_cfg_dirlist_enable: {
       section: 'Default',
       key: 'dirlist_enable',
-      raw: '{{ vsftpd_cfg_dirlist_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_dirlist_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -452,7 +497,8 @@
     _vsftpd_cfg_dirmessage_enable: {
       section: 'Default',
       key: 'dirmessage_enable',
-      raw: '{{ vsftpd_cfg_dirmessage_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_dirmessage_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -462,7 +508,8 @@
     _vsftpd_cfg_download_enable: {
       section: 'Default',
       key: 'download_enable',
-      raw: '{{ vsftpd_cfg_download_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_download_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -472,12 +519,14 @@
     _vsftpd_cfg_download_file: {
       section: 'Default',
       key: 'download_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_download_file }}',
+      data: '{{
         "{" + vsftpd_cfg_download_file | join(",") + "}"
         if vsftpd_cfg_download_file | length > 0 else
         ""
       }}',
-      hint: 'str',
+      default: [],
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
@@ -486,12 +535,15 @@
     _vsftpd_cfg_dsa_cert_file: {
       section: 'Default',
       key: 'dsa_cert_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_dsa_cert_file }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/dsa.cert"
-        if vsftpd_cfg_dsa_cert_file | default("") | length > 0 else
+        if vsftpd_cfg_dsa_cert_file | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_dsa_cert_file | default("") }}',
+      default: '',
+      role_src: "{{ vsftpd_cfg_dsa_cert_file | regex_replace('\\/$', '') }}",
+      role_dest: '{{ vsftpd_role_service_dir ~ "/dsa.cert" }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: true,
@@ -501,12 +553,16 @@
     _vsftpd_cfg_dsa_private_key_file: {
       section: 'Default',
       key: 'dsa_private_key_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_dsa_private_key_file }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/dsa.key"
-        if vsftpd_cfg_dsa_private_key_file | default("") | length > 0 else
+        if vsftpd_cfg_dsa_private_key_file | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_dsa_private_key_file | default("") }}',
+      default: '',
+      role_src:
+        "{{ vsftpd_cfg_dsa_private_key_file | regex_replace('\\/$', '') }}",
+      role_dest: '{{ vsftpd_role_service_dir ~ "/dsa.key" }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: true,
@@ -516,7 +572,8 @@
     _vsftpd_cfg_dual_log_enable: {
       section: 'Default',
       key: 'dual_log_enable',
-      raw: '{{ vsftpd_cfg_dual_log_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_dual_log_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -526,13 +583,15 @@
     _vsftpd_cfg_email_passwords: {
       section: 'Default',
       key: 'email_password_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_email_passwords }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/email_passwords"
-        if vsftpd_cfg_email_passwords | default([]) | length > 0 else
+        if vsftpd_cfg_email_passwords | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_email_passwords | default([]) }}',
-      hint: 'str',  # Autogenerated path from list.
+      default: [],
+      role_dest: '{{ vsftpd_role_service_dir ~ "/email_passwords" }}',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: true,
       deprecated: false,
@@ -541,7 +600,8 @@
     _vsftpd_cfg_file_open_mode: {
       section: 'Default',
       key: 'file_open_mode',
-      raw: '{{ vsftpd_cfg_file_open_mode | default("0666") }}',
+      raw: '{{ vsftpd_cfg_file_open_mode }}',
+      default: '0666',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -551,7 +611,8 @@
     _vsftpd_cfg_force_anon_data_ssl: {
       section: 'Default',
       key: 'force_anon_data_ssl',
-      raw: '{{ vsftpd_cfg_force_anon_data_ssl | default(false) }}',
+      raw: '{{ vsftpd_cfg_force_anon_data_ssl }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -561,7 +622,8 @@
     _vsftpd_cfg_force_anon_logins_ssl: {
       section: 'Default',
       key: 'force_anon_logins_ssl',
-      raw: '{{ vsftpd_cfg_force_anon_logins_ssl | default(false) }}',
+      raw: '{{ vsftpd_cfg_force_anon_logins_ssl }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -571,7 +633,8 @@
     _vsftpd_cfg_force_dot_files: {
       section: 'Default',
       key: 'force_dot_files',
-      raw: '{{ vsftpd_cfg_force_dot_files | default(false) }}',
+      raw: '{{ vsftpd_cfg_force_dot_files }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -581,7 +644,8 @@
     _vsftpd_cfg_force_local_data_ssl: {
       section: 'Default',
       key: 'force_local_data_ssl',
-      raw: '{{ vsftpd_cfg_force_local_data_ssl | default(true) }}',
+      raw: '{{ vsftpd_cfg_force_local_data_ssl }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -591,7 +655,8 @@
     _vsftpd_cfg_force_local_logins_ssl: {
       section: 'Default',
       key: 'force_local_logins_ssl',
-      raw: '{{ vsftpd_cfg_force_local_logins_ssl | default(true) }}',
+      raw: '{{ vsftpd_cfg_force_local_logins_ssl }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -601,7 +666,8 @@
     _vsftpd_cfg_ftp_data_port: {
       section: 'Default',
       key: 'ftp_data_port',
-      raw: '{{ vsftpd_cfg_ftp_data_port | default(20) }}',
+      raw: '{{ vsftpd_cfg_ftp_data_port }}',
+      default: 20,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -611,7 +677,8 @@
     _vsftpd_cfg_ftp_username: {
       section: 'Default',
       key: 'ftp_username',
-      raw: '{{ vsftpd_cfg_ftp_username | default("ftp") }}',
+      raw: '{{ vsftpd_cfg_ftp_username }}',
+      default: 'ftp',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -621,7 +688,8 @@
     _vsftpd_cfg_ftpd_banner: {
       section: 'Default',
       key: 'ftpd_banner',
-      raw: '{{ vsftpd_cfg_ftpd_banner | default("") }}',
+      raw: '{{ vsftpd_cfg_ftpd_banner }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -631,8 +699,9 @@
     _vsftpd_cfg_guest_enable: {
       section: 'Default',
       key: 'guest_enable',
-      raw: '{{
-        vsftpd_cfg_guest_enable | default(false) or
+      raw: '{{ vsftpd_cfg_guest_enable }}',
+      data: '{{
+        vsftpd_cfg_guest_enable or
         vsftpd_srv_virtual_users | length > 0
       }}',  # Enable if virtual users set (guest_enable=true).
       hint: 'bool',
@@ -644,7 +713,8 @@
     _vsftpd_cfg_guest_username: {
       section: 'Default',
       key: 'guest_username',
-      raw: '{{ vsftpd_cfg_guest_username | default("ftp") }}',
+      raw: '{{ vsftpd_cfg_guest_username }}',
+      default: 'ftp',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -654,12 +724,14 @@
     _vsftpd_cfg_hide_file: {
       section: 'Default',
       key: 'hide_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_hide_file }}',
+      data: '{{
         "{" + vsftpd_cfg_hide_file | join(",") + "}"
         if vsftpd_cfg_hide_file | length > 0 else
         ""
       }}',
-      hint: 'str',
+      default: [],
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
@@ -668,7 +740,8 @@
     _vsftpd_cfg_hide_ids: {
       section: 'Default',
       key: 'hide_ids',
-      raw: '{{ vsftpd_cfg_hide_ids | default(false) }}',
+      raw: '{{ vsftpd_cfg_hide_ids }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -678,7 +751,8 @@
     _vsftpd_cfg_idle_session_timeout: {
       section: 'Default',
       key: 'idle_session_timeout',
-      raw: '{{ vsftpd_cfg_idle_session_timeout | default(300) }}',
+      raw: '{{ vsftpd_cfg_idle_session_timeout }}',
+      default: 300,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -688,7 +762,8 @@
     _vsftpd_cfg_implicit_ssl: {
       section: 'Default',
       key: 'implicit_ssl',
-      raw: '{{ vsftpd_cfg_implicit_ssl | default(false) }}',
+      raw: '{{ vsftpd_cfg_implicit_ssl }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -698,7 +773,8 @@
     _vsftpd_cfg_listen: {
       section: 'Default',
       key: 'listen',
-      raw: '{{ vsftpd_cfg_listen | default(false) }}',
+      raw: '{{ vsftpd_cfg_listen }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -708,7 +784,8 @@
     _vsftpd_cfg_listen_address6: {
       section: 'Default',
       key: 'listen_address6',
-      raw: '{{ vsftpd_cfg_listen_address6 | default("") }}',
+      raw: '{{ vsftpd_cfg_listen_address6 }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -718,7 +795,8 @@
     _vsftpd_cfg_listen_address: {
       section: 'Default',
       key: 'listen_address',
-      raw: '{{ vsftpd_cfg_listen_address | default("") }}',
+      raw: '{{ vsftpd_cfg_listen_address }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -728,7 +806,8 @@
     _vsftpd_cfg_listen_ipv6: {
       section: 'Default',
       key: 'listen_ipv6',
-      raw: '{{ vsftpd_cfg_listen_ipv6 | default(true) }}',
+      raw: '{{ vsftpd_cfg_listen_ipv6 }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -738,7 +817,8 @@
     _vsftpd_cfg_listen_port: {
       section: 'Default',
       key: 'listen_port',
-      raw: '{{ vsftpd_cfg_listen_port | default(21) }}',
+      raw: '{{ vsftpd_cfg_listen_port }}',
+      default: 21,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -748,7 +828,8 @@
     _vsftpd_cfg_local_enable: {
       section: 'Default',
       key: 'local_enable',
-      raw: '{{ vsftpd_cfg_local_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_local_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -758,7 +839,8 @@
     _vsftpd_cfg_local_max_rate: {
       section: 'Default',
       key: 'local_max_rate',
-      raw: '{{ vsftpd_cfg_local_max_rate | default(0) }}',
+      raw: '{{ vsftpd_cfg_local_max_rate }}',
+      default: 0,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -768,7 +850,8 @@
     _vsftpd_cfg_local_root: {
       section: 'Default',
       key: 'local_root',
-      raw: '{{ vsftpd_cfg_local_root | default("") }}',
+      raw: '{{ vsftpd_cfg_local_root }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -778,7 +861,8 @@
     _vsftpd_cfg_local_umask: {
       section: 'Default',
       key: 'local_umask',
-      raw: '{{ vsftpd_cfg_local_umask | default("077") }}',
+      raw: '{{ vsftpd_cfg_local_umask }}',
+      default: '077',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -788,7 +872,8 @@
     _vsftpd_cfg_lock_upload_files: {
       section: 'Default',
       key: 'lock_upload_files',
-      raw: '{{ vsftpd_cfg_lock_upload_files | default(true) }}',
+      raw: '{{ vsftpd_cfg_lock_upload_files }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -798,7 +883,8 @@
     _vsftpd_cfg_log_ftp_protocol: {
       section: 'Default',
       key: 'log_ftp_protocol',
-      raw: '{{ vsftpd_cfg_log_ftp_protocol | default(false) }}',
+      raw: '{{ vsftpd_cfg_log_ftp_protocol }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -808,7 +894,8 @@
     _vsftpd_cfg_ls_recurse_enable: {
       section: 'Default',
       key: 'ls_recurse_enable',
-      raw: '{{ vsftpd_cfg_ls_recurse_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_ls_recurse_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -818,7 +905,8 @@
     _vsftpd_cfg_max_clients: {
       section: 'Default',
       key: 'max_clients',
-      raw: '{{ vsftpd_cfg_max_clients | default(2000) }}',
+      raw: '{{ vsftpd_cfg_max_clients }}',
+      default: 2000,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -828,7 +916,8 @@
     _vsftpd_cfg_max_login_fails: {
       section: 'Default',
       key: 'max_login_fails',
-      raw: '{{ vsftpd_cfg_max_login_fails | default(3) }}',
+      raw: '{{ vsftpd_cfg_max_login_fails }}',
+      default: 3,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -838,7 +927,8 @@
     _vsftpd_cfg_max_per_ip: {
       section: 'Default',
       key: 'max_per_ip',
-      raw: '{{ vsftpd_cfg_max_per_ip | default(50) }}',
+      raw: '{{ vsftpd_cfg_max_per_ip }}',
+      default: 50,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -848,7 +938,8 @@
     _vsftpd_cfg_mdtm_write: {
       section: 'Default',
       key: 'mdtm_write',
-      raw: '{{ vsftpd_cfg_mdtm_write | default(true) }}',
+      raw: '{{ vsftpd_cfg_mdtm_write }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -858,7 +949,8 @@
     _vsftpd_cfg_message_file: {
       section: 'Default',
       key: 'message_file',
-      raw: '{{ vsftpd_cfg_message_file | default(".message") }}',
+      raw: '{{ vsftpd_cfg_message_file }}',
+      default: '.message',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -868,7 +960,8 @@
     _vsftpd_cfg_no_anon_password: {
       section: 'Default',
       key: 'no_anon_password',
-      raw: '{{ vsftpd_cfg_no_anon_password | default(false) }}',
+      raw: '{{ vsftpd_cfg_no_anon_password }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -878,7 +971,8 @@
     _vsftpd_cfg_no_log_lock: {
       section: 'Default',
       key: 'no_log_lock',
-      raw: '{{ vsftpd_cfg_no_log_lock | default(false) }}',
+      raw: '{{ vsftpd_cfg_no_log_lock }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -888,7 +982,8 @@
     _vsftpd_cfg_nopriv_user: {
       section: 'Default',
       key: 'nopriv_user',
-      raw: '{{ vsftpd_cfg_nopriv_user | default("nobody") }}',
+      raw: '{{ vsftpd_cfg_nopriv_user }}',
+      default: 'nobody',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -898,7 +993,8 @@
     _vsftpd_cfg_one_process_model: {
       section: 'Default',
       key: 'one_process_model',
-      raw: '{{ vsftpd_cfg_one_process_model | default(false) }}',
+      raw: '{{ vsftpd_cfg_one_process_model }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -908,16 +1004,17 @@
     _vsftpd_cfg_pam_service_name: {
       section: 'Default',
       key: 'pam_service_name',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_pam_service_name }}',
+      data: '{{
         "vsftpd_virtual"
         if vsftpd_srv_virtual_users | length > 0 else
-        vsftpd_cfg_pam_service_name | default("vsftpd")
+        vsftpd_cfg_pam_service_name
       }}',  # Enable if virtual users set (vsftpd_virtual module).
-      parsed: '{{
+      default: 'vsftpd',
+      role_dest: '{{
         vsftpd_role_pam_dir ~ "/vsftpd_virtual"
         if vsftpd_srv_virtual_users | length > 0 else
-        vsftpd_role_pam_dir ~ "/" ~ vsftpd_cfg_pam_service_name |
-          default("vsftpd")
+        vsftpd_role_pam_dir ~ "/" ~ vsftpd_cfg_pam_service_name
       }}',
       hint: 'str',
       added: '0.0.0',
@@ -928,7 +1025,8 @@
     _vsftpd_cfg_passwd_chroot_enable: {
       section: 'Default',
       key: 'passwd_chroot_enable',
-      raw: '{{ vsftpd_cfg_passwd_chroot_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_passwd_chroot_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -938,7 +1036,8 @@
     _vsftpd_cfg_pasv_addr_resolve: {
       section: 'Default',
       key: 'pasv_addr_resolve',
-      raw: '{{ vsftpd_cfg_pasv_addr_resolve | default(false) }}',
+      raw: '{{ vsftpd_cfg_pasv_addr_resolve }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -948,7 +1047,8 @@
     _vsftpd_cfg_pasv_address: {
       section: 'Default',
       key: 'pasv_address',
-      raw: '{{ vsftpd_cfg_pasv_address | default("") }}',
+      raw: '{{ vsftpd_cfg_pasv_address }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -958,7 +1058,8 @@
     _vsftpd_cfg_pasv_enable: {
       section: 'Default',
       key: 'pasv_enable',
-      raw: '{{ vsftpd_cfg_pasv_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_pasv_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -968,7 +1069,8 @@
     _vsftpd_cfg_pasv_max_port: {
       section: 'Default',
       key: 'pasv_max_port',
-      raw: '{{ vsftpd_cfg_pasv_max_port | default(0) }}',
+      raw: '{{ vsftpd_cfg_pasv_max_port }}',
+      default: 0,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -978,7 +1080,8 @@
     _vsftpd_cfg_pasv_min_port: {
       section: 'Default',
       key: 'pasv_min_port',
-      raw: '{{ vsftpd_cfg_pasv_min_port | default(0) }}',
+      raw: '{{ vsftpd_cfg_pasv_min_port }}',
+      default: 0,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -988,7 +1091,8 @@
     _vsftpd_cfg_pasv_promiscuous: {
       section: 'Default',
       key: 'pasv_promiscuous',
-      raw: '{{ vsftpd_cfg_pasv_promiscuous | default(false) }}',
+      raw: '{{ vsftpd_cfg_pasv_promiscuous }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -998,7 +1102,8 @@
     _vsftpd_cfg_port_enable: {
       section: 'Default',
       key: 'port_enable',
-      raw: '{{ vsftpd_cfg_port_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_port_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1008,7 +1113,8 @@
     _vsftpd_cfg_port_promiscuous: {
       section: 'Default',
       key: 'port_promiscuous',
-      raw: '{{ vsftpd_cfg_port_promiscuous | default(false) }}',
+      raw: '{{ vsftpd_cfg_port_promiscuous }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1018,7 +1124,8 @@
     _vsftpd_cfg_require_cert: {
       section: 'Default',
       key: 'require_cert',
-      raw: '{{ vsftpd_cfg_require_cert | default(false) }}',
+      raw: '{{ vsftpd_cfg_require_cert }}',
+      default: false,
       hint: 'bool',
       added: '2.0.6',
       sensitive: false,
@@ -1028,7 +1135,8 @@
     _vsftpd_cfg_require_ssl_reuse: {
       section: 'Default',
       key: 'require_ssl_reuse',
-      raw: '{{ vsftpd_cfg_require_ssl_reuse | default(true) }}',
+      raw: '{{ vsftpd_cfg_require_ssl_reuse }}',
+      default: true,
       hint: 'bool',
       added: '2.1.0',
       sensitive: false,
@@ -1038,12 +1146,15 @@
     _vsftpd_cfg_rsa_cert_file: {
       section: 'Default',
       key: 'rsa_cert_file',
-      raw: '{{
-        "/usr/share/ssl/certs/vsftpd.pem"
-        if vsftpd_cfg_rsa_cert_file | default("") | length == 0 else
+      raw: '{{ vsftpd_cfg_rsa_cert_file }}',
+      data: '{{
+        "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+        if vsftpd_cfg_rsa_cert_file | length == 0 else
         vsftpd_role_service_dir ~ "/rsa.pem"
       }}',
-      parsed: '{{ vsftpd_cfg_rsa_cert_file | default("") }}',
+      default: '',
+      role_src: "{{ vsftpd_cfg_rsa_cert_file | regex_replace('\\/$', '') }}",
+      role_dest: '{{ vsftpd_role_service_dir ~ "/rsa.pem" }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: true,
@@ -1053,12 +1164,16 @@
     _vsftpd_cfg_rsa_private_key_file: {
       section: 'Default',
       key: 'rsa_private_key_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_rsa_private_key_file }}',
+      data: '{{
         "/etc/ssl/private/ssl-cert-snakeoil.key"
-        if vsftpd_cfg_rsa_private_key_file | default("") | length == 0 else
+        if vsftpd_cfg_rsa_private_key_file | length == 0 else
         vsftpd_role_service_dir ~ "/rsa.key"
       }}',
-      parsed: '{{ vsftpd_cfg_rsa_private_key_file | default("") }}',
+      default: '',
+      role_src:
+        "{{ vsftpd_cfg_rsa_private_key_file | regex_replace('\\/$', '') }}",
+      role_dest: '{{ vsftpd_role_service_dir ~ "/rsa.key" }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: true,
@@ -1068,7 +1183,8 @@
     _vsftpd_cfg_run_as_launching_user: {
       section: 'Default',
       key: 'run_as_launching_user',
-      raw: '{{ vsftpd_cfg_run_as_launching_user | default(false) }}',
+      raw: '{{ vsftpd_cfg_run_as_launching_user }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1078,8 +1194,8 @@
     _vsftpd_cfg_secure_chroot_dir: {
       section: 'Default',
       key: 'secure_chroot_dir',
-      raw:
-        '{{ vsftpd_cfg_secure_chroot_dir | default("/usr/share/empty") }}',
+      raw: "{{ vsftpd_cfg_secure_chroot_dir | regex_replace('\\/$', '') }}",
+      default: '/usr/share/empty',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1089,7 +1205,8 @@
     _vsftpd_cfg_secure_email_list_enable: {
       section: 'Default',
       key: 'secure_email_list_enable',
-      raw: '{{ vsftpd_cfg_secure_email_list_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_secure_email_list_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1099,7 +1216,8 @@
     _vsftpd_cfg_session_support: {
       section: 'Default',
       key: 'session_support',
-      raw: '{{ vsftpd_cfg_session_support | default(false) }}',
+      raw: '{{ vsftpd_cfg_session_support }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1109,7 +1227,8 @@
     _vsftpd_cfg_setproctitle_enable: {
       section: 'Default',
       key: 'setproctitle_enable',
-      raw: '{{ vsftpd_cfg_setproctitle_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_setproctitle_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1119,7 +1238,8 @@
     _vsftpd_cfg_ssl_ciphers: {
       section: 'Default',
       key: 'ssl_ciphers',
-      raw: '{{ vsftpd_cfg_ssl_ciphers | default("DES-CBC3-SHA") }}',
+      raw: '{{ vsftpd_cfg_ssl_ciphers }}',
+      default: 'DES-CBC3-SHA',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1129,7 +1249,8 @@
     _vsftpd_cfg_ssl_enable: {
       section: 'Default',
       key: 'ssl_enable',
-      raw: '{{ vsftpd_cfg_ssl_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_ssl_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1139,7 +1260,8 @@
     _vsftpd_cfg_ssl_request_cert: {
       section: 'Default',
       key: 'ssl_request_cert',
-      raw: '{{ vsftpd_cfg_ssl_request_cert | default(true) }}',
+      raw: '{{ vsftpd_cfg_ssl_request_cert }}',
+      default: true,
       hint: 'bool',
       added: '2.0.7',
       sensitive: true,
@@ -1149,7 +1271,8 @@
     _vsftpd_cfg_ssl_sslv2: {
       section: 'Default',
       key: 'ssl_sslv2',
-      raw: '{{ vsftpd_cfg_ssl_sslv2 | default(false) }}',
+      raw: '{{ vsftpd_cfg_ssl_sslv2 }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1159,7 +1282,8 @@
     _vsftpd_cfg_ssl_sslv3: {
       section: 'Default',
       key: 'ssl_sslv3',
-      raw: '{{ vsftpd_cfg_ssl_sslv3 | default(false) }}',
+      raw: '{{ vsftpd_cfg_ssl_sslv3 }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1169,7 +1293,8 @@
     _vsftpd_cfg_ssl_tlsv1: {
       section: 'Default',
       key: 'ssl_tlsv1',
-      raw: '{{ vsftpd_cfg_ssl_tlsv1 | default(true) }}',
+      raw: '{{ vsftpd_cfg_ssl_tlsv1 }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1179,7 +1304,8 @@
     _vsftpd_cfg_strict_ssl_read_eof: {
       section: 'Default',
       key: 'strict_ssl_read_eof',
-      raw: '{{ vsftpd_cfg_strict_ssl_read_eof | default(false) }}',
+      raw: '{{ vsftpd_cfg_strict_ssl_read_eof }}',
+      default: false,
       hint: 'bool',
       added: '2.00.7',
       sensitive: false,
@@ -1189,7 +1315,8 @@
     _vsftpd_cfg_strict_ssl_write_shutdown: {
       section: 'Default',
       key: 'strict_ssl_write_shutdown',
-      raw: '{{ vsftpd_cfg_strict_ssl_write_shutdown | default(false) }}',
+      raw: '{{ vsftpd_cfg_strict_ssl_write_shutdown }}',
+      default: false,
       hint: 'bool',
       added: '2.0.7',
       sensitive: false,
@@ -1199,7 +1326,8 @@
     _vsftpd_cfg_syslog_enable: {
       section: 'Default',
       key: 'syslog_enable',
-      raw: '{{ vsftpd_cfg_syslog_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_syslog_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1209,7 +1337,8 @@
     _vsftpd_cfg_tcp_wrappers: {
       section: 'Default',
       key: 'tcp_wrappers',
-      raw: '{{ vsftpd_cfg_tcp_wrappers | default(false) }}',
+      raw: '{{ vsftpd_cfg_tcp_wrappers }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1219,7 +1348,8 @@
     _vsftpd_cfg_text_userdb_names: {
       section: 'Default',
       key: 'text_userdb_names',
-      raw: '{{ vsftpd_cfg_text_userdb_names | default(false) }}',
+      raw: '{{ vsftpd_cfg_text_userdb_names }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1229,7 +1359,8 @@
     _vsftpd_cfg_tilde_user_enable: {
       section: 'Default',
       key: 'tilde_user_enable',
-      raw: '{{ vsftpd_cfg_tilde_user_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_tilde_user_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.10.0',
       sensitive: false,
@@ -1239,7 +1370,8 @@
     _vsftpd_cfg_trans_chunk_size: {
       section: 'Default',
       key: 'trans_chunk_size',
-      raw: '{{ vsftpd_cfg_trans_chunk_size | default(0) }}',
+      raw: '{{ vsftpd_cfg_trans_chunk_size }}',
+      default: 0,
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -1249,12 +1381,14 @@
     _vsftpd_cfg_upload_file: {
       section: 'Default',
       key: 'upload_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_upload_file }}',
+      data: '{{
         "{" + vsftpd_cfg_upload_file | join(",") + "}"
         if vsftpd_cfg_upload_file | length > 0 else
         ""
       }}',
-      hint: 'str',
+      default: [],
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
@@ -1263,7 +1397,8 @@
     _vsftpd_cfg_use_localtime: {
       section: 'Default',
       key: 'use_localtime',
-      raw: '{{ vsftpd_cfg_use_localtime | default(true) }}',
+      raw: '{{ vsftpd_cfg_use_localtime }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1273,7 +1408,8 @@
     _vsftpd_cfg_use_sendfile: {
       section: 'Default',
       key: 'use_sendfile',
-      raw: '{{ vsftpd_cfg_use_sendfile | default(true) }}',
+      raw: '{{ vsftpd_cfg_use_sendfile }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1283,16 +1419,15 @@
     _vsftpd_cfg_user_config_dir: {
       section: 'Default',
       key: 'user_config_dir',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_user_config_dir }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/user_config"
-        if vsftpd_cfg_user_config_dir | default("") | length > 0 else
+        if vsftpd_cfg_user_config_dir | length > 0 else
         ""
       }}',
-      parsed: '{{
-        vsftpd_cfg_user_config_dir | default("")
-        if (vsftpd_cfg_user_config_dir | default("")).endswith("/") else
-        vsftpd_cfg_user_config_dir | default("") ~ "/"
-      }}',
+      role_src:
+        "{{ vsftpd_cfg_user_config_dir | regex_replace('\\/$', '') ~ '/' }}",
+      role_dest: '{{ vsftpd_role_service_dir ~ "/user_config" }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1302,7 +1437,8 @@
     _vsftpd_cfg_user_sub_token: {
       section: 'Default',
       key: 'user_sub_token',
-      raw: '{{ vsftpd_cfg_user_sub_token | default("") }}',
+      raw: '{{ vsftpd_cfg_user_sub_token }}',
+      default: '',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1312,7 +1448,8 @@
     _vsftpd_cfg_userlist_deny: {
       section: 'Default',
       key: 'userlist_deny',
-      raw: '{{ vsftpd_cfg_userlist_deny | default(true) }}',
+      raw: '{{ vsftpd_cfg_userlist_deny }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1322,7 +1459,8 @@
     _vsftpd_cfg_userlist_enable: {
       section: 'Default',
       key: 'userlist_enable',
-      raw: '{{ vsftpd_cfg_userlist_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_userlist_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1332,13 +1470,15 @@
     _vsftpd_cfg_userlist: {
       section: 'Default',
       key: 'userlist_file',
-      raw: '{{
+      raw: '{{ vsftpd_cfg_userlist }}',
+      data: '{{
         vsftpd_role_service_dir ~ "/user_list"
-        if vsftpd_cfg_userlist | default([]) | length > 0 else
+        if vsftpd_cfg_userlist | length > 0 else
         ""
       }}',
-      parsed: '{{ vsftpd_cfg_userlist | default([]) }}',
-      hint: 'str',  # Autogenerated path from list.
+      default: [],
+      role_dest: '{{ vsftpd_role_service_dir ~ "/user_list" }}',
+      hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
@@ -1347,7 +1487,8 @@
     _vsftpd_cfg_validate_cert: {
       section: 'Default',
       key: 'validate_cert',
-      raw: '{{ vsftpd_cfg_validate_cert | default(false) }}',
+      raw: '{{ vsftpd_cfg_validate_cert }}',
+      default: false,
       hint: 'bool',
       added: '2.0.6',
       sensitive: false,
@@ -1357,8 +1498,8 @@
     _vsftpd_cfg_vsftpd_log_file: {
       section: 'Default',
       key: 'vsftpd_log_file',
-      raw:
-        '{{ vsftpd_cfg_vsftpd_log_file | default("/var/log/vsftpd.log") }}',
+      raw: '{{ vsftpd_cfg_vsftpd_log_file }}',
+      default: '/var/log/vsftpd.log',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1368,7 +1509,8 @@
     _vsftpd_cfg_virtual_use_local_privs: {
       section: 'Default',
       key: 'virtual_use_local_privs',
-      raw: '{{ vsftpd_cfg_virtual_use_local_privs | default(false) }}',
+      raw: '{{ vsftpd_cfg_virtual_use_local_privs }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1378,7 +1520,8 @@
     _vsftpd_cfg_write_enable: {
       section: 'Default',
       key: 'write_enable',
-      raw: '{{ vsftpd_cfg_write_enable | default(false) }}',
+      raw: '{{ vsftpd_cfg_write_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1388,7 +1531,8 @@
     _vsftpd_cfg_xferlog_enable: {
       section: 'Default',
       key: 'xferlog_enable',
-      raw: '{{ vsftpd_cfg_xferlog_enable | default(true) }}',
+      raw: '{{ vsftpd_cfg_xferlog_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1398,7 +1542,8 @@
     _vsftpd_cfg_xferlog_file: {
       section: 'Default',
       key: 'xferlog_file',
-      raw: '{{ vsftpd_cfg_xferlog_file | default("/var/log/xferlog") }}',
+      raw: '{{ vsftpd_cfg_xferlog_file }}',
+      default: '/var/log/xferlog',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1408,7 +1553,8 @@
     _vsftpd_cfg_xferlog_std_format: {
       section: 'Default',
       key: 'xferlog_std_format',
-      raw: '{{ vsftpd_cfg_xferlog_std_format | default(false) }}',
+      raw: '{{ vsftpd_cfg_xferlog_std_format }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1418,7 +1564,8 @@
     _vsftpd_cfg_debian_utf8_filesystem: {
       section: 'Debian Specific Patches',
       key: 'utf8_filesystem',
-      raw: '{{ vsftpd_cfg_debian_utf8_filesystem | default(false) }}',
+      raw: '{{ vsftpd_cfg_debian_utf8_filesystem }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1431,12 +1578,9 @@
     _vsftpd_srv_virtual_users: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_virtual_users | default([]) }}',
-      parsed: '{{
-        vsftpd_role_service_dir ~ "/virtual_users"
-        if vsftpd_srv_virtual_users | default([]) | length > 0 else
-        ""
-      }}',
+      raw: '{{ vsftpd_srv_virtual_users }}',
+      default: [],
+      role_dest: '{{ vsftpd_role_service_dir ~ "/virtual_users" }}',
       hint: 'list of dict',
       added: '0.0.0',
       sensitive: false,
@@ -1446,7 +1590,8 @@
     _vsftpd_srv_harden_enable: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_harden_enable | default(false) }}',
+      raw: '{{ vsftpd_srv_harden_enable }}',
+      default: false,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1456,14 +1601,12 @@
     _vsftpd_srv_harden_rw_paths: {
       section: '',
       key: '',
-      raw: '{{
-        vsftpd_srv_harden_rw_paths |
-        default([_vsftpd_cfg_local_root.raw,
-                 _vsftpd_cfg_anon_root.raw,
-                 _vsftpd_cfg_vsftpd_log_file.raw,
-                 _vsftpd_cfg_xferlog_file.raw,
-                 "/srv/ftp"])
-      }}',
+      raw: '{{ vsftpd_srv_harden_rw_paths }}',
+      default: ['{{ _vsftpd_cfg_local_root.raw }}',
+                '{{ _vsftpd_cfg_anon_root.raw }}',
+                '{{ _vsftpd_cfg_vsftpd_log_file.raw }}',
+                '{{ _vsftpd_cfg_xferlog_file.raw }}',
+                '/srv/ftp'],
       hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
@@ -1473,7 +1616,8 @@
     _vsftpd_srv_harden_ro_paths: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_harden_ro_paths | default([]) }}',
+      raw: '{{ vsftpd_srv_harden_ro_paths }}',
+      default: [],
       hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
@@ -1483,7 +1627,8 @@
     _vsftpd_srv_harden_inaccessible_paths: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_harden_inaccessible_paths | default([]) }}',
+      raw: '{{ vsftpd_srv_harden_inaccessible_paths }}',
+      default: [],
       hint: 'list of str',
       added: '0.0.0',
       sensitive: false,
@@ -1493,8 +1638,10 @@
     _vsftpd_srv_user: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_user | default("ftp") }}',
-      parsed: '',  # Updated with UID when determined in prep.
+      raw: '{{ vsftpd_srv_user }}',
+      default: 'ftp',
+      role_uid: '',  # (str) UID.
+      role_home: '',  # (str) home directory.
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1504,7 +1651,8 @@
     _vsftpd_srv_user_home_mode: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_user_home_mode | default("0755") }}',
+      raw: '{{ vsftpd_srv_user_home_mode }}',
+      default: '0755',
       parsed: '',
       hint: 'str',
       added: '0.0.0',
@@ -1515,8 +1663,9 @@
     _vsftpd_srv_group: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_group | default("ftp") }}',
-      parsed: '',  # Updated with GID when determined in prep.
+      raw: '{{ vsftpd_srv_group }}',
+      default: 'ftp',
+      role_gid: '',  # (str) GID.
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1526,7 +1675,8 @@
     _vsftpd_srv_create_user: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_create_user | default(true) }}',
+      raw: '{{ vsftpd_srv_create_user }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1536,7 +1686,8 @@
     _vsftpd_srv_user_data_manage_enable: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_user_data_manage_enable | default(false) }}',
+      raw: '{{ vsftpd_srv_user_data_manage_enable }}',
+      default: false,
       hint: 'bool',
       added: '3.0.0',
       sensitive: false,
@@ -1546,8 +1697,9 @@
     _vsftpd_srv_local_root_user: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_local_root_user | default("ftp") }}',
-      parsed: '',  # Updated with UID when determined in prep.
+      raw: '{{ vsftpd_srv_local_root_user }}',
+      default: 'ftp',
+      role_uid: '',  # (str) UID.
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1557,8 +1709,9 @@
     _vsftpd_srv_local_root_group: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_local_root_group | default("ftp") }}',
-      parsed: '',  # Updated with GID when determined in prep.
+      raw: '{{ vsftpd_srv_local_root_group }}',
+      default: 'ftp',
+      role_gid: '',  # (str) GID.
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1568,7 +1721,8 @@
     _vsftpd_srv_local_root_mode: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_local_root_mode | default("0770") }}',
+      raw: '{{ vsftpd_srv_local_root_mode }}',
+      default: '0770',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1578,7 +1732,8 @@
     _vsftpd_srv_local_root_recursive_enable: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_local_root_recursive_enable | default(true) }}',
+      raw: '{{ vsftpd_srv_local_root_recursive_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -1588,8 +1743,9 @@
     _vsftpd_srv_anon_root_user: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_anon_root_user | default("ftp") }}',
-      parsed: '',  # Updated with UID when determined in prep.
+      raw: '{{ vsftpd_srv_anon_root_user }}',
+      default: 'ftp',
+      role_uid: '',  # (str) UID.
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1599,8 +1755,9 @@
     _vsftpd_srv_anon_root_group: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_anon_root_group | default("ftp") }}',
-      parsed: '',  # Updated with GID when determined in prep.
+      raw: '{{ vsftpd_srv_anon_root_group }}',
+      default: 'ftp',
+      role_gid: '',  # (str) GID.
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1610,7 +1767,8 @@
     _vsftpd_srv_anon_root_mode: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_anon_root_mode | default("0770") }}',
+      raw: '{{ vsftpd_srv_anon_root_mode }}',
+      default: '0770',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1620,7 +1778,8 @@
     _vsftpd_srv_anon_root_recursive_enable: {
       section: '',
       key: '',
-      raw: '{{ vsftpd_srv_anon_root_recursive_enable | default(true) }}',
+      raw: '{{ vsftpd_srv_anon_root_recursive_enable }}',
+      default: true,
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
