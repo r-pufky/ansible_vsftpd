@@ -34,18 +34,18 @@ provisioner:
           - 'test'
         vsftpd_cfg_ls_recurse_enable: true
     host_vars:
-      vsftpd-debian-12-default-hardened:
+      vsftpd-debian-13-default-hardened:
         vsftpd_srv_harden_enable: true
 platforms:
-  - name: 'vsftpd-debian-12-user_data'
-    image: 'ghcr.io/hifis-net/debian-systemd:12'
+  - name: 'vsftpd-debian-13-user_data'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
     command: '/lib/systemd/systemd'
     pre_build_image: true
-  - name: 'vsftpd-debian-12-user_data-hardened'
-    image: 'ghcr.io/hifis-net/debian-systemd:12'
+  - name: 'vsftpd-debian-13-user_data-hardened'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'

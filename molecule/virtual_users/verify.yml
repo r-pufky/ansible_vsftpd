@@ -33,9 +33,13 @@
       ansible.builtin.assert:
         quiet: true
         that: _test_vsftpd_test_login.rc == 0
-        fail_msg: >
-          ✘ test@127.0.0.1 should successfully login.
-          ({{ _test_vsftpd_test_login.stderr }}).
+        fail_msg: |
+          ╭───────────────────────────────────────────────────────────────────╮
+          │                                                                   │
+          │             test@127.0.0.1 should successfully login.             │
+          │                                                                   │
+          ├───────────────────────────────────────────────────────────────────╯
+          │ {{ _test_vsftpd_test_login.stderr }}
 
     - name: 'Verify | query virtual user test2 login success'
       ansible.builtin.command:
@@ -53,6 +57,10 @@
       ansible.builtin.assert:
         quiet: true
         that: _test_vsftpd_test_login.rc == 0
-        fail_msg: >
-          ✘ test@127.0.0.1 should successfully login.
-          ({{ _test_vsftpd_test_login.stderr }}).
+        fail_msg: |
+          ╭───────────────────────────────────────────────────────────────────╮
+          │                                                                   │
+          │             test@127.0.0.1 should successfully login.             │
+          │                                                                   │
+          ├───────────────────────────────────────────────────────────────────╯
+          │ {{ _test_vsftpd_test_login.stderr }}

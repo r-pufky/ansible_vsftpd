@@ -69,8 +69,8 @@ provisioner:
             "/files/user_config"
           }}'
 platforms:
-  - name: 'vsftpd-debian-12-vsftpd.d'
-    image: 'ghcr.io/hifis-net/debian-systemd:12'
+  - name: 'vsftpd-debian-13-vsftpd.d'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'

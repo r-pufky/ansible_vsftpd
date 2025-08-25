@@ -8,7 +8,7 @@
 # See provided example in README.md.
 #
 # Reference:
-# * https://manpages.debian.org/bookworm/vsftpd/vsftpd.conf.5.en.html
+# * https://manpages.debian.org/trixie/vsftpd/vsftpd.conf.5.en.html
 
 # Timeout for client to establish PASV data connection (seconds). Default: 60.
 vsftpd_cfg_accept_timeout: 60
@@ -1239,7 +1239,7 @@ vsftpd_cfg_xferlog_std_format: false
 
 # Indicate that VSFTPd runs on UTF8 filesystems. Default: False.
 #
-# 2025-03-03 - confirmed still patched for Debian bookworm.
+# 2025-08-25 - confirmed still patched for Debian Trixie.
 #
 # Reference:
 # * https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=804777

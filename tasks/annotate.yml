@@ -39,21 +39,6 @@
 # * https://github.com/ansible/ansible/issues/77159
 # yamllint enable rule:line-length
 
-# TODO(trixie): Remove variable renaming check on next major vsftpd release.
-- name: 'Annotate | check deprecated variable usage'
-  when: >
-    hostvars[inventory_hostname] | dict2items |
-    selectattr("key", "match", "vsftpd_config_*") | length > 0 or
-    hostvars[inventory_hostname] | dict2items |
-    selectattr("key", "match", "vsftpd_service_*") | length > 0
-  ansible.builtin.fail:
-    msg: |
-      ✘ Role variables have migrated. Read defaults and update.
-
-      vsftpd_config_* -> vsftpd_cfg_*
-      vsftpd_service_* -> vsftpd_srv_*
-      vsftpd_* -> vsftpd_srv_*
-
 - name: 'Annotate | sanitize & annotate config defaults'
   ansible.builtin.set_fact:
     _vsftpd_cfg_accept_timeout: {

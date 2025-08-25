@@ -20,13 +20,13 @@
 #   change - e.g. Debian: 3.0.3 -> Role: 3.0.301  (01 role release).
 #
 # Reference:
-# * https://manpages.debian.org/bookworm/vsftpd/vsftpd.conf.5.en.html
+# * https://manpages.debian.org/trixie/vsftpd/vsftpd.conf.5.en.html
 # * https://security.appspot.com/vsftpd.html
 
 # Last time VSFTPd options were validated against a default configuration.
-vsftpd_role_validate_date: '2025-08-11'
-vsftpd_role_validate_release: 'bookworm'
-vsftpd_role_validate_version: '3.0.3-13'
+vsftpd_role_validate_date: '2025-08-25'
+vsftpd_role_validate_release: 'trixie'
+vsftpd_role_validate_version: '3.0.5-0.2'
 
 vsftpd_role_service_dir: '/etc/vsftpd.d'
 vsftpd_role_pam_dir: '/etc/pam.d'

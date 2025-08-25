@@ -21,6 +21,12 @@
   ansible.builtin.assert:
     quiet: true
     that: ansible_facts.services[item].state == 'running'
-    fail_msg: '✘ {{ item }} should be running.'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                     Service failed to start.                      │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ {{ item }}
   loop:
     - 'vsftpd.service'

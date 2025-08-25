@@ -41,8 +41,8 @@ provisioner:
         vsftpd_cfg_guest_username: 'ftp'
         vsftpd_cfg_virtual_use_local_privs: true
 platforms:
-  - name: 'vsftpd-debian-12-virtual_users'
-    image: 'ghcr.io/hifis-net/debian-systemd:12'
+  - name: 'vsftpd-debian-13-virtual_users'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'

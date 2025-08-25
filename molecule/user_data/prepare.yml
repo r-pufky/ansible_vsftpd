@@ -15,4 +15,5 @@
         path: '/data'
         owner: 950
         group: 950
+        mode: '0755'
         state: 'directory'

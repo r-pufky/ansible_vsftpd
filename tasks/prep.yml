@@ -15,10 +15,13 @@
     quiet: true
     that: _vsftpd_cfg_listen.raw != _vsftpd_cfg_listen_ipv6.raw
     fail_msg: |
-      ✘ vsftpd_cfg_listen, vsftpd_cfg_listen_ipv6 are mutually exclusive.
-
-           vsftpd_cfg_listen: {{ _vsftpd_cfg_listen.raw }}
-      vsftpd_cfg_listen_ipv6: {{ _vsftpd_cfg_listen_ipv6.raw }}
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │ vsftpd_cfg_listen, vsftpd_cfg_listen_ipv6 are mutually exclusive. │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ vsftpd_cfg_listen: {{ _vsftpd_cfg_listen.raw }}
+      │ vsftpd_cfg_listen_ipv6: {{ _vsftpd_cfg_listen_ipv6.raw }}
 
 - name: 'Prep | manage users'
   when: _vsftpd_srv_create_user.raw
