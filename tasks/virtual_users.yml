@@ -17,12 +17,12 @@
   block:
     - name: 'Virtual users | enable | clear virtual users'
       ansible.builtin.file:
-        path: '{{ _vsftpd_srv_virtual_users.role_dest }}'
+        path: '{{ _vsftpd_srv_virtual_users._dest }}'
         state: 'absent'
 
     - name: 'Virtual users | enable | add virtual users'
       community.general.htpasswd:
-        path: '{{ _vsftpd_srv_virtual_users.role_dest }}'
+        path: '{{ _vsftpd_srv_virtual_users._dest }}'
         name: '{{ item.user }}'
         password: '{{ item.pass }}'
         crypt_scheme: 'md5_crypt'
@@ -37,7 +37,7 @@
     - name: 'Virtual users | enable | add PAM vsftpd_virtual module'
       ansible.builtin.template:
         src: 'vsftpd_virtual.j2'
-        dest: '{{ _vsftpd_cfg_pam_service_name.role_dest }}'
+        dest: '{{ _vsftpd_cfg_pam_service_name._dest }}'
         owner: 'root'
         group: 'root'
         mode: '0644'
@@ -48,5 +48,5 @@
     path: '{{ item }}'
     state: 'absent'
   loop:
-    - '{{ _vsftpd_srv_virtual_users.role_dest }}'
-    - '{{ _vsftpd_cfg_pam_service_name.role_dest }}'
+    - '{{ _vsftpd_srv_virtual_users._dest }}'
+    - '{{ _vsftpd_cfg_pam_service_name._dest }}'

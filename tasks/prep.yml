@@ -44,19 +44,19 @@
   ansible.builtin.set_fact:
     _vsftpd_srv_user: '{{
         _vsftpd_srv_user |
-        combine({"role_uid": _vsftpd_srv_user_query.uid,
-                 "role_home": _vsftpd_srv_user_query.home})
+        combine({"_uid": _vsftpd_srv_user_query.uid,
+                 "_home": _vsftpd_srv_user_query.home})
       }}'
     _vsftpd_srv_group: '{{
         _vsftpd_srv_group |
-        combine({"role_gid": _vsftpd_srv_user_query.group})
+        combine({"_gid": _vsftpd_srv_user_query.group})
       }}'
 
 - name: 'Prep | set user home directory'
   ansible.builtin.file:
-    path: '{{ _vsftpd_srv_user.role_home }}'
-    owner: '{{ _vsftpd_srv_user.role_uid }}'
-    group: '{{ _vsftpd_srv_group.role_gid }}'
+    path: '{{ _vsftpd_srv_user._home }}'
+    owner: '{{ _vsftpd_srv_user._uid }}'
+    group: '{{ _vsftpd_srv_group._gid }}'
     mode: '{{ _vsftpd_srv_user_home_mode.raw }}'
     state: 'directory'
   become: true
@@ -89,11 +89,11 @@
   ansible.builtin.set_fact:
     _vsftpd_srv_local_root_user: '{{
         _vsftpd_srv_local_root_user |
-        combine({"role_uid": _vsftpd_srv_user_local_root_query.uid})
+        combine({"_uid": _vsftpd_srv_user_local_root_query.uid})
       }}'
     _vsftpd_srv_local_root_group: '{{
         _vsftpd_srv_local_root_group |
-        combine({"role_gid": _vsftpd_srv_user_local_group_query.gid})
+        combine({"_gid": _vsftpd_srv_user_local_group_query.gid})
       }}'
 
 - name:
@@ -119,9 +119,9 @@
   ansible.builtin.set_fact:
     _vsftpd_srv_anon_root_user: '{{
         _vsftpd_srv_anon_root_user |
-        combine({"role_uid": _vsftpd_srv_user_anon_root_query.uid})
+        combine({"_uid": _vsftpd_srv_user_anon_root_query.uid})
       }}'
     _vsftpd_srv_anon_root_group: '{{
         _vsftpd_srv_anon_root_group |
-        combine({"role_gid": _vsftpd_srv_user_anon_group_query.gid})
+        combine({"_gid": _vsftpd_srv_user_anon_group_query.gid})
       }}'
