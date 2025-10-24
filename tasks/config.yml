@@ -21,6 +21,9 @@
 #
 #   vsftpd_srv_user_home_mode: '0550'
 #
+# Specific container environments will fail to create vsftpd.log file when used
+# with hardening. Touch file explicitly to prevent issue from occurring.
+#
 # Reference:
 # * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
 # * https://security.appspot.com/vsftpd/vsftpd_conf.html
@@ -35,6 +38,16 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
+
+- name: 'Config | set {{ _vsftpd_cfg_vsftpd_log_file.raw }}'
+  ansible.builtin.file:
+    path: '{{ _vsftpd_cfg_vsftpd_log_file.raw }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    state: 'touch'
+  become: true
+  become_user: 'root'
 
 - name: 'Config | set banner_file'
   when: _vsftpd_cfg_banner.raw | length > 0
