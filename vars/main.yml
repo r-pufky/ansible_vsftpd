@@ -43,7 +43,7 @@ vsftpd_role_virtual_user_packages:
   - 'libpam-pwdfile'  # pam_pwdfile.so for virtual_users.
 
 ###############################################################################
-# Default Radarr User/Group
+# Default User/Group
 ###############################################################################
 
 vsftpd_role_group:
