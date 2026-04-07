@@ -1,127 +1,404 @@
 ---
 ###############################################################################
-# Prep
+#  Pre Execution Tasks
 ###############################################################################
-# Create user and set home directory if needed and determine UID/GID for
-# potential remote filesystems. Stop services if they exist.
+# Only use data annotations in role after merging role, defaults, runtime data.
+# Service may not exist if first install.
+#
+# VSFTPd configuration requires YES/NO strings. Convert boolean values to these
+# strings.
 #
 # Reference:
 # * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
 # * https://security.appspot.com/vsftpd.html
 
-- name: 'Prep | assert mutually exclusive listen options'
-  when: _vsftpd_cfg_listen.raw or _vsftpd_cfg_listen_ipv6.raw
+- name: 'Prep | assert | mutually exclusive listen options'
+  when: vsftpd_cfg_listen or vsftpd_cfg_listen_ipv6
   ansible.builtin.assert:
     quiet: true
-    that: _vsftpd_cfg_listen.raw != _vsftpd_cfg_listen_ipv6.raw
+    that: vsftpd_cfg_listen != vsftpd_cfg_listen_ipv6
     fail_msg: |
-      ╭───────────────────────────────────────────────────────────────────╮
-      │                                                                   │
-      │ vsftpd_cfg_listen, vsftpd_cfg_listen_ipv6 are mutually exclusive. │
-      │                                                                   │
-      ├───────────────────────────────────────────────────────────────────╯
-      │ vsftpd_cfg_listen: {{ _vsftpd_cfg_listen.raw }}
-      │ vsftpd_cfg_listen_ipv6: {{ _vsftpd_cfg_listen_ipv6.raw }}
 
-- name: 'Prep | manage users'
-  when: _vsftpd_srv_create_user.raw
-  ansible.builtin.include_role:
-    name: 'r_pufky.deb.users'
-    tasks_from: 'role_account_add.yml'
-  vars:
-    users_role_user: '{{ vsftpd_role_user }}'
-    users_role_group: '{{ vsftpd_role_group }}'
+      ✘ vsftpd_cfg_listen, vsftpd_cfg_listen_ipv6 are mutually exclusive.
 
-- name: 'Prep | enumerate system user {{ _vsftpd_srv_user.raw }}'
-  ansible.builtin.user:
-    name: '{{ _vsftpd_srv_user.raw }}'
-    state: 'present'
-  check_mode: true
-  changed_when: false
-  register: _vsftpd_srv_user_query
+      vsftpd_cfg_listen: {{ vsftpd_cfg_listen }}
+      vsftpd_cfg_listen_ipv6: {{ vsftpd_cfg_listen_ipv6 }}
 
-- name: 'Prep | parse system user UID/GID'
+- name: 'Prep | fact | record start time'
   ansible.builtin.set_fact:
-    _vsftpd_srv_user: '{{
-        _vsftpd_srv_user |
-        combine({"_uid": _vsftpd_srv_user_query.uid,
-                 "_home": _vsftpd_srv_user_query.home})
-      }}'
-    _vsftpd_srv_group: '{{
-        _vsftpd_srv_group |
-        combine({"_gid": _vsftpd_srv_user_query.group})
-      }}'
+    vsftpd__srv: "{{ vsftpd___release | r_pufky.data.v3(
 
-- name: 'Prep | set user home directory'
-  ansible.builtin.file:
-    path: '{{ _vsftpd_srv_user._home }}'
-    owner: '{{ _vsftpd_srv_user._uid }}'
-    group: '{{ _vsftpd_srv_group._gid }}'
-    mode: '{{ _vsftpd_srv_user_home_mode.raw }}'
-    state: 'directory'
-  become: true
-  become_user: '{{
-      _vsftpd_srv_user.raw
-      if _vsftpd_srv_user_data_manage_enable.raw else
-      "root"
-    }}'
+        _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
+        _user=vsftpd_srv_user,
+        _group=vsftpd_srv_group,
+        _secure_d=vsftpd_srv_secure_d | regex_replace('\\/$', ''),
+        _user_d=vsftpd_srv_user_d | regex_replace('\\/$', ''),
+        _home_mode=vsftpd_srv_home_mode,
+        _virtual_users=vsftpd_srv_virtual_users,
 
-- name:
-    'Prep | enumerate local root user {{ _vsftpd_srv_local_root_user.raw }}'
-  ansible.builtin.user:
-    name: '{{ _vsftpd_srv_local_root_user.raw }}'
-    state: 'present'
-  check_mode: true
-  changed_when: false
-  register: _vsftpd_srv_user_local_root_query
+        _harden_rw_paths=vsftpd_srv_harden_rw_paths | join(' '),
+        _harden_ro_paths=vsftpd_srv_harden_ro_paths | join(' '),
+        _harden_inaccessible_paths=(
+          vsftpd_srv_harden_inaccessible_paths | join(' ')
+        ),
 
-- name: >
-    Prep | enumerate local root group
-    {{ _vsftpd_srv_local_root_group.raw }}
-  ansible.builtin.group:
-    name: '{{ _vsftpd_srv_local_root_group.raw }}'
-    state: 'present'
-  check_mode: true
-  changed_when: false
-  register: _vsftpd_srv_user_local_group_query
+        _local_root_user=vsftpd_srv_local_root_user,
+        _local_root_group=vsftpd_srv_local_root_group,
+        _local_root_mode=vsftpd_srv_local_root_mode,
+        _local_root_recursive=vsftpd_srv_local_root_recursive,
 
-- name: 'Prep | parse local root UID/GID'
-  ansible.builtin.set_fact:
-    _vsftpd_srv_local_root_user: '{{
-        _vsftpd_srv_local_root_user |
-        combine({"_uid": _vsftpd_srv_user_local_root_query.uid})
-      }}'
-    _vsftpd_srv_local_root_group: '{{
-        _vsftpd_srv_local_root_group |
-        combine({"_gid": _vsftpd_srv_user_local_group_query.gid})
-      }}'
+        _anon_root_user=vsftpd_srv_anon_root_user,
+        _anon_root_group=vsftpd_srv_anon_root_group,
+        _anon_root_mode=vsftpd_srv_anon_root_mode,
+        _anon_root_recursive=vsftpd_srv_anon_root_recursive_enable,
 
-- name:
-    'Prep | enumerate anon root user {{ _vsftpd_srv_anon_root_user.raw }}'
-  ansible.builtin.user:
-    name: '{{ _vsftpd_srv_anon_root_user.raw }}'
-    state: 'present'
-  check_mode: true
-  changed_when: false
-  register: _vsftpd_srv_user_anon_root_query
+        _banned_emails=vsftpd_srv_banned_emails,
+        _banner=vsftpd_srv_banner,
+        _chroot_list=vsftpd_srv_chroot_list,
+        _email_passwords=vsftpd_srv_email_passwords,
+        _userlist=vsftpd_srv_userlist,
+      ) }}"
+    vsftpd__cfg: "{{ vsftpd___app | r_pufky.data.v3(
 
-- name: >
-    Prep | enumerate anon root group
-    {{ _vsftpd_srv_anon_root_group.raw }}
-  ansible.builtin.group:
-    name: '{{ _vsftpd_srv_anon_root_group.raw }}'
-    state: 'present'
-  check_mode: true
-  changed_when: false
-  register: _vsftpd_srv_user_anon_group_query
+        _accept_timeout=vsftpd_cfg_accept_timeout,
+        _allow_anon_ssl='YES' if vsftpd_cfg_allow_anon_ssl else 'NO',
+        _anon_max_rate=vsftpd_cfg_anon_max_rate,
+        _anon_mkdir_write_enable=(
+          'YES' if vsftpd_cfg_anon_mkdir_write_enable else 'NO'
+        ),
+        _anon_other_write_enable=(
+          'YES' if vsftpd_cfg_anon_other_write_enable else 'NO'
+        ),
+        _anon_root=vsftpd_cfg_anon_root,
+        _anon_umask=vsftpd_cfg_anon_umask,
+        _anon_upload_enable='YES' if vsftpd_cfg_anon_upload_enable else 'NO',
+        _anon_world_readable_only=(
+          'YES' if vsftpd_cfg_anon_world_readable_only else 'NO'
+        ),
+        _anonymous_enable='YES' if vsftpd_cfg_anonymous_enable else 'NO',
+        _ascii_download_enable=(
+          'YES' if vsftpd_cfg_ascii_download_enable else 'NO'
+        ),
+        _ascii_upload_enable='YES' if vsftpd_cfg_ascii_upload_enable else 'NO',
+        _async_abor_enable='YES' if vsftpd_cfg_async_abor_enable else 'NO',
+        _background='YES' if vsftpd_cfg_background else 'NO',
+        _banned_email_file=(
+          vsftpd___app._banned_emails
+          if vsftpd_srv_banned_emails | length > 0 else
+          ''
+        ),
+        _banner_file=(
+          vsftpd___app._banner
+          if vsftpd_srv_banner | length > 0 else
+          ''
+        ),
+        _ca_certs_file=vsftpd_cfg_ca_certs_file,
+        _check_shell='YES' if vsftpd_cfg_check_shell else 'NO',
+        _chmod_enable='YES' if vsftpd_cfg_chmod_enable else 'NO',
+        _chown_upload_mode=vsftpd_cfg_chown_upload_mode,
+        _chown_uploads='YES' if vsftpd_cfg_chown_uploads else 'NO',
+        _chown_username=vsftpd_cfg_chown_username,
+        _chroot_list_enable='YES' if vsftpd_cfg_chroot_list_enable else 'NO',
+        _chroot_list_file=(
+          vsftpd___app._chroot_list
+          if vsftpd_srv_chroot_list | length > 0 else
+          ''
+        ),
+        _chroot_local_user='YES' if vsftpd_cfg_chroot_local_user else 'NO',
+        _cmds_allowed=(
+          vsftpd_cfg_cmds_allowed | join(',')
+          if vsftpd_cfg_cmds_allowed | length > 0 else
+          ''
+        ),
+        _cmds_denied=(
+          vsftpd_cfg_cmds_denied | join(',')
+          if vsftpd_cfg_cmds_denied | length > 0 else
+          ''
+        ),
+        _connect_from_port_20=(
+          'YES' if vsftpd_cfg_connect_from_port_20 else 'NO'
+        ),
+        _connect_timeout=vsftpd_cfg_connect_timeout,
+        _data_connection_timeout=vsftpd_cfg_data_connection_timeout,
+        _debug_ssl='YES' if vsftpd_cfg_debug_ssl else 'NO',
+        _delay_failed_login=vsftpd_cfg_delay_failed_login,
+        _delay_successful_login=vsftpd_cfg_delay_successful_login,
+        _delete_failed_uploads=(
+          'YES' if vsftpd_cfg_delete_failed_uploads else 'NO'
+        ),
+        _deny_email_enable='YES' if vsftpd_cfg_deny_email_enable else 'NO',
+        _deny_file=(
+          '{' ~ vsftpd_cfg_deny_file | join(',') ~ '}'
+          if vsftpd_cfg_deny_file | length > 0 else
+          ''
+        ),
+        _dirlist_enable='YES' if vsftpd_cfg_dirlist_enable else 'NO',
+        _dirmessage_enable='YES' if vsftpd_cfg_dirmessage_enable else 'NO',
+        _download_enable='YES' if vsftpd_cfg_download_enable else 'NO',
+        _download_file=(
+          '{' ~ vsftpd_cfg_download_file | join(',') ~ '}'
+          if vsftpd_cfg_download_file | length > 0 else
+          ''
+        ),
+        _dsa_cert_file=vsftpd_cfg_dsa_cert_file,
+        _dsa_private_key_file=vsftpd_cfg_dsa_private_key_file,
+        _dual_log_enable='YES' if vsftpd_cfg_dual_log_enable else 'NO',
+        _email_password_file=(
+          vsftpd___app._email_passwords
+          if vsftpd_srv_email_passwords | length > 0 else
+          ''
+        ),
+        _file_open_mode=vsftpd_cfg_file_open_mode,
+        _force_anon_data_ssl='YES' if vsftpd_cfg_force_anon_data_ssl else 'NO',
+        _force_anon_logins_ssl=(
+          'YES' if vsftpd_cfg_force_anon_logins_ssl else 'NO'
+        ),
+        _force_dot_files='YES' if vsftpd_cfg_force_dot_files else 'NO',
+        _force_local_data_ssl=(
+          'YES' if vsftpd_cfg_force_local_data_ssl else 'NO'
+        ),
+        _force_local_logins_ssl=(
+          'YES' if vsftpd_cfg_force_local_logins_ssl else 'NO'
+        ),
+        _ftp_data_port=vsftpd_cfg_ftp_data_port,
+        _ftp_username=vsftpd_cfg_ftp_username,
+        _ftpd_banner=vsftpd_cfg_ftpd_banner,
+        _guest_enable='YES' if vsftpd_cfg_guest_enable else 'NO',
+        _guest_username=vsftpd_cfg_guest_username,
+        _hide_file=(
+          '{' ~ vsftpd_cfg_hide_file | join(',') ~ '}'
+          if vsftpd_cfg_hide_file | length > 0 else
+          ''
+        ),
+        _hide_ids='YES' if vsftpd_cfg_hide_ids else 'NO',
+        _idle_session_timeout=vsftpd_cfg_idle_session_timeout,
+        _implicit_ssl='YES' if vsftpd_cfg_implicit_ssl else 'NO',
+        _listen='YES' if vsftpd_cfg_listen else 'NO',
+        _listen_address6=vsftpd_cfg_listen_address6,
+        _listen_address=vsftpd_cfg_listen_address,
+        _listen_ipv6='YES' if vsftpd_cfg_listen_ipv6 else 'NO',
+        _listen_port=vsftpd_cfg_listen_port,
+        _local_enable='YES' if vsftpd_cfg_local_enable else 'NO',
+        _local_max_rate=vsftpd_cfg_local_max_rate,
+        _local_root=vsftpd_cfg_local_root,
+        _local_umask=vsftpd_cfg_local_umask,
+        _lock_upload_files='YES' if vsftpd_cfg_lock_upload_files else 'NO',
+        _log_ftp_protocol='YES' if vsftpd_cfg_log_ftp_protocol else 'NO',
+        _ls_recurse_enable='YES' if vsftpd_cfg_ls_recurse_enable else 'NO',
+        _max_clients=vsftpd_cfg_max_clients,
+        _max_login_fails=vsftpd_cfg_max_login_fails,
+        _max_per_ip=vsftpd_cfg_max_per_ip,
+        _mdtm_write='YES' if vsftpd_cfg_mdtm_write else 'NO',
+        _message_file=vsftpd_cfg_message_file,
+        _no_anon_password='YES' if vsftpd_cfg_no_anon_password else 'NO',
+        _no_log_lock='YES' if vsftpd_cfg_no_log_lock else 'NO',
+        _nopriv_user=vsftpd_cfg_nopriv_user,
+        _one_process_model='YES' if vsftpd_cfg_one_process_model else 'NO',
+        _pam_service_name=(
+          'vsftpd_virtual'
+          if vsftpd_srv_virtual_users | length > 0 else
+          vsftpd_cfg_pam_service_name
+        ),
+        _passwd_chroot_enable=(
+          'YES' if vsftpd_cfg_passwd_chroot_enable else 'NO'
+        ),
+        _pasv_addr_resolve='YES' if vsftpd_cfg_pasv_addr_resolve else 'NO',
+        _pasv_address=vsftpd_cfg_pasv_address,
+        _pasv_enable='YES' if vsftpd_cfg_pasv_enable else 'NO',
+        _pasv_max_port=vsftpd_cfg_pasv_max_port,
+        _pasv_min_port=vsftpd_cfg_pasv_min_port,
+        _pasv_promiscuous='YES' if vsftpd_cfg_pasv_promiscuous else 'NO',
+        _port_enable='YES' if vsftpd_cfg_port_enable else 'NO',
+        _port_promiscuous='YES' if vsftpd_cfg_port_promiscuous else 'NO',
+        _require_cert='YES' if vsftpd_cfg_require_cert else 'NO',
+        _require_ssl_reuse='YES' if vsftpd_cfg_require_ssl_reuse else 'NO',
+        _rsa_cert_file=vsftpd_cfg_rsa_cert_file,
+        _rsa_private_key_file=vsftpd_cfg_rsa_private_key_file,
+        _run_as_launching_user=(
+          'YES' if vsftpd_cfg_run_as_launching_user else 'NO'
+        ),
+        _secure_chroot_dir=vsftpd_cfg_secure_chroot_dir,
+        _secure_email_list_enable=(
+          'YES' if vsftpd_cfg_secure_email_list_enable else 'NO'
+        ),
+        _session_support='YES' if vsftpd_cfg_session_support else 'NO',
+        _setproctitle_enable='YES' if vsftpd_cfg_setproctitle_enable else 'NO',
+        _ssl_ciphers=vsftpd_cfg_ssl_ciphers | join(':'),
+        _ssl_enable='YES' if vsftpd_cfg_ssl_enable else 'NO',
+        _ssl_request_cert='YES' if vsftpd_cfg_ssl_request_cert else 'NO',
+        _ssl_sslv2='YES' if vsftpd_cfg_ssl_sslv2 else 'NO',
+        _ssl_sslv3='YES' if vsftpd_cfg_ssl_sslv3 else 'NO',
+        _ssl_tlsv1='YES' if vsftpd_cfg_ssl_tlsv1 else 'NO',
+        _strict_ssl_read_eof='YES' if vsftpd_cfg_strict_ssl_read_eof else 'NO',
+        _strict_ssl_write_shutdown=(
+          'YES' if vsftpd_cfg_strict_ssl_write_shutdown else 'NO'
+        ),
+        _syslog_enable='YES' if vsftpd_cfg_syslog_enable else 'NO',
+        _tcp_wrappers='YES' if vsftpd_cfg_tcp_wrappers else 'NO',
+        _text_userdb_names='YES' if vsftpd_cfg_text_userdb_names else 'NO',
+        _tilde_user_enable='YES' if vsftpd_cfg_tilde_user_enable else 'NO',
+        _trans_chunk_size=vsftpd_cfg_trans_chunk_size,
+        _upload_file=(
+          '{' ~ vsftpd_cfg_upload_file | join(',') ~ '}'
+          if vsftpd_cfg_upload_file | length > 0 else
+          ''
+        ),
+        _use_localtime='YES' if vsftpd_cfg_use_localtime else 'NO',
+        _use_sendfile='YES' if vsftpd_cfg_use_sendfile else 'NO',
+        _config_dir=(
+          vsftpd___app._user_d
+          if vsftpd_srv_user_d | length > 0 else
+          ''
+        ),
+        _user_sub_token=vsftpd_cfg_user_sub_token,
+        _userlist_deny='YES' if vsftpd_cfg_userlist_deny else 'NO',
+        _userlist_enable='YES' if vsftpd_cfg_userlist_enable else 'NO',
+        _userlist_file=(
+          vsftpd___app._user_list
+          if vsftpd_srv_userlist | length > 0 else
+          ''
+        ),
+        _validate_cert='YES' if vsftpd_cfg_validate_cert else 'NO',
+        _vsftpd_log_file=vsftpd_cfg_vsftpd_log_file,
+        _virtual_use_local_privs=(
+          'YES' if vsftpd_cfg_virtual_use_local_privs else 'NO'
+        ),
+        _write_enable='YES' if vsftpd_cfg_write_enable else 'NO',
+        _xferlog_enable='YES' if vsftpd_cfg_xferlog_enable else 'NO',
+        _xferlog_file=vsftpd_cfg_xferlog_file,
+        _xferlog_std_format='YES' if vsftpd_cfg_xferlog_std_format else 'NO',
+        _debian_utf8_filesystem=(
+          'YES' if vsftpd_cfg_debian_utf8_filesystem else 'NO'
+        ),
+      ) }}"
 
-- name: 'Prep | parse local root UID/GID'
-  ansible.builtin.set_fact:
-    _vsftpd_srv_anon_root_user: '{{
-        _vsftpd_srv_anon_root_user |
-        combine({"_uid": _vsftpd_srv_user_anon_root_query.uid})
-      }}'
-    _vsftpd_srv_anon_root_group: '{{
-        _vsftpd_srv_anon_root_group |
-        combine({"_gid": _vsftpd_srv_user_anon_group_query.gid})
-      }}'
+- name: 'Prep | account | service user'
+  block:
+    - name: '{{ "Prep | account | query user " ~ vsftpd__srv._user }}'
+      ansible.builtin.command: '{{ "id " ~ vsftpd__srv._user }}'
+      failed_when: false
+      register: vsftpd__cfg_check
+      changed_when: vsftpd__cfg_check.rc > 0
+
+    - name: '{{ "Prep | account | query group " ~ vsftpd__srv._group }}'
+      ansible.builtin.command: '{{ "groups " ~ vsftpd__srv._group }}'
+      failed_when: false
+      register: vsftpd__group_check
+      changed_when: vsftpd__group_check.rc > 0
+
+    - name: '{{ "Prep | account | create group " ~ vsftpd__srv._group }}'
+      when: vsftpd__group_check.rc != 0
+      ansible.builtin.group:
+        gid: '{{ vsftpd___group.gid }}'
+        name: '{{ vsftpd___group.name }}'
+        state: 'present'
+
+    - name: '{{ "Prep | account | create user " ~ vsftpd__srv._user }}'
+      when: vsftpd__cfg_check.rc != 0
+      ansible.builtin.user:
+        name: '{{ vsftpd___user.name }}'
+        group: '{{ vsftpd___user.group }}'
+        uid: '{{ vsftpd___user.uid }}'
+        shell: '{{ vsftpd___user.shell }}'
+        home: '{{ vsftpd___user.home }}'
+        create_home: '{{ vsftpd___user.create_home }}'
+        password: '{{ vsftpd___user.password }}'
+        password_lock: '{{ vsftpd___user.password_lock }}'
+        update_password: '{{ vsftpd___user.update_password }}'
+        expires: '{{ vsftpd___user.expires }}'
+        system: '{{ vsftpd___user.system }}'
+
+    # Pre-existing users may have a different UID/GID/Home.
+    - name: '{{ "Prep | account | enumerate " ~ vsftpd__srv._user }}'
+      ansible.builtin.user:
+        name: '{{ vsftpd__srv._user }}'
+      check_mode: true
+      changed_when: false
+      register: vsftpd__cfg_query
+
+    - name: 'Prep | fact | parse service UID/GID'
+      ansible.builtin.set_fact:
+        vsftpd__cfg: "{{ vsftpd__cfg | r_pufky.data.v3(
+
+            _uid=vsftpd__cfg_query.uid,
+            _gid=vsftpd__cfg_query.group,
+            _home=vsftpd__cfg_query.home,
+          ) }}"
+
+    - name: '{{ "Install | filesystem | set " ~ vsftpd__cfg._home }}'
+      block:
+        - name: '{{ "Install | filesystem | set " ~ vsftpd__cfg._home }}'
+          ansible.builtin.file:
+            path: '{{ vsftpd__cfg._home }}'
+            owner: '{{ vsftpd__srv._user }}'
+            group: '{{ vsftpd__srv._group }}'
+            mode: '{{ vsftpd__srv._home_mode }}'
+            state: 'directory'
+      rescue:
+        - name: '{{ "Install ⛑ | filesystem | set " ~vsftpd__cfg._home }}'
+          ansible.builtin.file:
+            path: '{{ vsftpd__cfg._home }}'
+            owner: '{{ vsftpd__srv._user }}'
+            group: '{{ vsftpd__srv._group }}'
+            mode: '{{ vsftpd__srv._home_mode }}'
+            state: 'directory'
+          become: true
+          become_user: '{{ vsftpd__srv._user }}'
+
+- name: 'Prep | account | local root user'
+  block:
+    - name:
+        '{{ "Prep | account | enumerate " ~ vsftpd__srv._local_root_user }}'
+      ansible.builtin.user:
+        name: '{{ vsftpd__srv._local_root_user }}'
+      check_mode: true
+      changed_when: false
+      register: vsftpd__user
+
+    - name:
+        '{{ "Prep | account | enumerate " ~ vsftpd__srv._local_root_group }}'
+      ansible.builtin.group:
+        name: '{{ vsftpd__srv._local_root_group }}'
+      check_mode: true
+      changed_when: false
+      register: vsftpd__group
+
+    - name: 'Prep | fact | parse local root user UID/GID'
+      ansible.builtin.set_fact:
+        vsftpd__cfg: "{{ vsftpd__cfg | r_pufky.data.v3(
+
+            _local_root_uid=vsftpd__user.uid,
+            _local_root_gid=vsftpd__group.gid,
+          ) }}"
+
+- name: 'Prep | account | anon root user'
+  block:
+    - name:
+        '{{ "Prep | account | enumerate " ~ vsftpd__srv._anon_root_user }}'
+      ansible.builtin.user:
+        name: '{{ vsftpd__srv._anon_root_user }}'
+      check_mode: true
+      changed_when: false
+      register: vsftpd__user
+
+    - name:
+        '{{ "Prep | account | enumerate " ~ vsftpd__srv._anon_root_group }}'
+      ansible.builtin.group:
+        name: '{{ vsftpd__srv._anon_root_group }}'
+      check_mode: true
+      changed_when: false
+      register: vsftpd__group
+
+    - name: 'Prep | fact | parse anon root user UID/GID'
+      ansible.builtin.set_fact:
+        vsftpd__cfg: "{{ vsftpd__cfg | r_pufky.data.v3(
+
+            _anon_root_uid=vsftpd__user.uid,
+            _anon_root_gid=vsftpd__group.gid,
+          ) }}"
+
+- name: 'Install | systemd | stop vsftpd'
+  ansible.builtin.systemd:
+    name: 'vsftpd.service'
+    state: 'stopped'
+  failed_when: false

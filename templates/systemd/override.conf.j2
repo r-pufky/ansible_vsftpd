@@ -1,0 +1,11 @@
+[Service]
+ExecStartPre=
+ExecStartPre=-/bin/mkdir -p {{ vsftpd_cfg_secure_chroot_dir }}
+
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ReadWritePaths={{ vsftpd__srv._harden_rw_paths }}
+ReadOnlyPaths={{ vsftpd__srv._harden_ro_paths }}
+InaccessiblePaths={{ vsftpd__srv._harden_inaccessible_paths }}

@@ -22,7 +22,7 @@ provisioner:
   inventory:
     group_vars:
       all:
-        vsftpd_srv_user_home_mode: '0550'
+        vsftpd_srv_home_mode: '0550'
         vsftpd_srv_virtual_users:
           - user: 'test'
             pass: 'test'
@@ -41,7 +41,7 @@ provisioner:
         vsftpd_cfg_guest_username: 'ftp'
         vsftpd_cfg_virtual_use_local_privs: true
 platforms:
-  - name: 'vsftpd-debian-13-virtual_users'
+  - name: 'vsftpd-virtual-users'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
@@ -50,21 +50,11 @@ platforms:
     pre_build_image: true
 verifier:
   name: 'ansible'
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
 scenario:
   test_sequence:
-    # - 'dependency'
-    # - 'cleanup'
     - 'destroy'
     - 'syntax'
     - 'create'
-    # - 'prepare'
     - 'converge'
-    # - 'idempotence'  # service drop-ins always enforce.
-    # - 'side_effect'
     - 'verify'
-    # - 'cleanup'
     - 'destroy'

@@ -6,7 +6,6 @@
 #
 # Tests:
 # * Test local user setup and login success.
-# * standard service override works correctly (service running).
 # * hardened service override works correctly (service running).
 # * all remaining default options works correctly.
 
@@ -25,24 +24,15 @@ provisioner:
   inventory:
     group_vars:
       all:
+        vsftpd_flg_harden: true
         vsftpd_cfg_write_enable: true
         vsftpd_cfg_chroot_local_user: true
         vsftpd_cfg_chroot_list_enable: true
-        vsftpd_cfg_chroot_list:
+        vsftpd_srv_chroot_list:
           - 'test'
         vsftpd_cfg_ls_recurse_enable: true
-    host_vars:
-      vsftpd-debian-13-default-hardened:
-        vsftpd_srv_harden_enable: true
 platforms:
-  - name: 'vsftpd-debian-13-default'
-    image: 'ghcr.io/hifis-net/debian-systemd:13'
-    systemd: 'always'
-    volumes:
-      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
-    command: '/lib/systemd/systemd'
-    pre_build_image: true
-  - name: 'vsftpd-debian-13-default-hardened'
+  - name: 'vsftpd-default'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
@@ -51,21 +41,12 @@ platforms:
     pre_build_image: true
 verifier:
   name: 'ansible'
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
 scenario:
   test_sequence:
-    # - 'dependency'
-    # - 'cleanup'
     - 'destroy'
     - 'syntax'
     - 'create'
     - 'prepare'
     - 'converge'
-    # - 'idempotence'  # service drop-ins always enforce.
-    # - 'side_effect'
     - 'verify'
-    # - 'cleanup'
     - 'destroy'

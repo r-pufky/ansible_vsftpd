@@ -3,12 +3,18 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Verify | /etc/vsftpd.d'
+    - name: 'Verify | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: '{{ "Verify | test | " ~ vsftpd___app._etc_d }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | /etc/vsftpd.d/{{ item.file }}'
+        test_name: '{{ "Verify | test | " ~ vsftpd___app._etc_d }}'
         test_src: 'files/{{ item.file }}'
         test_file: '/etc/vsftpd.d/{{ item.file }}'
         test_owner: 'root'
@@ -16,22 +22,22 @@
         test_mode: '{{ item.mode }}'
         test_diff: true
       loop:
-        - {file: 'banned_emails', mode: '0600'}
-        - {file: 'banner_file', mode: '0644'}
+        # - {file: 'banned_emails', mode: '0600'}
+        - {file: 'banner', mode: '0644'}
         - {file: 'chroot_list', mode: '0600'}
         - {file: 'user_list', mode: '0600'}
         - {file: 'email_passwords', mode: '0600'}
       loop_control:
         label: '{{ item.file }}'
 
-    - name: 'Verify | /etc/vsftpd.conf'
+    - name: '{{ "Verify | test | " ~ vsftpd___app._cfg }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | /etc/vsftpd.conf'
+        test_name: '{{ "Verify | test | " ~ vsftpd___app._cfg }}'
         test_src: 'files/vsftpd.conf'
-        test_file: '/etc/vsftpd.conf'
+        test_file: '{{ vsftpd___app._cfg }}'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0644'

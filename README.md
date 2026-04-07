@@ -1,84 +1,89 @@
-# Very Secure FTP Daemon (VSFTPd)
+# [Very Secure FTP Daemon (VSFTPd)][h]
 VSFTPd service configuration.
 
-## Requirements
-[supported platforms](https://github.com/r-pufky/ansible_vsftpd/blob/main/meta/main.yml)
+## [Requirements][i]
+Requires [r_pufky.srv][g] galaxy-ng collection. See
+[additional documentation][m] and [reference documentation][n] for
+troubleshooting and config variables.
+Install size: ~360KB
+
+> Tasks [potentially touching Network Mounted Filesystems][o] will be run as
+> the task user and fallback to the service user. Manage these locations
+> externally if these fail.
 
 ## Role Variables
-[defaults](https://github.com/r-pufky/ansible_vsftpd/tree/main/defaults/main/)
+Detailed variable use documented in defaults. See usage for role operation.
 
-### Ports
-All ports and protocols have been defined for the role.
+* [defaults][j] - User configurable service options.
 
-[defaults/ports.yml](https://github.com/r-pufky/ansible_vsftpd/blob/main/defaults/main/ports.yml)
+* [config][j] - Encapsulated VSFTPd config options.
 
-## Dependencies
-**galaxy-ng** roles cannot be used independently. Part of
-[r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv) collection.
+* [ports][k] - Ports are **not** managed (defined for external use).
 
-## Example Playbook
-Read through defaults and [arch documentation](https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon)
-before proceeding. VSFTPd is very powerful but easily mis-configured. Role
-requires configuration for deployment.
+## Usage
 
-### FTP server with local users.
+### Feature Flags
+Tasks are gated by feature flags and executed in the following order.
+
+  Step | Flag                | Notes
+ ------|---------------------|-------
+  1    | forgejo_flg_install | Install required packages, users, etc.
+  2    | vsftpd_flg_harden   | Harden service.
+
+### Example Playbooks
+Read through defaults and [additional documentation][m] before proceeding.
+VSFTPd is very powerful but easily mis-configured. Role requires configuration
+for deployment.
+
+### FTP server with local users
 Setup FTP server allowing `test_local_user` local user login. `test_local_user`
 is managed outside of this role.
 
 ``` yaml
-vsftpd_cfg_write_enable: true
-vsftpd_cfg_chroot_local_user: true
-vsftpd_cfg_chroot_list_enable: true
-vsftpd_cfg_chroot_list:
-  - 'test_local_user'
-vsftpd_cfg_ls_recurse_enable: true
-vsftpd_srv_harden_enable: true
-```
-
-``` yaml
-- name: 'FTP local users'
-  hosts: '*'
-  become: true
-  roles:
-     - 'r_pufky.srv.vsftpd'
+- name: 'Create VSFTPd instance with local users.'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.vsftpd'
+  vars:
+    vsftpd_flg_harden: true
+    vsftpd_srv_chroot_list:
+      - 'test_local_user'
+    vsftpd_cfg_write_enable: true
+    vsftpd_cfg_chroot_local_user: true
+    vsftpd_cfg_chroot_list_enable: true
+    vsftpd_cfg_ls_recurse_enable: true
 ```
 
 ### FTP server with virtual users.
 Setup FTP server allowing virtual user logins backed by the local `ftp` user
 account. Virtual user configuration is automatically managed, see defaults.
 
-host_vars/vsftpd.example.com/vars/vsftpd.yml
 ``` yaml
-vsftpd_srv_user_home_mode: '0550'
-vsftpd_srv_virtual_users:
-  - user: 'test'
-    pass: '{{ vault_test }}'
-  - user: 'test2'
-    pass: '{{ vault_test2 }}'
-vsftpd_cfg_anonymous_enable: false
-vsftpd_cfg_local_enable: true
-vsftpd_cfg_write_enable: true
-vsftpd_cfg_chroot_local_user: true
-vsftpd_cfg_guest_enable: true
-vsftpd_cfg_guest_username: 'ftp'
-vsftpd_cfg_virtual_use_local_privs: true
-vsftpd_srv_harden_enable: true
-```
-
-``` yaml
-- name: 'FTP local users'
-  hosts: '*'
-  become: true
-  roles:
-     - 'r_pufky.srv.vsftpd'
+- name: 'Create VSFTPd instance with virtual users.'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.vsftpd'
+  vars:
+    vsftpd_flg_harden: true
+    vsftpd_srv_home_mode: '0550'
+    vsftpd_srv_virtual_users:
+      - user: 'test'
+        pass: '{{ vault_test }}'
+      - user: 'test2'
+        pass: '{{ vault_test2 }}'
+    vsftpd_cfg_anonymous_enable: false
+    vsftpd_cfg_local_enable: true
+    vsftpd_cfg_write_enable: true
+    vsftpd_cfg_chroot_local_user: true
+    vsftpd_cfg_guest_enable: true
+    vsftpd_cfg_guest_username: 'ftp'
+    vsftpd_cfg_virtual_use_local_privs: true
 ```
 
 ## Troubleshooting
 
 ### status=2/INVALIDARGUMENT
-If service fails to start with `status=2/INVALIDARGUMENT`; the configuration
-file is syntactically correct but has conflicting settings. This is an end user
-configuration issue.
+If service fails to start with `status=2/INVALIDARGUMENT` means the
+configuration file is syntactically correct but has conflicting settings. This
+is an **end user** configuration issue.
 
 Manually execute the configuration file to determine the exact cause:
 
@@ -87,8 +92,8 @@ vsftpd /etc/vsftpd.conf
 ```
 
 ### 500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
-Chroot environments require read-only root directories; otherwise logins result
-in:
+Chroot environments [require read-only root directories][l]. Otherwise logins
+result in:
 
 ``` bash
 500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
@@ -96,39 +101,29 @@ in:
 
 Check your configuration and set the backing user home directory read-only.
 See `vsftpd_srv_local_root_mode`, `vsftpd_srv_anon_root_mode`, and
-`vsftpd_srv_user_home_mode`. Ensure `vsftpd_srv_local_root_recursive_enable`,
+`vsftpd_srv_home_mode`. Ensure `vsftpd_srv_local_root_recursive`,
 `vsftpd_srv_anon_root_recursive_enable` are not plowing directory
 permissions.
 
 Typically `0550` permissions resolve.
 
-Reference:
-* https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
-
 ## Development
-Configure [environment](https://r-pufky.github.io/ansible_collection_docs/ansible/environment)
+Configure [environment][a].
 
-Run all unit tests:
 ``` bash
+# Run all tests.
 molecule test --all
 ```
 
-### Releases
-Release format: **{OS}-{SERVICE}-{ROLE}**
+### [Releases][b]
 
-Each type inherits the versioning system used; defaulting to schematic
-versioning.
-
-`12.0.0-2.0.3-1.0.0`
-
-* 12.0.0 - Debian 12 (bookworm).
-* 2.0.3 - Service/app version.
-* 1.0.0 - Role version.
-
-Releases are branched on Debian releases:
-
-* **[13.x.x](https://github.com/r-pufky/ansible_vsftpd)**: 13 Trixie.
-* **[12.x.x](https://github.com/r-pufky/ansible_vsftpd/tree/12.x)**: 12 Bookworm.
+  Release | Debian | Ansible | VSFTPd | Notes
+ ---------|--------|---------|--------|-------
+  5.x.x   | 13     | 2.20    | v3.0.5 | Ansible 2.20, feature flags, and semantic versioning.
+  4.x.x   | 12     | 2.18    | v3.0.5 | Migrate to Debian Trixie.
+  3.x.x   | 12     | 2.18    | v3.0.5 | Implement data annotations.
+  2.x.x   | 12     | 2.18    | v3.0.5 | Use libraries for common operations.
+  1.x.x   | 12     | 2.18    | v3.0.5 | Initial release.
 
 ## Issues
 Create a bug and provide as much information as possible.
@@ -136,9 +131,25 @@ Create a bug and provide as much information as possible.
 Associate pull requests with a submitted bug.
 
 ## License
-[AGPL-3.0 License](https://www.tldrlegal.com/license/gnu-affero-general-public-license-v3-agpl-3-0)
- [(direct link)](https://github.com/r-pufky/ansible_vsftpd/blob/main/LICENSE)
+[AGPL-3.0 License][c] | [direct link][f]
 
 ## Author Information
-PGP Fingerprint: [466EEC2B67516C7117C85CE3A0BC35D16698BAB9](https://keys.openpgp.org/vks/v1/by-fingerprint/466EEC2B67516C7117C85CE3A0BC35D16698BAB9)
-| [github gist](https://gist.github.com/r-pufky/a8df36977c55b5bb20829267c4c49d22)
+PGP: [466EEC2B67516C7117C85CE3A0BC35D16698BAB9][d] | [github gist][e]
+
+
+[a]: https://r-pufky.github.io/ansible_docs
+[b]: https://semver.org/spec/v2.0.0
+[c]: https://www.tldrlegal.com/license/gnu-affero-general-public-license-v3-agpl-3-0
+[d]: https://keys.openpgp.org/vks/v1/by-fingerprint/466EEC2B67516C7117C85CE3A0BC35D16698BAB9
+[e]: https://gist.github.com/r-pufky/a8df36977c55b5bb20829267c4c49d22
+
+[f]: https://github.com/r-pufky/ansible_vsftpd/blob/main/LICENSE
+[g]: https://github.com/r-pufky/ansible_collection_srv
+[h]: https://security.appspot.com/vsftpd.html
+[i]: https://github.com/r-pufky/ansible_vsftpd/blob/main/meta/main.yml
+[j]: https://github.com/r-pufky/ansible_vsftpd/tree/main/defaults/main/main.yml
+[k]: https://github.com/r-pufky/ansible_vsftpd/blob/main/defaults/main/ports.yml
+[l]: https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot
+[m]: https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
+[n]: https://linux.die.net/man/5/vsftpd.conf
+[o]: https://github.com/r-pufky/ansible_vsftpd/tree/main/defaults/main/config.yml

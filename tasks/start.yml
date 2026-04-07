@@ -1,0 +1,46 @@
+---
+###############################################################################
+# Start
+###############################################################################
+# Deploy hardening here to cover install/config only flags. Start services and
+# confirm they are active and running.
+
+- name: '{{ "Start | filesystem | set " ~ vsftpd__cfg._drop_in }}'
+  when: vsftpd_flg_harden
+  ansible.builtin.template:
+    src: 'systemd/override.conf.j2'
+    dest: '{{ vsftpd__cfg._drop_in }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+
+- name: 'Install | set service drop-in'
+  when: not vsftpd_flg_harden
+  ansible.builtin.file:
+    path: '{{ vsftpd__cfg._drop_in }}'
+    state: 'absent'
+
+- name: 'Start | systemd | vsftpd'
+  ansible.builtin.systemd:
+    name: 'vsftpd.service'
+    state: 'started'
+    enabled: true
+    daemon_reload: true
+  delay: 15
+  retries: 3
+  register: vsftpd__service
+  until: vsftpd__service.status.ActiveState == 'active'
+
+- name: 'Start | fact | query services'
+  ansible.builtin.service_facts:
+
+- name: 'Start | assert | services running'
+  ansible.builtin.assert:
+    quiet: true
+    that: ansible_facts.services[item].state == 'running'
+    fail_msg: |
+
+      ✘ Service failed to start.
+      {{ item }}
+  loop:
+    - 'vsftpd.service'

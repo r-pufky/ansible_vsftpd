@@ -2,32 +2,46 @@
 ###############################################################################
 # Install Packages
 ###############################################################################
+# VSFTPd only deploys a configuration file to /etc/vsftpd.conf. Add
+# /etc/vsftpd.d directory for service configuration.
+
+- name: 'Install | filesystem | set system directories'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'
+  loop:
+    - '{{ vsftpd___app._etc_d }}'  # src_d includes opt_d.
+    - '{{ vsftpd___app._drop_in | dirname }}'
+
+- name: 'Install | filesystem | set service directories'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
+    state: 'directory'
+  loop:
+    - '{{ vsftpd___app._secure_d }}'
+    - '{{ vsftpd___app._user_d }}'
 
 - name: 'Install | packages'
   ansible.builtin.include_role:
     name: 'r_pufky.deb.apt'
   vars:
     apt_packages:
-      - '{{ vsftpd_role_packages }}'
+      - '{{ vsftpd___packages }}'
       - '{{
-          vsftpd_role_virtual_user_packages
-          if _vsftpd_srv_virtual_users.raw | length > 0 else
+          vsftpd___virtual_user_packages
+          if vsftpd__srv._virtual_users | length > 0 else
           []
         }}'
-    apt_package_update_cache: true
+    apt_srv_package_update_cache: true
 
-- name: 'Prep | stop services'
+- name: 'Install | systemd | stop vsftpd'
   ansible.builtin.systemd:
-    name: '{{ item }}'
+    name: 'vsftpd.service'
     state: 'stopped'
   failed_when: false
-  loop:
-    - 'vsftpd.service'
-
-- name: 'Prep | create service config directory'
-  ansible.builtin.file:
-    path: '{{ vsftpd_role_service_dir }}'
-    owner: 'root'
-    group: 'root'
-    mode: '0755'
-    state: 'directory'

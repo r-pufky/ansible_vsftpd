@@ -1,44 +1,20 @@
 ---
 # yamllint disable rule:line-length
 ###############################################################################
-# VSFTPd Service Configuration
+# Feature Flags
 ###############################################################################
-# Install size: ~351kB
 
-# Virtual FTP users.
+# 1. Install application?
 #
-# Virtual users will be created automatically and have permissions from the
-# vsftpd_cfg_guest_username account.
+# Creates required default directories, users, install packages, update and
+# start services. Configuration is always applied regardless of install option.
 #
-# Chroot environments require read-only root directories; otherwise logins
-# result in:
+# Default: True.
 #
-#   500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
-#
-# Check your configuration and set the backing user home directory read-only.
-# See vsftpd_srv_local_root_mode, vsftpd_srv_anon_root_mode, and
-# vsftpd_srv_user_home_mode. Ensure vsftpd_srv_local_root_recursive_enable,
-# vsftpd_srv_anon_root_recursive_enable are not plowing directory
-# permissions.
-#
-# Special Case:
-#   * Forces vsftpd_cfg_guest_enable=true.
-#   * Forces vsftpd_cfg_pam_service_name='vsftpd_virtual'.
-#
-# vsftpd_srv_virtual_users:
-#       list of dict - virtual user names and passwords.
-#     - user: str - username.
-#       pass: str - password.
-#
-# Default: [] (disabled).
-#
-# Reference:
-# * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
-vsftpd_srv_virtual_users: []
+vsftpd_flg_install: true
 
-###############################################################################
-# VSFTPd Service Hardening
-###############################################################################
+# 2. Harden VSFTPd Service?
+#
 # Applies systemd drop-in restricting VSFTPd to:
 # * PrivateTmp=true
 # * ProtectSystem=strict
@@ -48,11 +24,65 @@ vsftpd_srv_virtual_users: []
 # * ReadOnlyPaths=vsftpd_srv_harden_ro_paths
 # * InaccessiblePaths=vsftpd_srv_harden_inaccessible_paths
 #
+# Default: False.
+#
 # Reference:
 # * https://wiki.archlinux.org/title/Very_Secure_FTP_Daemon
+vsftpd_flg_harden: false
 
-# Harden VSFTPd service? Default: False.
-vsftpd_srv_harden_enable: false
+###############################################################################
+# Service
+###############################################################################
+
+# User that VSFTPd will run under.
+#
+# 'ftp' will automatically be created using vars/main.yml if required.
+# All other accounts are checked for existence.
+#
+# Default: 'ftp'.
+vsftpd_srv_user: 'ftp'
+
+# Group that VSFTPd will run under.
+#
+# 'ftp' will automatically be created using vars/main.yml if required.
+# All other accounts are checked for existence.
+#
+# Default: 'ftp'.
+vsftpd_srv_group: 'ftp'
+
+# Secure configuration to set.
+#
+# Ansible controller path to source secure files (treated as a jinja2 templates
+# allowing for ansible variable interpretation). Overwrites existing
+# config data in /etc/vsftpd.d/secure.conf.d/* with 0750:0640 root:root. Files
+# not sourced will be removed. Certificates, keys, etc. should be stored here.
+#
+# vsftpd_srv_secure_d: 'host_vars/ftp.example.com/secure.conf.d'
+#
+# Default: '' (disabled).
+vsftpd_srv_secure_d: ''
+
+# VSTPd user home directory permissions.
+#
+# Chroot environments require read-only root directories; otherwise logins
+# result in:
+#
+#   500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
+#
+# Chroot environments with the service local user must set user home directory
+# read-only:
+#
+#   vsftpd_srv_home_mode: '0550'
+#
+# Ensure vsftpd_srv_local_root_recursive,
+# vsftpd_srv_anon_root_recursive_enable are not plowing directory
+# permissions.
+#
+# Default: '0755'.
+#
+# Reference:
+# * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
+vsftpd_srv_home_mode: '0755'
 
 # Absolute paths to allow VSFTPd service to write to.
 #
@@ -89,69 +119,6 @@ vsftpd_srv_harden_ro_paths: []
 # Default: [] (disabled).
 vsftpd_srv_harden_inaccessible_paths: []
 
-###############################################################################
-# VSFTPd User
-###############################################################################
-
-# User that VSFTPd will run under.
-#
-# Enable vsftpd_srv_create_user if this account is not externally managed.
-#
-# Default: 'ftp'.
-vsftpd_srv_user: 'ftp'
-
-# VSTPd user home directory permissions.
-#
-# Chroot environments require read-only root directories; otherwise logins
-# result in:
-#
-#   500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
-#
-# Chroot environments with the service local user must set user home directory
-# read-only:
-#
-#   vsftpd_srv_user_home_mode: '0550'
-#
-# Ensure vsftpd_srv_local_root_recursive_enable,
-# vsftpd_srv_anon_root_recursive_enable are not plowing directory
-# permissions.
-#
-# Default: '0755'.
-#
-# Reference:
-# * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
-vsftpd_srv_user_home_mode: '0755'
-
-# Group that VSFTPd will run under.
-#
-# Enable vsftpd_srv_create_user if this group is not externally managed.
-#
-# Default: 'ftp'.
-vsftpd_srv_group: 'ftp'
-
-# Create vsftpd_srv_user, vsftpd_srv_group if not detected?
-#
-# Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
-#
-# Default: True.
-vsftpd_srv_create_user: true
-
-# Enable user management of data/media files?
-#
-# Use vsftpd_srv_user to execute data/media management commands. Role applies media
-# permissions using 'root' by default. For mounted data locations (NFS with
-# squashed mounts, mapped container mounts, etc) the local root user will not
-# have sufficient privileges to modify these files.
-#
-# Applies to:
-# * vsftpd_cfg_local_root
-# * vsftpd_cfg_anon_root
-# * vsftpd_srv_user
-#
-# Default: False.
-vsftpd_srv_user_data_manage_enable: false
-
-###############################################################################
 # VSFTPd Local Root User Permissions
 ###############################################################################
 
@@ -182,9 +149,8 @@ vsftpd_srv_local_root_mode: '0770'
 # affected. Disabling will only set the root directory.
 #
 # Default: True.
-vsftpd_srv_local_root_recursive_enable: true
+vsftpd_srv_local_root_recursive: true
 
-###############################################################################
 # VSFTPd Local Anonymous User Permissions
 ###############################################################################
 
@@ -216,3 +182,120 @@ vsftpd_srv_anon_root_mode: '0770'
 #
 # Default: True.
 vsftpd_srv_anon_root_recursive_enable: true
+
+###############################################################################
+# Config
+###############################################################################
+# Role managed configuration options automatically setup and configure specific
+# vsftpd.conf options to ensure deployment success. See config.yml for standard
+# options.
+
+# Virtual FTP users.
+#
+# Virtual users will be created automatically and have permissions from the
+# vsftpd_cfg_guest_username account.
+#
+# Chroot environments require read-only root directories; otherwise logins
+# result in:
+#
+#   500 OOPS: vsftpd: refusing to run with writable root inside chroot ()
+#
+# Check your configuration and set the backing user home directory read-only.
+# See vsftpd_srv_local_root_mode, vsftpd_srv_anon_root_mode, and
+# vsftpd_srv_home_mode. Ensure vsftpd_srv_local_root_recursive,
+# vsftpd_srv_anon_root_recursive_enable are not plowing directory
+# permissions.
+#
+# Special Case:
+#   * Forces vsftpd_cfg_guest_enable=true.
+#   * Forces vsftpd_cfg_pam_service_name='vsftpd_virtual'.
+#
+# vsftpd_srv_virtual_users:
+#       list of dict - virtual user names and passwords.
+#     - user: str - username.
+#       pass: str - password.
+#
+# Default: [] (disabled).
+#
+# Reference:
+# * https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
+vsftpd_srv_virtual_users: []
+
+# Banned e-mails list.
+#
+# Requires vsftpd_cfg_deny_email_enable=true.
+#
+# List of email addresses (anonymous logins using email as passwords) which are
+# not permitted. Automatically sets
+# banned_email_file=/etc/vsftpd.d/banned_emails.
+#
+# vsftpd_srv_banned_emails:
+#   - 'user1@example.com'
+#   - 'user2@example.com'
+#
+# Default: [].
+vsftpd_srv_banned_emails: []
+
+# Login banner.
+#
+# Text to display when someone connects to the server. If set, it overrides the
+# banner string provided by the vsftpd_cfg_ftpd_banner option. Automatically
+# sets banner_file=/etc/vsftpd.d/banner.
+#
+# Default: ''.
+vsftpd_srv_banner: ''
+
+# Local user chroot list.
+#
+# Requires vsftpd_cfg_chroot_list_enable=true.
+#
+# List of local users which will be placed in a chroot() jail in their home
+# directory. Automatically sets chroot_list_file=/etc/vsftpd.d/chroot_list.
+#
+# Special Case:
+#   * vsftpd_cfg_chroot_local_user=true - list file becomes a list of users
+#     to NOT place in a chroot() jail.
+#
+# Default: [].
+vsftpd_srv_chroot_list: []
+
+# List of email passwords.
+#
+# Requires vsftpd_cfg_secure_email_list_enable=true.
+#
+# Automatically sets email_password_file=/etc/vsftpd.d/email_passwords.
+#
+# Default: [].
+vsftpd_srv_email_passwords: []
+
+# Username list.
+#
+# Requires vsftpd_cfg_userlist_enable=true. Automatically sets
+# userlist_file=/etc/vsftpd.d/user_list.
+#
+# Default: [].
+vsftpd_srv_userlist: []
+
+# VSFTPd per user session overrides.
+#
+# Ansible controller path to source user session override files (treated as a
+# jinja2 templates allowing for ansible variable interpretation). Overwrites
+# existing config data in /etc/vsftpd.d/user.d/* with 0750:0640 root:root.
+# Files not sourced will be removed.
+#
+# These are static VSFTPd per-user config files. See 'man vsftpd.conf 5'.
+# Allows the override of any config option specified in the manual page, on a
+# per-user basis. For example, user "chris" logins in, VSFTPd will apply
+# settings in /etc/vsftpd.d/user.d/chris for the duration of the session.
+#
+# PLEASE NOTE that not all settings are effective on a per-user basis. Examples
+# of settings which will not affect any behavior on a per-user basis include
+# vsftpd_cfg_listen_address, vsftpd_cfg_banner_file, vsftpd_cfg_max_per_ip,
+# vsftpd_cfg_max_clients, vsftpd_cfg_xferlog_file, etc.
+#
+# VSFTPd will be automatically configured to use the installed location.
+#
+# vsftpd_srv_user_d: 'host_vars/ftp.example.com/user.d'
+#
+# Default: '' (disabled).
+vsftpd_srv_user_d: ''

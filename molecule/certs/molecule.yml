@@ -1,6 +1,6 @@
 ---
 ###############################################################################
-# VSFTPd.d
+# Certs
 ###############################################################################
 # VSFTPd works with custom certificates.
 #
@@ -15,6 +15,7 @@
 # Tests:
 # * vsftpd.d/ options are deployed correctly.
 # * Standard service override works correctly (service running).
+
 
 dependency:
   name: 'galaxy'
@@ -31,45 +32,36 @@ provisioner:
   inventory:
     group_vars:
       all:
-        vsftpd_cfg_banner: 'test banner'
-        vsftpd_cfg_banned_emails:
+        vsftpd_srv_banner: 'test banner'
+        vsftpd_cfg_deny_email_enable: true
+        vsftpd_srv_banned_emails:
           - 'test@example.com'
           - 'test2@example.com'
-        vsftpd_cfg_chroot_list:
-          - 'chroot_user'
-          - 'chroot_user2'
-        vsftpd_cfg_userlist:
-          - 'user1'
-          - 'user2'
-        vsftpd_cfg_email_passwords:
+        vsftpd_cfg_secure_email_list_enable: true
+        vsftpd_srv_email_passwords:
           - 'test_password'
           - 'test_password2'
-        vsftpd_cfg_ca_certs_file: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/cache/ca.pem"
+        vsftpd_cfg_chroot_list_enable: true
+        vsftpd_srv_chroot_list:
+          - 'chroot_user'
+          - 'chroot_user2'
+        vsftpd_cfg_userlist_enable: true
+        vsftpd_srv_userlist:
+          - 'user1'
+          - 'user2'
+        vsftpd_srv_secure_d: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/molecule/cache"
           }}'
-        vsftpd_cfg_dsa_cert_file: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/cache/dsa.cert"
-          }}'
-        vsftpd_cfg_dsa_private_key_file: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/cache/dsakey.pem"
-          }}'
-        vsftpd_cfg_rsa_cert_file: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/cache/ssl-cert-snakeoil.pem"
-          }}'
-        vsftpd_cfg_rsa_private_key_file: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/cache/ssl-cert-snakeoil.key"
-          }}'
-        vsftpd_cfg_user_config_dir: '{{
-            lookup("env", "MOLECULE_SCENARIO_DIRECTORY") ~
-            "/files/user_config"
-          }}'
+        vsftpd_cfg_ca_certs_file: '/etc/vsftpd.d/secure.d/ca.pem'
+        vsftpd_cfg_dsa_cert_file: '/etc/vsftpd.d/secure.d/dsa.cert'
+        vsftpd_cfg_dsa_private_key_file: '/etc/vsftpd.d/secure.d/dsakey.pem'
+        vsftpd_cfg_rsa_cert_file:
+          '/etc/vsftpd.d/secure.d/ssl-cert-snakeoil.pem'
+        vsftpd_cfg_rsa_private_key_file:
+          '/etc/vsftpd.d/secure.d/ssl-cert-snakeoil.key'
+        vsftpd_srv_user_d: '/etc/vsftpd.d/secure.d/user_config'
 platforms:
-  - name: 'vsftpd-debian-13-vsftpd.d'
+  - name: 'vsftpd-certs'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
@@ -78,21 +70,12 @@ platforms:
     pre_build_image: true
 verifier:
   name: 'ansible'
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
 scenario:
   test_sequence:
-    # - 'dependency'
-    # - 'cleanup'
     - 'destroy'
     - 'syntax'
     - 'create'
     - 'prepare'
     - 'converge'
-    # - 'idempotence'  # service drop-ins always enforce.
-    # - 'side_effect'
     - 'verify'
-    # - 'cleanup'
     - 'destroy'

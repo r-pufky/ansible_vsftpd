@@ -3,14 +3,20 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Verify | /etc/vsftpd.conf'
+    - name: 'Verify | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: '{{ "Verify | test | " ~ vsftpd___app._cfg }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | /etc/vsftpd.conf'
+        test_name: '{{ "Verify | test | " ~ vsftpd___app._cfg }}'
         test_src: 'files/vsftpd.conf'
-        test_file: '/etc/vsftpd.conf'
+        test_file: '{{ vsftpd___app._cfg }}'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0644'
@@ -26,16 +32,14 @@
           - '--password=test'
           - 'ftp://127.0.0.1'
       changed_when: false
-      register: _test_vsftpd_test_login
+      register: vsftpd__test_login
 
     - name: 'Verify | assert local user login success'
       ansible.builtin.assert:
         quiet: true
-        that: _test_vsftpd_test_login.rc == 0
+        that: vsftpd__test_login.rc == 0
         fail_msg: |
-          ╭───────────────────────────────────────────────────────────────────╮
-          │                                                                   │
-          │             test@127.0.0.1 should successfully login.             │
-          │                                                                   │
-          ├───────────────────────────────────────────────────────────────────╯
-          │ {{ _test_vsftpd_test_login.stderr }}
+
+          ✘ test@127.0.0.1 should successfully login.
+
+          {{ vsftpd__test_login.stderr }}

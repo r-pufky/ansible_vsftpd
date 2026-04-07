@@ -1,7 +1,7 @@
 ---
 # yamllint disable rule:line-length
 ###############################################################################
-# Manager Virtual Users
+# Manage Virtual Users
 ###############################################################################
 # Create virtual users.
 #
@@ -13,16 +13,18 @@
 # yamllint enable rule:line-length
 
 - name: 'Virtual users | enable'
-  when: _vsftpd_srv_virtual_users.raw | length > 0
+  when: vsftpd__srv._virtual_users | length > 0
   block:
-    - name: 'Virtual users | enable | clear virtual users'
+    - name: '{{
+          "Virtual users | filesystem | remove " ~ vsftpd___app._virtual_users
+        }}'
       ansible.builtin.file:
-        path: '{{ _vsftpd_srv_virtual_users._dest }}'
+        path: '{{ vsftpd___app._virtual_users }}'
         state: 'absent'
 
-    - name: 'Virtual users | enable | add virtual users'
+    - name: 'Virtual users | htpasswd | add virtual users'
       community.general.htpasswd:
-        path: '{{ _vsftpd_srv_virtual_users._dest }}'
+        path: '{{ vsftpd___app._virtual_users }}'
         name: '{{ item.user }}'
         password: '{{ item.pass }}'
         crypt_scheme: 'md5_crypt'
@@ -30,23 +32,24 @@
         group: 'root'
         mode: '0640'
         state: 'present'
-      loop: '{{ _vsftpd_srv_virtual_users.raw }}'
+      loop: '{{ vsftpd__srv._virtual_users }}'
       loop_control:
         label: '{{ item.user }}'
 
-    - name: 'Virtual users | enable | add PAM vsftpd_virtual module'
+    - name:
+        '{{ "Virtual users | filesystem | set " ~ vsftpd___app._virtual_pam }}'
       ansible.builtin.template:
-        src: 'vsftpd_virtual.j2'
-        dest: '{{ _vsftpd_cfg_pam_service_name._dest }}'
+        src: 'pam.d/vsftpd_virtual.j2'
+        dest: '{{ vsftpd___app._virtual_pam }}'
         owner: 'root'
         group: 'root'
         mode: '0644'
 
-- name: 'Virtual users | disable'
-  when: _vsftpd_srv_virtual_users.raw | length == 0
+- name: 'Virtual users | filesystem | remove virtual users'
+  when: vsftpd__srv._virtual_users | length == 0
   ansible.builtin.file:
     path: '{{ item }}'
     state: 'absent'
   loop:
-    - '{{ _vsftpd_srv_virtual_users._dest }}'
-    - '{{ _vsftpd_cfg_pam_service_name._dest }}'
+    - '{{ vsftpd___app._virtual_users }}'
+    - '{{ vsftpd___app._virtual_pam }}'

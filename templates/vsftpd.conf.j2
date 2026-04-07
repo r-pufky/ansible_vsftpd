@@ -1,16 +1,130 @@
-{% for header in _vsftpd_order %}
-# {{ header }}
-{%   for section in _vsftpd_map | selectattr('value.section', '==', header) | sort(attribute='value.order') %}
-{%     if not section.value.deprecated %}
-{%       if section.value.key in ['banned_email_file', 'banner_file', 'ca_certs_file', 'chroot_list_file', 'cmds_allowed', 'cmds_denied', 'deny_file', 'download_file', 'dsa_cert_file', 'dsa_private_key_file', 'email_password_file', 'hide_file', 'pam_service_name', 'rsa_cert_file', 'rsa_private_key_file', 'upload_file', 'user_config_dir', 'userlist_file'] %}
-{{ section.value.key }}={{ section.value.data }}
-{%       elif section.value.key == 'guest_enable' %}
-{{ section.value.key }}={{ 'YES' if section.value.data else 'NO' }}
-{%       elif section.value.hint == 'bool' %}
-{{ section.value.key }}={{ 'YES' if section.value.raw else 'NO' }}
-{%       else %}
-{{ section.value.key }}={{ section.value.raw }}
-{%       endif %}
-{%     endif %}
-{%   endfor %}
-{% endfor %}
+# Default
+accept_timeout={{ vsftpd__cfg._accept_timeout }}
+allow_anon_ssl={{ vsftpd__cfg._allow_anon_ssl }}
+anon_max_rate={{ vsftpd__cfg._anon_max_rate }}
+anon_mkdir_write_enable={{ vsftpd__cfg._anon_mkdir_write_enable }}
+anon_other_write_enable={{ vsftpd__cfg._anon_other_write_enable }}
+anon_root={{ vsftpd__cfg._anon_root }}
+anon_umask={{ vsftpd__cfg._anon_umask }}
+anon_upload_enable={{ vsftpd__cfg._anon_upload_enable }}
+anon_world_readable_only={{ vsftpd__cfg._anon_world_readable_only }}
+anonymous_enable={{ vsftpd__cfg._anonymous_enable }}
+ascii_download_enable={{ vsftpd__cfg._ascii_download_enable }}
+ascii_upload_enable={{ vsftpd__cfg._ascii_upload_enable }}
+async_abor_enable={{ vsftpd__cfg._async_abor_enable }}
+background={{ vsftpd__cfg._background }}
+banned_email_file={{ vsftpd__cfg._banned_email_file }}
+banner_file={{ vsftpd__cfg._banner_file }}
+ca_certs_file={{ vsftpd__cfg._ca_certs_file }}
+check_shell={{ vsftpd__cfg._check_shell }}
+chmod_enable={{ vsftpd__cfg._chmod_enable }}
+chown_upload_mode={{ vsftpd__cfg._chown_upload_mode }}
+chown_uploads={{ vsftpd__cfg._chown_uploads }}
+chown_username={{ vsftpd__cfg._chown_username }}
+chroot_list_enable={{ vsftpd__cfg._chroot_list_enable }}
+chroot_list_file={{ vsftpd___app._chroot_list }}
+chroot_local_user={{ vsftpd__cfg._chroot_local_user }}
+cmds_allowed={{ vsftpd__cfg._cmds_allowed }}
+cmds_denied={{ vsftpd__cfg._cmds_denied }}
+connect_from_port_20={{ vsftpd__cfg._connect_from_port_20 }}
+connect_timeout={{ vsftpd__cfg._connect_timeout  }}
+data_connection_timeout={{ vsftpd__cfg._data_connection_timeout  }}
+debug_ssl={{ vsftpd__cfg._debug_ssl }}
+delay_failed_login={{ vsftpd__cfg._delay_failed_login  }}
+delay_successful_login={{ vsftpd__cfg._delay_successful_login }}
+delete_failed_uploads={{ vsftpd__cfg._delete_failed_uploads }}
+deny_email_enable={{ vsftpd__cfg._deny_email_enable }}
+deny_file={{ vsftpd__cfg._deny_file }}
+dirlist_enable={{ vsftpd__cfg._dirlist_enable }}
+dirmessage_enable={{ vsftpd__cfg._dirmessage_enable }}
+download_enable={{ vsftpd__cfg._download_enable }}
+download_file={{ vsftpd__cfg._download_file }}
+dsa_cert_file={{ vsftpd__cfg._dsa_cert_file }}
+dsa_private_key_file={{ vsftpd__cfg._dsa_private_key_file }}
+dual_log_enable={{ vsftpd__cfg._dual_log_enable }}
+email_password_file={{ vsftpd__cfg._email_password_file }}
+file_open_mode={{ vsftpd__cfg._file_open_mode }}
+force_anon_data_ssl={{ vsftpd__cfg._force_anon_data_ssl }}
+force_anon_logins_ssl={{ vsftpd__cfg._force_anon_logins_ssl }}
+force_dot_files={{ vsftpd__cfg._force_dot_files }}
+force_local_data_ssl={{ vsftpd__cfg._force_local_data_ssl }}
+force_local_logins_ssl={{ vsftpd__cfg._force_local_logins_ssl }}
+ftp_data_port={{ vsftpd__cfg._ftp_data_port }}
+ftp_username={{ vsftpd__cfg._ftp_username }}
+ftpd_banner={{ vsftpd__cfg._ftpd_banner }}
+guest_enable={{ vsftpd__cfg._guest_enable }}
+guest_username={{ vsftpd__cfg._guest_username }}
+hide_file={{ vsftpd__cfg._hide_file }}
+hide_ids={{ vsftpd__cfg._hide_ids }}
+idle_session_timeout={{ vsftpd__cfg._idle_session_timeout }}
+implicit_ssl={{ vsftpd__cfg._implicit_ssl }}
+listen={{ vsftpd__cfg._listen }}
+listen_address6={{ vsftpd__cfg._listen_address6 }}
+listen_address={{ vsftpd__cfg._listen_address }}
+listen_ipv6={{ vsftpd__cfg._listen_ipv6 }}
+listen_port={{ vsftpd__cfg._listen_port }}
+local_enable={{ vsftpd__cfg._local_enable }}
+local_max_rate={{ vsftpd__cfg._local_max_rate }}
+local_root={{ vsftpd__cfg._local_root }}
+local_umask={{ vsftpd__cfg._local_umask }}
+lock_upload_files={{ vsftpd__cfg._lock_upload_files }}
+log_ftp_protocol={{ vsftpd__cfg._log_ftp_protocol }}
+ls_recurse_enable={{ vsftpd__cfg._ls_recurse_enable }}
+max_clients={{ vsftpd__cfg._max_clients }}
+max_login_fails={{ vsftpd__cfg._max_login_fails }}
+max_per_ip={{ vsftpd__cfg._max_per_ip }}
+mdtm_write={{ vsftpd__cfg._mdtm_write }}
+message_file={{ vsftpd__cfg._message_file }}
+no_anon_password={{ vsftpd__cfg._no_anon_password }}
+no_log_lock={{ vsftpd__cfg._no_log_lock }}
+nopriv_user={{ vsftpd__cfg._nopriv_user }}
+one_process_model={{ vsftpd__cfg._one_process_model }}
+pam_service_name={{ vsftpd__cfg._pam_service_name }}
+passwd_chroot_enable={{ vsftpd__cfg._passwd_chroot_enable }}
+pasv_addr_resolve={{ vsftpd__cfg._pasv_addr_resolve }}
+pasv_address={{ vsftpd__cfg._pasv_address }}
+pasv_enable={{ vsftpd__cfg._pasv_enable }}
+pasv_max_port={{ vsftpd__cfg._pasv_max_port }}
+pasv_min_port={{ vsftpd__cfg._pasv_min_port }}
+pasv_promiscuous={{ vsftpd__cfg._pasv_promiscuous }}
+port_enable={{ vsftpd__cfg._port_enable }}
+port_promiscuous={{ vsftpd__cfg._port_promiscuous }}
+require_cert={{ vsftpd__cfg._require_cert }}
+require_ssl_reuse={{ vsftpd__cfg._require_ssl_reuse }}
+rsa_cert_file={{ vsftpd__cfg._rsa_cert_file }}
+rsa_private_key_file={{ vsftpd__cfg._rsa_private_key_file }}
+run_as_launching_user={{ vsftpd__cfg._run_as_launching_user }}
+secure_chroot_dir={{ vsftpd__cfg._secure_chroot_dir }}
+secure_email_list_enable={{ vsftpd__cfg._secure_email_list_enable }}
+session_support={{ vsftpd__cfg._session_support }}
+setproctitle_enable={{ vsftpd__cfg._setproctitle_enable }}
+ssl_ciphers={{ vsftpd__cfg._ssl_ciphers }}
+ssl_enable={{ vsftpd__cfg._ssl_enable }}
+ssl_request_cert={{ vsftpd__cfg._ssl_request_cert }}
+ssl_sslv2={{ vsftpd__cfg._ssl_sslv2 }}
+ssl_sslv3={{ vsftpd__cfg._ssl_sslv3 }}
+ssl_tlsv1={{ vsftpd__cfg._ssl_tlsv1 }}
+strict_ssl_read_eof={{ vsftpd__cfg._strict_ssl_read_eof }}
+strict_ssl_write_shutdown={{ vsftpd__cfg._strict_ssl_write_shutdown }}
+syslog_enable={{ vsftpd__cfg._syslog_enable }}
+tcp_wrappers={{ vsftpd__cfg._tcp_wrappers }}
+text_userdb_names={{ vsftpd__cfg._text_userdb_names }}
+tilde_user_enable={{ vsftpd__cfg._tilde_user_enable }}
+trans_chunk_size={{ vsftpd__cfg._trans_chunk_size }}
+upload_file={{ vsftpd__cfg._upload_file }}
+use_localtime={{ vsftpd__cfg._use_localtime }}
+use_sendfile={{ vsftpd__cfg._use_sendfile }}
+user_config_dir={{ vsftpd__cfg._config_dir }}
+user_sub_token={{ vsftpd__cfg._user_sub_token }}
+userlist_deny={{ vsftpd__cfg._userlist_deny }}
+userlist_enable={{ vsftpd__cfg._userlist_enable }}
+userlist_file={{ vsftpd__cfg._userlist_file }}
+validate_cert={{ vsftpd__cfg._validate_cert }}
+vsftpd_log_file={{ vsftpd__cfg._vsftpd_log_file }}
+virtual_use_local_privs={{ vsftpd__cfg._virtual_use_local_privs }}
+write_enable={{ vsftpd__cfg._write_enable }}
+xferlog_enable={{ vsftpd__cfg._xferlog_enable }}
+xferlog_file={{ vsftpd__cfg._xferlog_file }}
+xferlog_std_format={{ vsftpd__cfg._xferlog_std_format }}
+# Debian Specific Patches
+utf8_filesystem={{ vsftpd__cfg._debian_utf8_filesystem }}

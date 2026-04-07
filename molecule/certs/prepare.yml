@@ -18,25 +18,31 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: 'Prepare | generate cache location'
-      ansible.builtin.set_fact:
-        _test_cache:
-          '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache'
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
 
-    - name: 'Prepare | create cache'
+    - name: 'Prepare | cache'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'create_cache.yml'
       vars:
-        test_name: 'Prepare | create cache'
+        test_name: 'Prepare | cache'
 
-    - name: 'Prepare | generate test CA private key'
+    - name: 'Prepare | fact | generate cache location'
+      ansible.builtin.set_fact:
+        vsftpd__test_cache:
+          '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache'
+
+    - name: 'Prepare | cmd | generate test CA private key'
       ansible.builtin.shell:
-        'openssl genrsa 2048 > "{{ _test_cache }}/ca-key.pem"'
+        'openssl genrsa 2048 > "{{ vsftpd__test_cache }}/ca-key.pem"'
       args:
-        creates: '{{ _test_cache }}/ca-key.pem'
+        creates: '{{ vsftpd__test_cache ~ "/ca-key.pem" }}'
 
-    - name: 'Prepare | generate test CA certificate'
+    - name: 'Prepare | cmd | generate test CA certificate'
       ansible.builtin.command:
         argv:
           - 'openssl'
@@ -49,32 +55,32 @@
           - '-subj'
           - '/C=US/ST=NY/L=NY/O=test/CN=test.example.com'
           - '-key'
-          - '{{ _test_cache }}/ca-key.pem'
+          - '{{ vsftpd__test_cache ~ "/ca-key.pem" }}'
           - '-out'
-          - '{{ _test_cache }}/ca.pem'
-        creates: '{{ _test_cache }}/ca.pem'
+          - '{{ vsftpd__test_cache ~ "/ca.pem" }}'
+        creates: '{{ vsftpd__test_cache ~ "/ca.pem" }}'
 
-    - name: 'Prepare | generate test DSA parameters'
+    - name: 'Prepare | cmd | generate test DSA parameters'
       ansible.builtin.command:
         argv:
           - 'openssl'
           - 'dsaparam'
           - '-out'
-          - '{{ _test_cache }}/dsaparam.pem'
+          - '{{ vsftpd__test_cache ~ "/dsaparam.pem" }}'
           - '2048'
-        creates: '{{ _test_cache }}/dsaparam.pem'
+        creates: '{{ vsftpd__test_cache ~ "/dsaparam.pem" }}'
 
-    - name: 'Prepare | generate test DSA key'
+    - name: 'Prepare | cmd | generate test DSA key'
       ansible.builtin.command:
         argv:
           - 'openssl'
           - 'gendsa'
           - '-out'
-          - '{{ _test_cache }}/dsakey.pem'
-          - '{{ _test_cache }}/dsaparam.pem'
-        creates: '{{ _test_cache }}/dsakey.pem'
+          - '{{ vsftpd__test_cache ~ "/dsakey.pem" }}'
+          - '{{ vsftpd__test_cache ~ "/dsaparam.pem" }}'
+        creates: '{{ vsftpd__test_cache ~ "/dsakey.pem" }}'
 
-    - name: 'Prepare | generate test DSA certificate request'
+    - name: 'Prepare | cmd | generate test DSA certificate request'
       ansible.builtin.command:
         argv:
           - 'openssl'
@@ -83,55 +89,61 @@
           - '-subj'
           - '/C=US/ST=NY/L=NY/O=test/CN=test.example.com'
           - '-key'
-          - '{{ _test_cache }}/dsakey.pem'
+          - '{{ vsftpd__test_cache ~ "/dsakey.pem" }}'
           - '-out'
-          - '{{ _test_cache }}/dsa-req.pem'
-        creates: '{{ _test_cache }}/dsa-req.pem'
+          - '{{ vsftpd__test_cache ~ "/dsa-req.pem" }}'
+        creates: '{{ vsftpd__test_cache ~ "/dsa-req.pem" }}'
 
-    - name: 'Prepare | sign test DSA certificate request'
+    - name: 'Prepare | cmd | sign test DSA certificate request'
       ansible.builtin.command:
         argv:
           - 'openssl'
           - 'x509'
           - '-req'
           - '-in'
-          - '{{ _test_cache }}/dsa-req.pem'
+          - '{{ vsftpd__test_cache ~ "/dsa-req.pem" }}'
           - '-signkey'
-          - '{{ _test_cache }}/ca-key.pem'
+          - '{{ vsftpd__test_cache ~ "/ca-key.pem" }}'
           - '-out'
-          - '{{ _test_cache }}/dsa.cert'
-        creates: '{{ _test_cache }}/dsa.cert'
+          - '{{ vsftpd__test_cache ~ "/dsa.cert" }}'
+        creates: '{{ vsftpd__test_cache ~ "/dsa.cert" }}'
 
 - name: 'Prepare'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Prepare | generate cache location'
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: 'Prepare | fact | generate cache location'
       ansible.builtin.set_fact:
-        _test_cache:
+        vsftpd__test_cache:
           '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache'
 
     - name:
-        'Prepare | add ssl-cert package for snakeoil certificates'
+        'Prepare | inject | add ssl-cert package for snakeoil certificates'
       ansible.builtin.apt:
         name: 'ssl-cert'
         state: 'present'
 
-    - name: 'Prepare | sign test DSA certificate request'
+    - name: 'Prepare | cmd | sign test DSA certificate request'
       ansible.builtin.command:
         argv:
           - 'make-ssl-cert'
           - 'generate-default-snakeoil'
         creates: '/etc/ssl/private/ssl-cert-snakeoil.key'
 
-    - name: 'Prepare | stage ssl-cert-snakeoil.key'
+    - name: 'Prepare | fetch | ssl-cert-snakeoil.key'
       ansible.builtin.fetch:
         src: '/etc/ssl/private/ssl-cert-snakeoil.key'
-        dest: '{{ _test_cache }}/'
+        dest: '{{ vsftpd__test_cache }}/'
         flat: true
 
-    - name: 'Prepare | stage ssl-cert-snakeoil.pem'
+    - name: 'Prepare | fetch | ssl-cert-snakeoil.pem'
       ansible.builtin.fetch:
         src: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
-        dest: '{{ _test_cache }}/'
+        dest: '{{ vsftpd__test_cache }}/'
         flat: true

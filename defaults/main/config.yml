@@ -102,30 +102,6 @@ vsftpd_cfg_async_abor_enable: false
 # Default: False.
 vsftpd_cfg_background: false
 
-# Banned e-mails list.
-#
-# Requires vsftpd_cfg_deny_email_enable=true.
-#
-# List of email addresses (anonymous logins using email as passwords) which
-# are not permitted. Automatically sets
-# banned_email_file=/etc/vsftpd.d/banned_email.
-#
-# vsftpd_cfg_banned_emails:
-#   - 'user1@example.com'
-#   - 'user2@example.com'
-#
-# Default: [].
-vsftpd_cfg_banned_emails: []
-
-# Login banner.
-#
-# Text to display when someone connects to the server. If set, it overrides the
-# banner string provided by the vsftpd_cfg_ftpd_banner option. Automatically
-# sets banner_file=/etc/vsftpd.d/banner_file.
-#
-# Default: ''.
-vsftpd_cfg_banner: ''
-
 # Load CA certs from specified file.
 #
 # Name of a file to load Certificate Authority certs from, for the purpose of
@@ -134,11 +110,8 @@ vsftpd_cfg_banner: ''
 # default SSL CA cert paths are not used, because of vsftpd's use of restricted
 # filesystem spaces (chroot).
 #
-# Sourced from ansible controller; automatically placed in
-# vsftpd_role_service_dir/ca.cert with correct permissions. VSFTPd will be
-# automatically configured to use the installed location.
-#
-# vsftpd_cfg_ca_certs_file: 'host_vars/ftp.example.com/data/ca.cert'
+# Place certs using vsftpd_srv_secure_d and reference them here using
+# /etc/vsftpd.d/secure.d/{FILE}
 #
 # Default: '' (disabled).
 vsftpd_cfg_ca_certs_file: ''
@@ -146,7 +119,7 @@ vsftpd_cfg_ca_certs_file: ''
 # Enable valid shell checking?
 #
 # Note! This option only has an effect for non-PAM builds of vsftpd. If
-#  disabled, vsftpd will not check /etc/shells for a valid user shell for local
+# disabled, vsftpd will not check /etc/shells for a valid user shell for local
 # logins.
 #
 # Default: True.
@@ -177,7 +150,7 @@ vsftpd_cfg_chown_uploads: false
 # Default: 'root'.
 vsftpd_cfg_chown_username: 'root'
 
-# Enable chroot'ing users listed in vsftpd_cfg_chroot_list?
+# Enable chroot'ing users listed in vsftpd_srv_chroot_list?
 #
 # If activated, you may provide a list of local users who are placed in a
 # chroot() jail in their home directory upon login.
@@ -188,20 +161,6 @@ vsftpd_cfg_chown_username: 'root'
 #
 # Default: False.
 vsftpd_cfg_chroot_list_enable: false
-
-# Local user chroot list file.
-#
-# Requires vsftpd_cfg_chroot_list_enable=true.
-#
-# List of local users which will be placed in a chroot() jail in their home
-# directory.
-#
-# Special Case:
-#   * vsftpd_cfg_chroot_local_user=true - list file becomes a list of users
-#     to NOT place in a chroot() jail.
-#
-# Default: [].
-vsftpd_cfg_chroot_list: []
 
 # Enable local user chroot'ing to home directory?
 #
@@ -270,8 +229,8 @@ vsftpd_cfg_delete_failed_uploads: false
 
 # Enable anonymous password login denial e-email responses?
 #
-# If activated, you may provide a list of anonymous password e-mail responses
-# in vsftpd_cfg_banned_emails which cause login to be denied.
+# If activated, provide a list of anonymous password e-mail responses in
+# vsftpd_srv_banned_emails which cause login to be denied.
 #
 # Default: False.
 vsftpd_cfg_deny_email_enable: false
@@ -370,14 +329,6 @@ vsftpd_cfg_download_file: []
 
 # DSA certificate file for SSL connections.
 #
-# Load DSA certificate from specified file.
-#
-# Sourced from ansible controller; automatically placed in
-# vsftpd_role_service_dir/dsa.cert with correct permissions. VSFTPd will be
-# automatically configured to use the installed location.
-#
-# vsftpd_cfg_dsa_cert_file: 'host_vars/ftp.example.com/data/dsa.cert'
-#
 # Security: CVE-2024-6387
 #   CVE: https://nvd.nist.gov/vuln/detail/cve-2024-6387
 #   Decision: leave for legacy FTP sites - DSA keys are considered insecure and
@@ -386,19 +337,13 @@ vsftpd_cfg_download_file: []
 #   Reference:
 #   * https://www.openssh.com/txt/release-9.8
 #
+# Place certs using vsftpd_srv_secure_d and reference them here using
+# /etc/vsftpd.d/secure.d/{FILE}
+#
 # Default: '' (disabled).
 vsftpd_cfg_dsa_cert_file: ''
 
 # DSA private key file for SSL connections.
-#
-# This option specifies the location of the DSA private key to use for SSL
-# encrypted connections.
-#
-# Sourced from ansible controller; automatically placed in
-# vsftpd_role_service_dir/dsa.key with correct permissions. VSFTPd will be
-# automatically configured to use the installed location.
-#
-# vsftpd_cfg_dsa_private_key_file: 'host_vars/ftp.example.com/data/dsa.key'
 #
 # Security: CVE-2024-6387
 #   CVE: https://nvd.nist.gov/vuln/detail/cve-2024-6387
@@ -407,6 +352,9 @@ vsftpd_cfg_dsa_cert_file: ''
 #   Mitigation: Use vsftpd_cfg_rsa_private_key_file.
 #   Reference:
 #   * https://www.openssh.com/txt/release-9.8
+#
+# Place certs using vsftpd_srv_secure_d and reference them here using
+# /etc/vsftpd.d/secure.d/{FILE}
 #
 # Default: '' (disabled).
 vsftpd_cfg_dsa_private_key_file: ''
@@ -419,15 +367,6 @@ vsftpd_cfg_dsa_private_key_file: ''
 #
 # Default: False.
 vsftpd_cfg_dual_log_enable: false
-
-# List of email passwords.
-#
-# Requires vsftpd_cfg_secure_email_list_enable=true.
-#
-# Automatically sets email_password_file=/etc/vsftpd.d/email_passwords.
-#
-# Default: [].
-vsftpd_cfg_email_passwords: []
 
 # Permissions with which uploaded files are created.
 #
@@ -838,33 +777,19 @@ vsftpd_cfg_require_ssl_reuse: true
 
 # RSA certificate file for SSL connections.
 #
-# Sourced from ansible controller; automatically placed in
-# vsftpd_role_service_dir/rsa.pem with correct permissions. VSFTPd will be
-# automatically configured to use the installed location.
+# Place certs using vsftpd_srv_secure_d and reference them here using
+# /etc/vsftpd.d/secure.d/{FILE}
 #
-# Values:
-#   '': Use debian snakeoil certificate at /etc/ssl/certs/ssl-cert-snakeoil.pem
-#       (default).
-#
-# vsftpd_cfg_rsa_cert_file: 'host_vars/ftp.example.com/data/rsa.pem'
-#
-# Default: '' (use snakeoil).
-vsftpd_cfg_rsa_cert_file: ''
+# Default: '/etc/ssl/certs/ssl-cert-snakeoil.pem' (use snakeoil).
+vsftpd_cfg_rsa_cert_file: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
 
 # RSA private key file for SSL connections.
 #
-# Sourced from ansible controller; automatically placed in
-# vsftpd_role_service_dir/rsa.key with correct permissions. VSFTPd will be
-# automatically configured to use the installed location.
+# Place certs using vsftpd_srv_secure_d and reference them here using
+# /etc/vsftpd.d/secure.d/{FILE}
 #
-# Values:
-#   '': Use debian snakeoil certificate at
-#       /etc/ssl/private/ssl-cert-snakeoil.key (default).
-#
-# vsftpd_cfg_rsa_private_key_file: 'host_vars/ftp.example.com/data/rsa.key'
-#
-# Default: '' (use snakeoil).
-vsftpd_cfg_rsa_private_key_file: ''
+# Default: '/etc/ssl/private/ssl-cert-snakeoil.key' (use snakeoil).
+vsftpd_cfg_rsa_private_key_file: '/etc/ssl/private/ssl-cert-snakeoil.key'
 
 # Enable vsftpd to run as the user which launched vsftpd?
 #
@@ -901,7 +826,7 @@ vsftpd_cfg_secure_chroot_dir: '/var/run/vsftpd/empty'
 # Useful as a low-hassle way of restricting access to low-security content
 # without needing virtual users. When enabled, anonymous logins are prevented
 # unless the password provided is listed in the file specified by the
-# vsftp_email_password_file setting. The file format is one password per line,
+# vsftpd_email_password_file setting. The file format is one password per line,
 # no extra whitespace. The default filename is /etc/vsftpd.d/email_passwords.
 #
 # Default: False.
@@ -936,8 +861,10 @@ vsftpd_cfg_setproctitle_enable: false
 # malicious remote parties forcing a cipher which they have found problems
 # with.
 #
-# Default: 'DES-CBC3-SHA'.
-vsftpd_cfg_ssl_ciphers: 'DES-CBC3-SHA'
+# Default:
+#   - 'DES-CBC3-SHA'.
+vsftpd_cfg_ssl_ciphers:
+  - 'DES-CBC3-SHA'
 
 # Enable secure connections via SSL?
 #
@@ -1099,33 +1026,6 @@ vsftpd_cfg_use_localtime: true
 # Default: True.
 vsftpd_cfg_use_sendfile: true
 
-# Directory containing per-user VSFTPd config overrides.
-#
-# These are static VSFTPd per-user config files. See 'man vsftpd.conf 5'.
-#
-# This powerful option allows the override of any config option specified in
-# the manual page, on a per-user basis. Usage is simple, and is best
-# illustrated with an example. If you set vsftpd_cfg_user_config_dir to be
-# /etc/vsftpd.d/user_conf and then log on as the user "chris", then vsftpd will
-# apply the settings in the file /etc/vsftpd.d/user_conf/chris for the duration
-# of the session.
-#
-# PLEASE NOTE that not all settings are effective on a per-user basis. For
-# example, many settings only prior to the user's session being started.
-# Examples of settings which will not affect any behavior on a per-user basis
-# include vsftpd_cfg_listen_address, vsftpd_cfg_banner_file,
-# vsftpd_cfg_max_per_ip, vsftpd_cfg_max_clients,
-# vsftpd_cfg_xferlog_file, etc.
-#
-# Sourced from ansible controller; automatically placed in
-# vsftpd_role_service_dir/user_config with correct permissions. VSFTPd will be
-# automatically configured to use the installed location.
-#
-# vsftpd_cfg_user_config_dir: 'host_vars/ftp.example.com/user_config'
-#
-# Default: '' (disabled).
-vsftpd_cfg_user_config_dir: ''
-
 # Automatically generate virtual user home directory.
 #
 # This option is useful is conjunction with virtual users. It is used to
@@ -1141,10 +1041,10 @@ vsftpd_cfg_user_sub_token: ''
 
 # Enable use of denial user list?
 #
-# Requires vsftpd_cfg_userlist_enable=true.
+# Requires vsftpd_srv_userlist_enable=true.
 #
 # Denial is issued before the user is asked for a password. User list is read
-# from vsftpd_cfg_userlist.
+# from vsftpd_srv_userlist.
 #
 # Values:
 #    True: Users allowed login unless explicitly listed (list denies access).
@@ -1155,21 +1055,15 @@ vsftpd_cfg_userlist_deny: true
 
 # Enable loading of username list from vsftpd_cfg_userlist?
 #
-# Load a list of usernames from vsftpd_cfg_userlist. If a user tries to
+# Requires vsftpd_srv_userlist_enable=true.
+#
+# Load a list of usernames from vsftpd_srv_userlist. If a user tries to
 # log in using a name in this file, they will be denied before they are asked
 # for a password. This may be useful in preventing cleartext passwords being
 # transmitted. See also vsftpd_cfg_userlist_deny.
 #
 # Default: False.
 vsftpd_cfg_userlist_enable: false
-
-# Username list.
-#
-# Requires vsftpd_cfg_userlist_enable=true. Automatically sets
-# userlist_file=/etc/vsftpd.d/user_list.
-#
-# Default: [].
-vsftpd_cfg_userlist: []
 
 # Enable SSL client certificate validation?
 #

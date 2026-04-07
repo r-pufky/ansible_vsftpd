@@ -1,56 +1,76 @@
 ---
 ###############################################################################
-# Default VSFTPd Role Options
+# VSFTPd Role Options
 ###############################################################################
 #
 # Updates:
-# * New MAJOR, MINOR releases should hard branch at version before starting
-#   (e.g. 3.0.x branch).
-# * Debian OS version is irrelevant (tied to APT package version).
-# * Keep a separate change log as changes are made, you will not remember all
-#   of them.
-# * Use debian docs to validate package/process changes. Reference source docs
-#   if needed.
-# * Update role defaults (includes updating defaults, tasks):
-#   * Use configuration docs to add new variables.
-#   * Use defaults/ to remove any changed/deprecated variables.
+# * KEEP a separate change log as changes are made.
+# * Use bare-metal docs to validate package/process changes.
+# * Update defaults.
 # * Update tests for any changes.
-# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
-# * Tag with MAJOR.MINOR.PATCH[ROLE] version, with PATCH representing role
-#   change - e.g. Debian: 3.0.3 -> Role: 3.0.301  (01 role release).
+# * Standard validation testing (yamllint, ansible-lint, to-do, no-qa).
 #
 # Reference:
 # * https://manpages.debian.org/trixie/vsftpd/vsftpd.conf.5.en.html
 # * https://security.appspot.com/vsftpd.html
 
-# Last time VSFTPd options were validated against a default configuration.
-vsftpd_role_validate_date: '2025-08-25'
-vsftpd_role_validate_release: 'trixie'
-vsftpd_role_validate_version: '3.0.5-0.2'
+vsftpd___release: "{{ {} | r_pufky.data.v3(
 
-vsftpd_role_service_dir: '/etc/vsftpd.d'
-vsftpd_role_pam_dir: '/etc/pam.d'
+
+    _date='2026-04-05',
+    _debian='trixie',
+    _app='3.0.5-0.2',
+  ) }}"
+
+vsftpd___service_dir: '/etc/vsftpd.d'
+vsftpd___pam_dir: '/etc/pam.d'
 
 ###############################################################################
 # APT Packages
 ###############################################################################
 
-vsftpd_role_packages:
+vsftpd___packages:
   - 'vsftpd'
+  - 'ssl-cert'  # CA certificates.
 
-vsftpd_role_virtual_user_packages:
+vsftpd___virtual_user_packages:
   - 'python3-passlib'  # md5_crypt for community.general.htpasswd.
   - 'libpam-pwdfile'  # pam_pwdfile.so for virtual_users.
+
+###############################################################################
+# VSFTPd
+###############################################################################
+
+vsftpd___app: "{{ {} | r_pufky.data.v3(
+
+    _cfg='/etc/vsftpd.conf',
+    _etc_d='/etc/vsftpd.d',
+    _virtual_users='/etc/vsftpd.d/virtual_users',
+    _banned_emails='/etc/vsftpd.d/banned_emails',
+    _banner='/etc/vsftpd.d/banner',
+    _chroot_list='/etc/vsftpd.d/chroot_list',
+    _email_passwords='/etc/vsftpd.d/email_passwords',
+    _user_list='/etc/vsftpd.d/user_list',
+
+    _secure_d='/etc/vsftpd.d/secure.d',
+    _user_d='/etc/vsftpd.d/user.d',
+    _pam_d='/etc/pam.d',
+    _virtual_pam='/etc/pam.d/vsftpd_virtual',
+
+    _log='/var/log/vsftpd.log',
+    _xfer_log='/var/log/xferlog',
+    _drop_in='/etc/systemd/system/vsftpd.service.d/override.conf',
+  ) }}"
 
 ###############################################################################
 # Default User/Group
 ###############################################################################
 
-vsftpd_role_group:
+vsftpd___group:
   name: 'ftp'
   gid: 666
 
-vsftpd_role_user:
+vsftpd___user:
   name: 'ftp'
   group: 'ftp'
   uid: 666
