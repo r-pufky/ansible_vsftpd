@@ -5,6 +5,7 @@ VSFTPd service configuration.
 Requires [r_pufky.srv][g] galaxy-ng collection. See
 [additional documentation][m] and [reference documentation][n] for
 troubleshooting and config variables.
+
 Install size: ~360KB
 
 > Tasks [potentially touching Network Mounted Filesystems][o] will be run as
@@ -21,6 +22,12 @@ Detailed variable use documented in defaults. See usage for role operation.
 * [ports][k] - Ports are **not** managed (defined for external use).
 
 ## Usage
+
+  Path                  | Usage
+ -----------------------|-------
+ /etc/vsftpd.d          | Role managed files deployed here.
+ /etc/vsftpd.d/user.d   | Controller sourced user files deployed here.
+ /var/vsftpd.d/secure.d | Controller sourced user secure files (certs, etc.) deployed here.
 
 ### Feature Flags
 Tasks are gated by feature flags and executed in the following order.
