@@ -32,10 +32,10 @@ Detailed variable use documented in defaults. See usage for role operation.
 ### Feature Flags
 Tasks are gated by feature flags and executed in the following order.
 
-  Step | Flag                | Notes
- ------|---------------------|-------
-  1    | forgejo_flg_install | Install required packages, users, etc.
-  2    | vsftpd_flg_harden   | Harden service.
+  Step | Flag               | Notes
+ ------|--------------------|-------
+  1    | vsftpd_flg_install | Install required packages, users, etc.
+  2    | vsftpd_flg_harden  | Harden service.
 
 ### Example Playbooks
 Read through defaults and [additional documentation][m] before proceeding.
