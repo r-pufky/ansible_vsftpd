@@ -52,10 +52,16 @@ vsftpd_srv_group: 'ftp'
 
 # Secure configuration to set.
 #
-# Ansible controller path to source secure files (treated as a jinja2 templates
-# allowing for ansible variable interpretation). Overwrites existing
-# config data in /etc/vsftpd.d/secure.conf.d/* with 0750:0640 root:root. Files
-# not sourced will be removed. Certificates, keys, etc. should be stored here.
+# Ansible controller path to source directory (treated as a jinja2 templates
+# allowing for ansible variable use).
+#
+# Sets data in /etc/vsftpd.d/secure.conf.d/* with 0750:0640 root:root
+# permissions. Secure material such as certs should be included here and
+# sourced from config files. Files not sourced will be removed.
+#
+# vsftpd_srv_secure_d='' - Remove existing files.
+# vsftpd_srv_secure_d='{DIR}' - Replace existing files with sourced template
+#     dir.
 #
 # vsftpd_srv_secure_d: 'host_vars/ftp.example.com/secure.conf.d'
 #
@@ -74,9 +80,8 @@ vsftpd_srv_secure_d: ''
 #
 #   vsftpd_srv_home_mode: '0550'
 #
-# Ensure vsftpd_srv_local_root_recursive,
-# vsftpd_srv_anon_root_recursive_enable are not plowing directory
-# permissions.
+# Ensure vsftpd_srv_local_root_recursive, vsftpd_srv_anon_root_recursive are
+# not plowing directory permissions.
 #
 # Default: '0755'.
 #
@@ -181,7 +186,7 @@ vsftpd_srv_anon_root_mode: '0770'
 # affected. Disabling will only set the root directory.
 #
 # Default: True.
-vsftpd_srv_anon_root_recursive_enable: true
+vsftpd_srv_anon_root_recursive: true
 
 ###############################################################################
 # Config
@@ -203,8 +208,7 @@ vsftpd_srv_anon_root_recursive_enable: true
 # Check your configuration and set the backing user home directory read-only.
 # See vsftpd_srv_local_root_mode, vsftpd_srv_anon_root_mode, and
 # vsftpd_srv_home_mode. Ensure vsftpd_srv_local_root_recursive,
-# vsftpd_srv_anon_root_recursive_enable are not plowing directory
-# permissions.
+# vsftpd_srv_anon_root_recursive are not plowing directory permissions.
 #
 # Special Case:
 #   * Forces vsftpd_cfg_guest_enable=true.
@@ -278,9 +282,10 @@ vsftpd_srv_userlist: []
 
 # VSFTPd per user session overrides.
 #
-# Ansible controller path to source user session override files (treated as a
-# jinja2 templates allowing for ansible variable interpretation). Overwrites
-# existing config data in /etc/vsftpd.d/user.d/* with 0750:0640 root:root.
+# Ansible controller path to source directory (treated as a jinja2 templates
+# allowing for ansible variable use).
+#
+# Sets data in /etc/vsftpd.d/user.d/* with 0750:0640 root:root permissions.
 # Files not sourced will be removed.
 #
 # These are static VSFTPd per-user config files. See 'man vsftpd.conf 5'.
@@ -294,6 +299,9 @@ vsftpd_srv_userlist: []
 # vsftpd_cfg_max_clients, vsftpd_cfg_xferlog_file, etc.
 #
 # VSFTPd will be automatically configured to use the installed location.
+#
+# vsftpd_srv_user_d='' - Remove existing files.
+# vsftpd_srv_user_d='{DIR}' - Replace existing files with sourced template dir.
 #
 # vsftpd_srv_user_d: 'host_vars/ftp.example.com/user.d'
 #

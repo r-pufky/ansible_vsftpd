@@ -50,7 +50,7 @@
         _anon_root_user=vsftpd_srv_anon_root_user,
         _anon_root_group=vsftpd_srv_anon_root_group,
         _anon_root_mode=vsftpd_srv_anon_root_mode,
-        _anon_root_recursive=vsftpd_srv_anon_root_recursive_enable,
+        _anon_root_recursive=vsftpd_srv_anon_root_recursive,
 
         _banned_emails=vsftpd_srv_banned_emails,
         _banner=vsftpd_srv_banner,

@@ -83,6 +83,21 @@
           map('regex_replace', '^', vsftpd___app._secure_d ~ "/") | list
         )
 
+- name: '{{ "Config | filesystem | query " ~ vsftpd___app._secure_d }}'
+  when: vsftpd__srv._secure_d | length == 0
+  ansible.builtin.find:
+    paths: "{{ vsftpd___app._secure_d }}"
+    recurse: false  # Don't need to enumerate sub-directories to remove.
+    hidden: true
+  register: vsftpd__cmd
+
+- name: '{{ "Config | filesystem | clear " ~ vsftpd___app._secure_d }}'
+  when: vsftpd__srv._secure_d | length == 0
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ vsftpd__cmd.files }}"
+
 - name: '{{ "Config | filesystem | set " ~ vsftpd___app._user_d }}'
   when: vsftpd__srv._secure_d | length > 0
   block:
@@ -132,6 +147,21 @@
           map(attribute='path') |
           map('regex_replace', '^', vsftpd___app._user_d ~ "/") | list
         )
+
+- name: '{{ "Config | filesystem | query " ~ vsftpd___app._user_d }}'
+  when: vsftpd__srv._user_d | length == 0
+  ansible.builtin.find:
+    paths: "{{ vsftpd___app._user_d }}"
+    recurse: false  # Don't need to enumerate sub-directories to remove.
+    hidden: true
+  register: vsftpd__cmd
+
+- name: '{{ "Config | filesystem | clear " ~ vsftpd___app._user_d }}'
+  when: vsftpd__srv._user_d | length == 0
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ vsftpd__cmd.files }}"
 
 - name: '{{ "Config | filesystem | set " ~ vsftpd___app._cfg }}'
   ansible.builtin.template:
@@ -240,20 +270,20 @@
 - name: 'Config | filesystem | set local user login root directory'
   when: vsftpd__cfg._local_root | length > 0
   block:
-    - name: '{{ "Install | filesystem | set " ~ vsftpd__cfg._local_root }}'
+    - name: '{{ "Config | filesystem | set " ~ vsftpd__cfg._local_root }}'
       ansible.builtin.file:
         path: '{{ vsftpd__cfg._local_root }}'
-        owner: '{{ vsftpd__srv._local_root_uid }}'
-        group: '{{ vsftpd__srv._local_root_gid }}'
+        owner: '{{ vsftpd__cfg._local_root_uid }}'
+        group: '{{ vsftpd__cfg._local_root_gid }}'
         mode: '{{ vsftpd__srv._local_root_mode }}'
         recurse: '{{ vsftpd__srv._local_root_recursive }}'
         state: 'directory'
   rescue:
-    - name: '{{ "Install ⛑ | filesystem | set " ~ vsftpd__cfg._local_root }}'
+    - name: '{{ "Config ⛑ | filesystem | set " ~ vsftpd__cfg._local_root }}'
       ansible.builtin.file:
         path: '{{ vsftpd__cfg._local_root }}'
-        owner: '{{ vsftpd__srv._local_root_uid }}'
-        group: '{{ vsftpd__srv._local_root_gid }}'
+        owner: '{{ vsftpd__cfg._local_root_uid }}'
+        group: '{{ vsftpd__cfg._local_root_gid }}'
         mode: '{{ vsftpd__srv._local_root_mode }}'
         recurse: '{{ vsftpd__srv._local_root_recursive }}'
         state: 'directory'
@@ -263,20 +293,20 @@
 - name: 'Config | filesystem | set anon user login root directory'
   when: vsftpd__cfg._anon_root | length > 0
   block:
-    - name: '{{ "Install | filesystem | set " ~ vsftpd__cfg._anon_root }}'
+    - name: '{{ "Config | filesystem | set " ~ vsftpd__cfg._anon_root }}'
       ansible.builtin.file:
         path: '{{ vsftpd__cfg._anon_root }}'
-        owner: '{{ vsftpd__srv._anon_root_uid }}'
-        group: '{{ vsftpd__srv._anon_root_gid }}'
+        owner: '{{ vsftpd__cfg._anon_root_uid }}'
+        group: '{{ vsftpd__cfg._anon_root_gid }}'
         mode: '{{ vsftpd__srv._anon_root_mode }}'
         recurse: '{{ vsftpd__srv._anon_root_recursive }}'
         state: 'directory'
   rescue:
-    - name: '{{ "Install ⛑ | filesystem | set " ~ vsftpd__cfg._anon_root }}'
+    - name: '{{ "Config ⛑ | filesystem | set " ~ vsftpd__cfg._anon_root }}'
       ansible.builtin.file:
         path: '{{ vsftpd__cfg._anon_root }}'
-        owner: '{{ vsftpd__srv._anon_root_uid }}'
-        group: '{{ vsftpd__srv._anon_root_gid }}'
+        owner: '{{ vsftpd__cfg._anon_root_uid }}'
+        group: '{{ vsftpd__cfg._anon_root_gid }}'
         mode: '{{ vsftpd__srv._anon_root_mode }}'
         recurse: '{{ vsftpd__srv._anon_root_recursive }}'
         state: 'directory'

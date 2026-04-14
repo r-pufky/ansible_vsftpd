@@ -23,11 +23,11 @@ Detailed variable use documented in defaults. See usage for role operation.
 
 ## Usage
 
-  Path                  | Usage
- -----------------------|-------
- /etc/vsftpd.d          | Role managed files deployed here.
- /etc/vsftpd.d/user.d   | Controller sourced user files deployed here.
- /var/vsftpd.d/secure.d | Controller sourced user secure files (certs, etc.) deployed here.
+  Path                   | Usage
+ ------------------------|-------
+  /etc/vsftpd.d          | Role managed files deployed here.
+  /etc/vsftpd.d/user.d   | Controller sourced user files deployed here.
+  /var/vsftpd.d/secure.d | Controller sourced user secure files (certs, etc.) deployed here.
 
 ### Feature Flags
 Tasks are gated by feature flags and executed in the following order.
@@ -109,8 +109,7 @@ result in:
 Check your configuration and set the backing user home directory read-only.
 See `vsftpd_srv_local_root_mode`, `vsftpd_srv_anon_root_mode`, and
 `vsftpd_srv_home_mode`. Ensure `vsftpd_srv_local_root_recursive`,
-`vsftpd_srv_anon_root_recursive_enable` are not plowing directory
-permissions.
+`vsftpd_srv_anon_root_recursive` are not plowing directory permissions.
 
 Typically `0550` permissions resolve.
 
