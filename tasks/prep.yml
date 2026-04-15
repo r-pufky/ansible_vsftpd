@@ -325,9 +325,9 @@
             _home=vsftpd__cfg_query.home,
           ) }}"
 
-    - name: '{{ "Install | filesystem | set " ~ vsftpd__cfg._home }}'
+    - name: '{{ "Prep | filesystem | set " ~ vsftpd__cfg._home }}'
       block:
-        - name: '{{ "Install | filesystem | set " ~ vsftpd__cfg._home }}'
+        - name: '{{ "Prep | filesystem | set " ~ vsftpd__cfg._home }}'
           ansible.builtin.file:
             path: '{{ vsftpd__cfg._home }}'
             owner: '{{ vsftpd__srv._user }}'
@@ -335,7 +335,7 @@
             mode: '{{ vsftpd__srv._home_mode }}'
             state: 'directory'
       rescue:
-        - name: '{{ "Install ⛑ | filesystem | set " ~vsftpd__cfg._home }}'
+        - name: '{{ "Prep ⛑ | filesystem | set " ~vsftpd__cfg._home }}'
           ansible.builtin.file:
             path: '{{ vsftpd__cfg._home }}'
             owner: '{{ vsftpd__srv._user }}'
