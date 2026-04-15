@@ -1,6 +1,6 @@
 [Service]
 ExecStartPre=
-ExecStartPre=-/bin/mkdir -p {{ vsftpd_cfg_secure_chroot_dir }}
+ExecStartPre=-/bin/mkdir -p {{ vsftpd__cfg._secure_chroot_dir }}
 
 PrivateTmp=true
 ProtectSystem=strict

@@ -173,14 +173,14 @@
 
 - name: 'Config | filesystem | touch logs'
   ansible.builtin.file:
-    path: '{{ vsftpd__cfg._log }}'
+    path: '{{ item }}'
     owner: 'root'
     group: 'root'
     mode: '0644'
     state: 'touch'
   loop:
-    - '{{ vsftpd__cfg._log }}'
-    - '{{ vsftpd__cfg._xfer_log }}'
+    - '{{ vsftpd___app._log }}'
+    - '{{ vsftpd___app._xfer_log }}'
 
 - name: '{{ "Config | filesystem | set " ~ vsftpd___app._banner }}'
   when: vsftpd__srv._banner | length > 0

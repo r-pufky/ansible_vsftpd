@@ -58,7 +58,7 @@
         _email_passwords=vsftpd_srv_email_passwords,
         _userlist=vsftpd_srv_userlist,
       ) }}"
-    vsftpd__cfg: "{{ vsftpd___app | r_pufky.data.v3(
+    vsftpd__cfg: "{{ {} | r_pufky.data.v3(
 
         _accept_timeout=vsftpd_cfg_accept_timeout,
         _allow_anon_ssl='YES' if vsftpd_cfg_allow_anon_ssl else 'NO',
@@ -335,7 +335,7 @@
             mode: '{{ vsftpd__srv._home_mode }}'
             state: 'directory'
       rescue:
-        - name: '{{ "Prep ⛑ | filesystem | set " ~vsftpd__cfg._home }}'
+        - name: '{{ "Prep ⛑ | filesystem | set " ~ vsftpd__cfg._home }}'
           ansible.builtin.file:
             path: '{{ vsftpd__cfg._home }}'
             owner: '{{ vsftpd__srv._user }}'
